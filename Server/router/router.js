@@ -9,10 +9,6 @@ router.get("/presentation", presentationManager.getPres); //@TODO change to put 
 router.get("/search", presentationManager.search); //@TODO change to put -> get requests arent supposed to have a body
 router.delete("/presentation", presentationManager.deletePres);
 
-
-//do i need an endpoint for this
-router.put("/presentation", presentationManager.editPres);
-
 //User store routes
 router.put("/login", userStore.login);
 router.put("/addPresToUser", userStore.addPresToUser);
