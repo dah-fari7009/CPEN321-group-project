@@ -1,10 +1,16 @@
 package com.example.eloquent;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,8 +31,7 @@ public class AddPres extends AppCompatActivity {
     private Calendar calendar;
     private String todaysDate;
     private String currentTime;
-    private Button preparationBut;
-    private Button presentingBut;
+    private Button importButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,24 +46,6 @@ public class AddPres extends AppCompatActivity {
 
         presTitle = findViewById(R.id.presTitle);
         presDescription = findViewById(R.id.presDescription);
-
-        preparationBut = findViewById(R.id.preparation);
-        preparationBut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent preparationIntent = new Intent(AddPres.this, Preparation.class);
-                startActivity(preparationIntent);
-            }
-        });
-
-        presentingBut = findViewById(R.id.presenting);
-        presentingBut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent presentingIntent = new Intent(AddPres.this, Presenting.class);
-                startActivity(presentingIntent);
-            }
-        });
 
         presTitle.addTextChangedListener(new TextWatcher() {
             @Override
@@ -85,6 +72,20 @@ public class AddPres extends AppCompatActivity {
         currentTime = pad(calendar.get(Calendar.HOUR)) + ":" + pad(calendar.get(Calendar.MINUTE));
     }
 
+    ActivityResultLauncher<Intent> sActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if(result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        Uri uri = data.getData();
+                    }
+                }
+            }
+
+    );
+
     // if the hour or minute is less than 10, add 0 before it
     private String pad(int i) {
         if(i < 10) {
@@ -109,5 +110,16 @@ public class AddPres extends AppCompatActivity {
             Toast.makeText(this, "Save btt is clicked", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public void openFileDialog(View view) {
+        Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        data.addCategory(Intent.CATEGORY_OPENABLE);
+        data.setType("*/*");
+        String[] mimeTypes = {"text/*"};
+        data.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        data = Intent.createChooser(data, "choose a file");
+        sActivityResultLauncher.launch(data);
     }
 }
