@@ -20,13 +20,13 @@ const Presentation = new Schema(
             },
             back: {
                 backgroundColor: { type: Number, required: true },
-                content: {
+                content: [{
                     font: { type: String, required: true },
                     style: { type: String, required: true },
                     size: { type: Number, required: true },
                     colour: { type: Number, required: true },
                     message: { type: String, required: true },
-                }
+                }]
             }
         }],
         feedback: [{ 
