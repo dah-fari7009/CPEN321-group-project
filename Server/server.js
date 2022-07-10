@@ -9,6 +9,7 @@ const port = 8081;
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(express.text({ type: "text/plain"}));
 app.use('/api', router);
 
 app.get("/", (req, res) => {
