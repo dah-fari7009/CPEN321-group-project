@@ -2,9 +2,9 @@ package com.example.eloquent;
 
 public class Cards {
 
-    private Front front;
-    private Back back;
-    private int background_colour;
+    public Front front;
+    public Back back;
+    public int background_colour;
 
     public Cards(Front front, Back back, int background_colour) {
         this.front = front;
@@ -22,5 +22,17 @@ public class Cards {
 
     public int getBackground_color() {
         return background_colour;
+    }
+
+    public void setFront(Front front) {
+        this.front = front;
+    }
+
+    public void setBack(Back back) {
+        this.back = back;
+    }
+
+    public void setBackground_colour(int background_colour) {
+        this.background_colour = background_colour;
     }
 }
