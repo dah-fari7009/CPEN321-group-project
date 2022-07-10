@@ -7,7 +7,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -15,16 +27,22 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Login extends AppCompatActivity {
 
     private GoogleSignInClient mGoogleSignInClient;
     private Integer RC_SIGN_IN = 1;
     final static String TAG = "Login";
+    private RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        requestQueue = new RequestQueue(new DiskBasedCache(getCacheDir(), 1024 * 1024),  new BasicNetwork(new HurlStack()));
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -66,6 +84,7 @@ public class Login extends AppCompatActivity {
 
             // Signed in successfully, show authenticated UI.
             updateUI(account);
+            createUser(account.getId());
             openNewWindow();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
@@ -73,6 +92,25 @@ public class Login extends AppCompatActivity {
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             updateUI(null);
         }
+    }
+
+    private void createUser(String id) {
+        User user = User.getInstance();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://20.104.77.70:8081/", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), error.toString().trim(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        requestQueue.add(stringRequest);
+
     }
 
 
@@ -100,7 +138,9 @@ public class Login extends AppCompatActivity {
         }
     }
 
+
     private void openNewWindow() {
+
         Intent usingIntent = new Intent(Login.this, MainActivity.class);
         startActivity(usingIntent);
     }

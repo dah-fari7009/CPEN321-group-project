@@ -9,22 +9,22 @@ public class Presentation {
     private Cards[] cueCards;
     private Feedback[] feedback;
 
-    public Presentation(String title, int presentationID) {
-        this.title = title;
-        this.presentationID = presentationID;
+    public String getTitle() {
+        return title;
     }
 
-    ObjectMapper objectMapper = new ObjectMapper();
-    String json = "{ \"title\" : \"Keyword\", \"Cards\" : \"[\"sdadsad\",\"sdadsad\",\"sdadsad\",\"sdadsad\"]\" }";
-    Presentation presentation;
-
-    {
-        try {
-            presentation = objectMapper.readValue(json, Presentation.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+    public int getPresentationID() {
+        return presentationID;
     }
+
+    public Cards[] getCueCards() {
+        return cueCards;
+    }
+
+    public Feedback[] getFeedback() {
+        return feedback;
+    }
+
 
 
 }
