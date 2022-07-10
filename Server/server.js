@@ -1,5 +1,4 @@
-var express = require("express");
-const bodyParser = require('body-parser')
+const express = require("express");
 
 const db = require('./db/connection')
 const router = require('./router/router')
@@ -7,9 +6,9 @@ const router = require('./router/router')
 const app = express();
 const port = 8081;
 
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
-app.use(express.text({ type: "text/plain"}));
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(express.text({ type: "text/plain" }))
 app.use('/api', router);
 
 app.get("/", (req, res) => {
