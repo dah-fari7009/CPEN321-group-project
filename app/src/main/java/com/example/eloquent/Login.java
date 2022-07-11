@@ -35,14 +35,14 @@ public class Login extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private Integer RC_SIGN_IN = 1;
     final static String TAG = "Login";
-    private RequestQueue requestQueue;
+    private Router router;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        requestQueue = new RequestQueue(new DiskBasedCache(getCacheDir(), 1024 * 1024),  new BasicNetwork(new HurlStack()));
+        router = Router.getInstance(getApplicationContext());
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -84,6 +84,7 @@ public class Login extends AppCompatActivity {
 
             // Signed in successfully, show authenticated UI.
             updateUI(account);
+            router.createUser(account.getId());
             openNewWindow();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
