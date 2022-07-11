@@ -179,7 +179,7 @@ function parse(userID, text) {
 
     p.addUser(userID, "owner");
 
-    console.log(JSON.stringify(p));
+    // console.log(JSON.stringify(p));
     return JSON.stringify(p);
 }
 
