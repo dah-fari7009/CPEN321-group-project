@@ -31,7 +31,6 @@ public class AddPres extends AppCompatActivity {
     private Calendar calendar;
     private String todaysDate;
     private String currentTime;
-    private Button importButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

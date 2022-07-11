@@ -15,23 +15,20 @@ public class Presentation {
         this.presentationID = presentationID;
     }
 
-    ObjectMapper objectMapper = new ObjectMapper();
-    String json = "{ \"title\" : \"Keyword\", \"Cards\" : \"[\"sdadsad\",\"sdadsad\",\"sdadsad\",\"sdadsad\"]\" }";
-    Presentation presentation;
+    public Presentation() {
 
-    {
-        try {
-            presentation = objectMapper.readValue(json, Presentation.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
     }
+
+    public void setPresentationcard (int cueCards_max){
+        this.cueCards = new Cards[cueCards_max];
+    }
+
 
     public Cards getCards(int index){
         return cueCards[index];
     }
 
-    private String getTitle(){
+    public String getTitle(){
         return title;
     }
 

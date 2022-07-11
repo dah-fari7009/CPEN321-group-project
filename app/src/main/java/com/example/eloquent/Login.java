@@ -84,7 +84,6 @@ public class Login extends AppCompatActivity {
 
             // Signed in successfully, show authenticated UI.
             updateUI(account);
-            createUser(account.getId());
             openNewWindow();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
@@ -92,25 +91,6 @@ public class Login extends AppCompatActivity {
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             updateUI(null);
         }
-    }
-
-    private void createUser(String id) {
-        User user = User.getInstance();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://20.104.77.70:8081/", new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, response);
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), error.toString().trim(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        requestQueue.add(stringRequest);
-
     }
 
 
