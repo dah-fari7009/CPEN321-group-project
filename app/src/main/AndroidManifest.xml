@@ -18,7 +18,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".Import"
+            android:name=".EditPres"
             android:exported="false" />
         <activity
             android:name=".Presenting"
