@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Eloquent</string>
+    <string name="google_oauth2_web_client_id">9332959347-o8lhle1t6p7oanp5rq08vosu7vct3as3.apps.googleusercontent.com</string>
 </resources>
