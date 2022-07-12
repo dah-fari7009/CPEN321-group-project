@@ -7,6 +7,7 @@ public class User {
     private String userID;
     private String username;
     private Presentation[] presentations;
+    private String[] presentationTitles;
 
     private static User self;
 

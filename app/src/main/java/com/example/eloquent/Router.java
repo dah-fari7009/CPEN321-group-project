@@ -69,7 +69,18 @@ public class Router {
         requestQueue.add(stringRequest);
     }
 
-    
-
-
+    public void createEmptyPresentation() {
+        String url = BACKEND_HOST_AND_PORT + "api/presentation";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,error.toString());
+            }
+        });
+    }
 }
