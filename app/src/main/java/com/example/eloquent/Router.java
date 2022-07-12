@@ -12,6 +12,8 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +22,9 @@ public class Router {
 
     private static RequestQueue requestQueue;
     private static Router self;
+
     private static String TAG = "Router";
+    private static String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
 
     public static Router getInstance(Context applicationContext) {
         if (self == null) {
@@ -30,12 +34,15 @@ public class Router {
         return self;
     }
 
-    public void createUser(String IdToken, String userID, String username, User user) {
-        String url = "http://20.104.77.70:8081/api/login";
+    public void createUser(String IdToken, String userID, String username) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String url = BACKEND_HOST_AND_PORT + "/api/login";
         StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, response);
+                User user = User.getInstance(response);
+                Log.d(TAG, user.getUserID() + " " + user.getUsername());
             }
         }, new Response.ErrorListener() {
             @Override
@@ -61,4 +68,8 @@ public class Router {
 
         requestQueue.add(stringRequest);
     }
+
+    
+
+
 }
