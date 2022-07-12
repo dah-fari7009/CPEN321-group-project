@@ -45,6 +45,7 @@ public class Login extends AppCompatActivity {
         router = Router.getInstance(getApplicationContext());
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.google_oauth2_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -81,10 +82,10 @@ public class Login extends AppCompatActivity {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
+            User user = null;
             // Signed in successfully, show authenticated UI.
             updateUI(account);
-            router.createUser(account.getId());
+            router.createUser(account.getIdToken(), account.getId(), account.getEmail());
             openNewWindow();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
