@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">Eloquent</string>
+    <string name="app_name">Project1</string>
+    <string name="favoutire_place_button_caption">My favorite city</string>
+    <string name="phone_model_button_caption">Phone Model</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="title_activity_display_information">DisplayInformation</string>
+    <string name="current_city_caption">Current City : Vancouver</string>
+
 </resources>
