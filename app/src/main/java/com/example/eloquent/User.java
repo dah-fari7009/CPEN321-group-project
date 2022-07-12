@@ -3,6 +3,8 @@ package com.example.eloquent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
+
 public class User {
     private String userID;
     private String username;
@@ -33,5 +35,9 @@ public class User {
 
     public Presentation[] getPresentations() {
         return presentations;
+    }
+
+    public String[] getPresentationTitles() {
+        return presentationTitles;
     }
 }
