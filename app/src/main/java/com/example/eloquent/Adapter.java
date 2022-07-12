@@ -66,7 +66,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         @Override
         public void onClick(View v) {
-
+            onPresListener.OnPresClick(getAdapterPosition());
         }
     }
 

@@ -1,10 +1,22 @@
 package com.example.eloquent;
 
-public class Cards {
+import java.io.Serializable;
+
+public class Cards implements Serializable {
 
     public Front front;
     public Back back;
     public int background_colour;
+    public String transitionPhrase;
+    public int endWithPause;
+
+    public Cards(int backgroundColour, String transitionPhrase, int endWithPause, Front front, Back back) {
+        this.background_colour = backgroundColour;
+        this.transitionPhrase = transitionPhrase;
+        this.endWithPause = endWithPause;
+        this.front = front;
+        this.back = back;
+    }
 
     public Cards(Front front, Back back, int background_colour) {
         this.front = front;

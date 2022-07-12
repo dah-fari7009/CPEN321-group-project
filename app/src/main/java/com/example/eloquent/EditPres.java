@@ -17,9 +17,12 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import java.util.Calendar;
 
@@ -30,13 +33,18 @@ public class EditPres extends AppCompatActivity {
     private Calendar calendar;
     private String todaysDate;
     private String currentTime;
-    private Button importButton;
-    Presentation presentation;
+    private Button preparationBtn;
+    private Button presentingBtn;
+    private Button liveCollabBtn;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_pres);
+        setContentView(R.layout.activity_edit_pres);
+
+        Presentation presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
 
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
@@ -46,6 +54,36 @@ public class EditPres extends AppCompatActivity {
 
         presTitle = findViewById(R.id.presTitle);
         presDescription = findViewById(R.id.presDescription);
+        preparationBtn = findViewById(R.id.preparationButton);
+        presentingBtn = findViewById(R.id.presentingButton);
+        liveCollabBtn = findViewById(R.id.liveCollabButton);
+
+        preparationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent preparationIntent = new Intent(EditPres.this, Preparation.class);
+                preparationIntent.putExtra("Presentation", presentation);
+                startActivity(preparationIntent);
+            }
+        });
+
+        presentingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent presentingIntent = new Intent(EditPres.this, Presenting.class);
+                startActivity(presentingIntent);
+            }
+        });
+
+        liveCollabBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent shareIntent = new Intent(EditPres.this, Share.class);
+                startActivity(shareIntent);
+            }
+        });
+
+        presTitle.setText(presentation.getTitle());
 
         presTitle.addTextChangedListener(new TextWatcher() {
             @Override

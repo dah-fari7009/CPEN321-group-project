@@ -3,29 +3,35 @@ package com.example.eloquent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Presentation {
-    public String title;
+import java.io.Serializable;
+import java.util.ArrayList;
 
+public class Presentation implements Serializable {
+    public String title;
     public int presentationID;
-    public Cards[] cueCards;
-    public Feedback[] feedback;
+    public ArrayList<Cards> cueCards;
+    public ArrayList<Feedback> feedback;
 
     public Presentation(String title, int presentationID) {
         this.title = title;
         this.presentationID = presentationID;
+        this.cueCards = new ArrayList<>();
+        this.feedback = new ArrayList<>();
+    }
+
+    public Presentation(String title) {
+        this.title = title;
+        this.cueCards = new ArrayList<>();
+        this.feedback = new ArrayList<>();
     }
 
     public Presentation() {
-
+        this.cueCards = new ArrayList<>();
+        this.feedback = new ArrayList<>();
     }
-
-    public void setPresentationcard (int cueCards_max){
-        this.cueCards = new Cards[cueCards_max];
-    }
-
 
     public Cards getCards(int index){
-        return cueCards[index];
+        return cueCards.get(index);
     }
 
     public String getTitle(){
@@ -37,7 +43,7 @@ public class Presentation {
     }
 
     public Feedback getFeedback(int index) {
-        return feedback[index];
+        return feedback.get(index);
     }
 
     public void setPresentationID(int presentationID) {
@@ -49,10 +55,10 @@ public class Presentation {
     }
 
     public void setCueCards(Cards cueCards, int index) {
-        this.cueCards[index] = cueCards;
+        this.cueCards.set(index,cueCards);
     }
 
     public void setFeedback(Feedback feedback,int index) {
-        this.feedback[index] = feedback;
+        this.feedback.set(index, feedback);
     }
 }

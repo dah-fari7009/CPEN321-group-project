@@ -1,4 +1,6 @@
 package com.example.eloquent;
 
-public class Feedback {
+import java.io.Serializable;
+
+public class Feedback implements Serializable {
 }

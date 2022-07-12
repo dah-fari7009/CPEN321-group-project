@@ -106,7 +106,15 @@ public class AddPres extends AppCompatActivity {
             Toast.makeText(this, "Delete btt is clicked", Toast.LENGTH_SHORT).show();
         }
         if(item.getItemId() == R.id.save) {
-            Toast.makeText(this, "Save btt is clicked", Toast.LENGTH_SHORT).show();
+            if(presTitle.getText().toString()!= null) {
+                Presentation presentation = new Presentation(presTitle.getText().toString());
+                Intent savingIntent = new Intent(AddPres.this, MainActivity.class);
+                savingIntent.putExtra("Presentation", presentation);
+                startActivity(savingIntent);
+            }
+            else {
+                Toast.makeText(getApplicationContext(),"Please enter a title", Toast.LENGTH_SHORT).show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }

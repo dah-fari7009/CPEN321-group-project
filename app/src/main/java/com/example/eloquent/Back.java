@@ -4,8 +4,14 @@ public class Back {
     public int background_color;
     public Content[] content;
 
+    public Back(int backgroundColour, Content[] content) {
+        this.background_color = backgroundColour;
+        this.content = content;
+    }
+
     public Back(int background_color) {
         this.background_color = background_color;
+        this.content = new Content[1];
     }
 
     public int getBackground_color() {return background_color;}
