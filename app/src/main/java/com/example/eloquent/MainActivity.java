@@ -42,11 +42,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     List<Presentation> presentations;
-    private String url = "http://20.104.77.70:8081/";
-    // private ListView listView;
-    // String[] name = {"Alice", "Bob", "Cathy", "Cherry", "Chritopher", "Dog", "Eddy"};
     Adapter adapter;
-   // ArrayAdapter<String> arrayAdapter;
     private Button test;
     Presentation presentation = new Presentation("test1");
     Presentation presentation2 = new Presentation("test2");
@@ -86,7 +82,9 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
 
         recyclerView = findViewById(R.id.listOfPres);
         presentations = new ArrayList<>();
-        extractPresentations();
+
+        adapter = new Adapter(this, presentations, this::selectedPres);
+        //extractPresentations();
 
         // put here to test the add functionality
         passedPres = (Presentation) getIntent().getSerializableExtra("Presentation");
@@ -118,41 +116,40 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         presentations.add(presentation);
         presentations.add(presentation2);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        adapter = new Adapter(getApplicationContext(), presentations, this::OnPresClick);
         recyclerView.setAdapter(adapter);
     }
 
-    private void extractPresentations() {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                for (int i = 0; i < response.length(); i++) {
-                    try {
-                        JSONObject presentationObject = response.getJSONObject(i);
-
-                        Presentation presentation = new Presentation();
-                        presentation.setTitle(presentationObject.getString("title").toString());
-                        presentations.add(presentation);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                //adapter = new Adapter(getApplicationContext(), presentations, this);
-                recyclerView.setAdapter(adapter);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("tag", "onErrorResponse: " + error.getMessage());
-            }
-        });
-
-        queue.add(jsonArrayRequest);
-    }
+//    private void extractPresentations() {
+//        RequestQueue queue = Volley.newRequestQueue(this);
+//        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+//            @Override
+//            public void onResponse(JSONArray response) {
+//                for (int i = 0; i < response.length(); i++) {
+//                    try {
+//                        JSONObject presentationObject = response.getJSONObject(i);
+//
+//                        Presentation presentation = new Presentation();
+//                        presentation.setTitle(presentationObject.getString("title").toString());
+//                        presentations.add(presentation);
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+//                //adapter = new Adapter(getApplicationContext(), presentations, this);
+//                recyclerView.setAdapter(adapter);
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.d("tag", "onErrorResponse: " + error.getMessage());
+//            }
+//        });
+//
+//        queue.add(jsonArrayRequest);
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -192,11 +189,11 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
-    public void OnPresClick(int position) {
-        Presentation pres = presentations.get(position);
-        Intent intent = new Intent(MainActivity.this, EditPres.class);
-        intent.putExtra("Presentation", pres);
+    public void selectedPres(Presentation presentation) {
+        Intent intent = new Intent(this, EditPres.class);
+        intent.putExtra("Presentation", presentation);
         startActivity(intent);
     }
 }

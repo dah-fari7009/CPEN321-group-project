@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -28,9 +29,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 import com.google.gson.Gson;
 
 import java.util.Calendar;
+import java.util.Collections;
 
 public class EditPres extends AppCompatActivity {
 
@@ -42,6 +56,7 @@ public class EditPres extends AppCompatActivity {
     private Button preparationBtn;
     private Button presentingBtn;
     private Button liveCollabBtn;
+    private DriverServiceHelper driverServiceHelper;
 
     Presentation presentation;
 
@@ -118,19 +133,72 @@ public class EditPres extends AppCompatActivity {
         currentTime = pad(calendar.get(Calendar.HOUR)) + ":" + pad(calendar.get(Calendar.MINUTE));
     }
 
-    ActivityResultLauncher<Intent> sActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if(result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        Uri uri = data.getData();
-                    }
-                }
-            }
+//    ActivityResultLauncher<Intent> sActivityResultLauncher = registerForActivityResult(
+//            new ActivityResultContracts.StartActivityForResult(),
+//            new ActivityResultCallback<ActivityResult>() {
+//                @Override
+//                public void onActivityResult(ActivityResult result) {
+//                    if(result.getResultCode() == Activity.RESULT_OK) {
+//                        Intent data = result.getData();
+//                        Uri uri = data.getData();
+//                    }
+//                }
+//            }
+//
+//    );
 
-    );
+    private void requestSignIn() {
+        GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
+                .build();
+
+        GoogleSignInClient client = GoogleSignIn.getClient(this, signInOptions);
+
+        startActivityForResult(client.getSignInIntent(),400);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch(requestCode)
+        {
+            case 400:
+                if(resultCode == RESULT_OK) {
+                    handleSignInIntent(data);
+                }
+                break;
+        }
+    }
+
+    private void handleSignInIntent(Intent data) {
+        GoogleSignIn.getSignedInAccountFromIntent(data)
+                .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
+                    @Override
+                    public void onSuccess(GoogleSignInAccount googleSignInAccount) {
+                        GoogleAccountCredential credential = GoogleAccountCredential.
+                                usingOAuth2(EditPres.this, Collections.singleton(DriveScopes.DRIVE_FILE));
+
+                        Drive googleDriveService = new Drive.Builder(
+                                AndroidHttp.newCompatibleTransport(),
+                                new GsonFactory(),
+                                credential)
+                                .setApplicationName("Drive")
+                                .build();
+
+                        driverServiceHelper = new DriverServiceHelper(googleDriveService);
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+    }
 
     // if the hour or minute is less than 10, add 0 before it
     private String pad(int i) {
@@ -150,10 +218,18 @@ public class EditPres extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.delete) {
-            Toast.makeText(this, "Delete btt is clicked", Toast.LENGTH_SHORT).show();
+
         }
         if(item.getItemId() == R.id.save) {
-            Toast.makeText(this, "Save btt is clicked", Toast.LENGTH_SHORT).show();
+            if(presentation.title != null) {
+                presentation.title = presTitle.getText().toString();
+                Intent changingIntent = new Intent(EditPres.this, MainActivity.class);
+                changingIntent.putExtra("Presentation", presentation);
+                startActivity(changingIntent);
+            }
+            else {
+                Toast.makeText(getApplicationContext(),"Title cannot be null", Toast.LENGTH_SHORT).show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
