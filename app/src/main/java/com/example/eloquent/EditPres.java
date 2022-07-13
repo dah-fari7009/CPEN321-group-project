@@ -5,11 +5,17 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -37,6 +43,8 @@ public class EditPres extends AppCompatActivity {
     private Button presentingBtn;
     private Button liveCollabBtn;
 
+    Presentation presentation;
+
 
 
     @Override
@@ -44,7 +52,7 @@ public class EditPres extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_pres);
 
-        Presentation presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
+        presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
 
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
@@ -70,8 +78,8 @@ public class EditPres extends AppCompatActivity {
         presentingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent presentingIntent = new Intent(EditPres.this, Presenting.class);
-                startActivity(presentingIntent);
+                checkPermission();
+
             }
         });
 
@@ -148,5 +156,37 @@ public class EditPres extends AppCompatActivity {
             Toast.makeText(this, "Save btt is clicked", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            Intent presentingIntent = new Intent(EditPres.this, Presenting.class);
+            presentingIntent.putExtra("Presentation", presentation);
+            startActivity(presentingIntent);
+        } else {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
+                Toast.makeText(this, "We need these location permissions to run!", Toast.LENGTH_LONG).show();
+                new AlertDialog.Builder(this)
+                        .setTitle("Need Recording Permissions")
+                        .setMessage("We need your audio recording permissions to mark automatically switch cue cards")
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(EditPres.this, "We need these location permissions to run!", Toast.LENGTH_LONG).show();
+                                dialog.dismiss();
+                            }
+                        })
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(EditPres.this, new String[] {Manifest.permission.RECORD_AUDIO}, 1);
+                            }
+                        })
+                        .create()
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.RECORD_AUDIO}, 1);
+            }
+        }
     }
 }

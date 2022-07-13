@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -52,11 +53,32 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     Presentation passedPres;
     private String TAG = "MainActivity.this";
 
+    Content contentCard1Front1 = new Content("font", "style", 5, Color.BLUE, "Speeches often start with a hook");
+    Content contentCard1Back1 = new Content("font", "style", 5, Color.BLUE, "A hook is anything that grabs the audience's attention");
+    Content contentCard1Back2 = new Content("font", "style", 5, Color.BLUE, "Examples of hooks are anecdotes, jokes, hot takes");
+    Content contentCard1Back3 = new Content("font", "style", 5, Color.BLUE, "Knowing target audience leads to better hooks");
+
+    Content contentCard2Back1 = new Content("font", "style", 5, Color.BLUE, "The audience needs to first know why they should pay attention to your speech");
+    Content contentCard2Back2 = new Content("font", "style", 5, Color.BLUE, "Then, deliver on your promise");
+    Content contentCard2Front1 = new Content("font", "style", 5, Color.BLUE, "Bottom line upfront");
+
+    Front sideFront1 = new Front(Color.WHITE, new Content[]{contentCard1Front1});
+    Back sideBack1 = new Back(Color.WHITE, new Content[]{contentCard1Back1, contentCard1Back2, contentCard1Back3});
+
+    Front sideFront2 = new Front(Color.WHITE, new Content[]{contentCard2Front1});
+    Back sideBack2 = new Back(Color.WHITE, new Content[]{contentCard2Back1, contentCard2Back2});
+
+    Cards card1 = new Cards(Color.WHITE, "Knowing target audience leads to better hooks", 0, sideFront1, sideBack1);
+    Cards card2 = new Cards(Color.WHITE, "Then, deliver on your promise", 1, sideFront2, sideBack2);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        presentation.cueCards.add(card1);
+        presentation.cueCards.add(card2);
 
 
         toolbar = findViewById(R.id.toolbar);
@@ -173,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     @Override
     public void OnPresClick(int position) {
         Presentation pres = presentations.get(position);
-        Intent intent = new Intent(this, EditPres.class);
+        Intent intent = new Intent(MainActivity.this, EditPres.class);
         intent.putExtra("Presentation", pres);
         startActivity(intent);
     }
