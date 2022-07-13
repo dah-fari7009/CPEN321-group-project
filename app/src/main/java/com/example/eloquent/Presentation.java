@@ -8,11 +8,11 @@ import java.util.ArrayList;
 
 public class Presentation implements Serializable {
     public String title;
-    public int presentationID;
+    public String presentationID;
     public ArrayList<Cards> cueCards;
     public ArrayList<Feedback> feedback;
 
-    public Presentation(String title, int presentationID) {
+    public Presentation(String title, String presentationID) {
         this.title = title;
         this.presentationID = presentationID;
         this.cueCards = new ArrayList<>();
@@ -38,7 +38,7 @@ public class Presentation implements Serializable {
         return title;
     }
 
-    private int getPresentationID(){
+    private String getPresentationID(){
         return presentationID;
     }
 
@@ -46,7 +46,7 @@ public class Presentation implements Serializable {
         return feedback.get(index);
     }
 
-    public void setPresentationID(int presentationID) {
+    public void setPresentationID(String presentationID) {
         this.presentationID = presentationID;
     }
 

@@ -82,7 +82,6 @@ public class Login extends AppCompatActivity {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            User user = null;
             // Signed in successfully, show authenticated UI.
             updateUI(account);
             router.createUser(account.getIdToken(), account.getId(), account.getEmail());

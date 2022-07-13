@@ -108,6 +108,12 @@ public class AddPres extends AppCompatActivity {
         if(item.getItemId() == R.id.save) {
             if(presTitle.getText().toString()!= null) {
                 Presentation presentation = new Presentation(presTitle.getText().toString());
+
+                // Create new presentation in backend
+                Router router = Router.getInstance(this);
+                router.createEmptyPresentation(User.getInstance().getData().getUserID(), presTitle.getText().toString(), presentation);
+
+                // Send new presentation to main activity
                 Intent savingIntent = new Intent(AddPres.this, MainActivity.class);
                 savingIntent.putExtra("Presentation", presentation);
                 startActivity(savingIntent);
