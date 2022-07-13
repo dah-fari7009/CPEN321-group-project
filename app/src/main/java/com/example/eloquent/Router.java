@@ -1,6 +1,7 @@
 package com.example.eloquent;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -132,4 +133,36 @@ public class Router {
 
         requestQueue.add(stringRequest);
     }
+
+    public void importPresentation(String userID, String presentationTextRep) {
+        String url = BACKEND_HOST_AND_PORT + "/api/import"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
+        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("userID", userID);
+                params.put("text", presentationTextRep);
+                return params;
+            }
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+    }
+
 }

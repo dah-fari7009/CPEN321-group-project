@@ -28,6 +28,7 @@ public class AddPres extends AppCompatActivity {
 
     private Toolbar toolbar;
     private EditText presTitle, presDescription;
+    private Button importButton;
     private Calendar calendar;
     private String todaysDate;
     private String currentTime;
@@ -62,6 +63,17 @@ public class AddPres extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
 
+            }
+        });
+
+        importButton = findViewById(R.id.importButton);
+        importButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Router.getInstance(AddPres.this).importPresentation(
+                        User.getInstance().getData().getUserID(),
+                        getString(R.string.sample_import_input)
+                );
             }
         });
 
