@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Calendar;
 
 public class AddPres extends AppCompatActivity {
@@ -32,6 +35,7 @@ public class AddPres extends AppCompatActivity {
     private Calendar calendar;
     private String todaysDate;
     private String currentTime;
+    private String importText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +98,8 @@ public class AddPres extends AppCompatActivity {
                     if(result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         Uri uri = data.getData();
+                        byte[] bytes = getBytesFromUrl(getApplicationContext(), uri);
+                        importText = new String((bytes));
                     }
                 }
             }
@@ -152,5 +158,24 @@ public class AddPres extends AppCompatActivity {
         data.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         data = Intent.createChooser(data, "choose a file");
         sActivityResultLauncher.launch(data);
+    }
+
+    byte[] getBytesFromUrl (Context context, Uri uri) {
+        InputStream inputStream = null;
+        try {
+            inputStream = context.getContentResolver().openInputStream(uri);
+            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
+            int len = 0;
+            while((len = inputStream.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
+            }
+            return byteBuffer.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
