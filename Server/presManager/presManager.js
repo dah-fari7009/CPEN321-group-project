@@ -54,7 +54,9 @@ getPresTitle = (presentationId, userID) => {
 // Internal - for calls from parse() of parser.js, rather than 
 // for responding to requests form the frontend.
 storeImportedPres = (presObj) => {
-    Presentation.create(presObj).then((data) => {return data;});
+    return new Promise ((resolve, reject) => {
+        Presentation.create(presObj).then((data) => {resolve(data)});
+    })
 }
 
 checkPermission = (userID, presID) => {

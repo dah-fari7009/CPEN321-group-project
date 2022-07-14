@@ -18,11 +18,7 @@ router.put("/login", userStore.login);
 router.put("/addPresToUser", userStore.addPresToUser);
 
 //Parser routes
-router.put("/import", (req, res) => {
-    console.log(req.body.userID + " " + req.body.text);
-    // res.send(parser.parse(req.body.userID, req.body.text));
-    res.send("yo")
-});
+router.put("/import", parser.parse);
 
 router.post("/export", exporter.unParsePresentation);
 

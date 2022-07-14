@@ -36,12 +36,12 @@ function Cuecard() {
     this.transitionPhrase = ""; // If empty transition phrase, default to manual cuecard transition
     this.endWithPause = true;
     this.front = {
-        font: "Times New Roman",
-        style: "normalfont",
-        size: "12",
         backgroundColor: colors["white"], 
         content: {
             // TODO add font, size, and style attributes
+            font: "Times New Roman",
+            style: "normalfont",
+            size: "12",
             colour: colors["black"], // black by default
             message: ""
         }
@@ -81,17 +81,20 @@ Presentation.prototype.addUser = function(userID, permission) {
  *      Text representation of presentation (e.g. contents of 
  *      sampleInputText.txt).
  */ 
-function parse(userID, text) {
+parse = (req, res) => {
+    var userID = req.body.userID;
+    var text = req.body.text;
+    console.log(req.body)
     // strip comments, whitespace at start of lines, and newlines
     text = parsePreProcessing(text);
-    console.log(text);
+    // console.log(text);
     
     // tokenize text with delimiter "\"
     var tokens = text.split("\\");
     for (let i = 0; i < tokens.length; i++) {
         tokens[i] = tokens[i].trim();
     } 
-    console.log(tokens);
+    // console.log(tokens);
 
     var keywords = {begin:"begin", end:"end", title:"title", point:"point", item:"item"};
     var contexts = {presentation:false, cuecard:false, details:false};
@@ -123,7 +126,7 @@ function parse(userID, text) {
                             c.transitionPhrase = tokenNoKeyword; // last added detail is transition phrase of cuecard
                             c.back.content["message"] += "\n >" + tokenNoKeyword;
                         }
-                        console.log(c.back.content);
+                        // console.log(c.back.content);
                     }
                 } else {
                     if (tokenNoWhitespace.slice(0, attributesStartIndex) === keywords["begin"] + "{details}"
@@ -175,14 +178,17 @@ function parse(userID, text) {
                 contexts["presentation"] = true;
             }
         }
-        console.log(contexts);
+        // console.log(contexts);
     }
 
     p.addUser(userID, "owner");
 
-    console.log(JSON.stringify(p));
-    p = presentationManager.storeImportedPres(p);    
-    return JSON.stringify(p);
+    // console.log(p);
+    presentationManager.storeImportedPres(p).then((data) => {
+        return res.status(200).json( data );
+    }).catch((err) => {
+        return res.status(500).json({ err: err });
+    })
 }
 
 /* Strip comments (all characters on a line, after a "%"), tabs, and newlines
