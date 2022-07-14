@@ -40,7 +40,7 @@ getPres = (req, res) => {
 
 // Internal - for calls from login() of userStore.js, rather than
 // for responding to requests from the frontend.
-getPresTitle = (presentationId, userID) => {
+getPresTitle = (presentationID, userID) => {
     Presentation.find({
         "_id": presentationID,
         "users.id": userID
