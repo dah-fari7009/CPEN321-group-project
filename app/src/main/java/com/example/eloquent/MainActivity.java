@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     private RecyclerView recyclerView;
     List<Presentation> presentations;
     Adapter adapter;
-    private Button test;
+
     Presentation presentation = new Presentation("test1");
     Presentation presentation2 = new Presentation("test2");
     Presentation passedPres;
@@ -96,15 +96,6 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         showPresentation();
 
 
-
-        test = findViewById(R.id.button2);
-        test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent presentingIntent = new Intent(MainActivity.this, Presenting.class);
-//                startActivity(presentingIntent);
-            }
-        });
 
 //        listView = findViewById(R.id.listView);
 //        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, name);

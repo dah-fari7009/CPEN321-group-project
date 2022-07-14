@@ -21,6 +21,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements Filterable {
     LayoutInflater inflater;
     public List<Presentation> presentations;
@@ -46,6 +47,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements
         return new ViewHolder(view,mOnPresListener);
     }
 
+    //create a templete of view holder for the recyclerView
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // bind the data
@@ -62,11 +64,13 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements
 
     }
 
+    // get the number of presentations
     @Override
     public int getItemCount() {
         return presentations.size();
     }
 
+    // filter the presentation list and show the response corresponding to user's input
     @Override
     public Filter getFilter() {
         Filter filter = new Filter() {
@@ -100,7 +104,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements
         return filter;
     }
 
-
+    // detects the on click on presentation object
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView presentationTitle;
         OnPresListener onPresListener;

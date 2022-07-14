@@ -1,6 +1,8 @@
 package com.example.eloquent;
 
-public class Front {
+import java.io.Serializable;
+
+public class Front implements Serializable {
     public int background_color;
     public Content content;
 

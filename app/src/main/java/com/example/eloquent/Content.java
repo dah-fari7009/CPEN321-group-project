@@ -2,7 +2,9 @@ package com.example.eloquent;
 
 import android.telephony.IccOpenLogicalChannelResponse;
 
-public class Content {
+import java.io.Serializable;
+
+public class Content implements Serializable {
     public String font;
     public String style;
     public int size;

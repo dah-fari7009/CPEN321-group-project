@@ -11,11 +11,16 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -109,9 +114,9 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
         });
 
         //get permissions for audio
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
-            checkPermission();
-        }
+//        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
+//            checkPermission();
+//        }
         speechText = findViewById(R.id.speech_text);
 
         resetSpeechRecognizer();
@@ -149,9 +154,12 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
         TextView textView1 = new TextView(Presenting.this);
         textView1.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         if (isOnFront) {
-            textView1.setText(pres.cueCards.get(cardIndex).front.content.message);
+            Spannable spannable = getColoredtext(pres.cueCards.get(cardIndex).front.content.colour, pres.cueCards.get(cardIndex).front.content.message);
+            textView1.setText(spannable);
+
         } else {
-            textView1.setText(pres.cueCards.get(cardIndex).back.content.message);
+            Spannable spannable = getColoredtext(pres.cueCards.get(cardIndex).back.content.colour, pres.cueCards.get(cardIndex).back.content.message);
+            textView1.setText(spannable);
         }
         textView1.setBackgroundColor(0xffffffff); // hex color 0xAARRGGBB
         textView1.setPadding(20, 20, 20, 20);// in pixels (left, top, right, bottom)
@@ -287,5 +295,11 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
     @Override
     public void onEvent(int eventType, Bundle params) {
 
+    }
+
+    private Spannable getColoredtext(int color, String text){
+        Spannable colored_text = new SpannableString(text);
+        colored_text.setSpan(new ForegroundColorSpan(color),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return colored_text;
     }
 }

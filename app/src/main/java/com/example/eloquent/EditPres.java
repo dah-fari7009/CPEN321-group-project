@@ -60,8 +60,6 @@ public class EditPres extends AppCompatActivity {
 
     Presentation presentation;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -236,9 +234,9 @@ public class EditPres extends AppCompatActivity {
 
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-//            Intent presentingIntent = new Intent(EditPres.this, Presenting.class);
-//            presentingIntent.putExtra("Presentation", presentation);
-//            startActivity(presentingIntent);
+            Intent presentingIntent = new Intent(EditPres.this, Presenting.class);
+            presentingIntent.putExtra("Presentation", presentation);
+            startActivity(presentingIntent);
         } else {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
                 Toast.makeText(this, "We need these location permissions to run!", Toast.LENGTH_LONG).show();
