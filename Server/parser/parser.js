@@ -34,12 +34,12 @@ function Presentation() {
 function Cuecard() {
     this.backgroundColor = colors["white"]; // white by default
     this.transitionPhrase = ""; // If empty transition phrase, default to manual cuecard transition
-    this.endpause = true;
+    this.endWithPause = true;
     this.front = {
         backgroundColor: colors["white"], 
         content: {
             // TODO add font, size, and style attributes
-            color: colors["black"], // black by default
+            colour: colors["black"], // black by default
             message: ""
         }
     };
@@ -49,7 +49,7 @@ function Cuecard() {
 function CuecardBack() {
     this.backgroundColor = colors["white"];
     this.content = {
-        color: colors["black"],
+        colour: colors["black"],
         message: ""
     };
 }
@@ -63,19 +63,6 @@ Presentation.prototype.addCard = function(card) {
 Presentation.prototype.addUser = function(userID, permission) {
     this.users.push({id: userID, permission: permission});
 }
-
-
-// CuecardBack.prototype.addContent = function(font, style, size, color, message) {
-//     var c = colors["black"];
-//     if (color) {
-//         c = colors[color];
-//     }
-//     // TODO add support for font, style, and size attributes
-//     this.content.push({
-//         color: c,
-//         message: message
-//     });
-// }
 
 
 /* Creates and stores away a presentation object, given its text representation, 
@@ -122,7 +109,7 @@ function parse(userID, text) {
                         if (tokenNoKeyword[0] === "[" && tokenNoKeyword.slice(1, tokenNoKeyword.indexOf("=")) === "color") { 
                             var color = tokenNoKeyword.slice(tokenNoKeyword.indexOf("=") + 1, tokenNoKeyword.indexOf("]"));
                             if (color in colors) {
-                                c.back.content["color"] = colors[color]; 
+                                c.back.content["colour"] = colors[color]; 
                                 c.transitionPhrase = tokenNoKeyword.slice(tokenNoKeyword.indexOf("]") + 1, tokenNoKeyword.length); // last added detail is transition phrase of cuecard
                                 c.back.content["message"] += "\n >" + tokenNoKeyword.slice(tokenNoKeyword.indexOf("]") + 1, tokenNoKeyword.length);
                             }
@@ -164,7 +151,7 @@ function parse(userID, text) {
                             var attributeValue = attributes[j].slice(attributes[j].indexOf("=") + 1, attributes[j].length);
                             
                             if (attributeKey === "color" && attributeValue in colors) c.backgroundColor = colors[attributeValue];
-                            else if (attributeKey === "endpause" && attributeValue === "false") c.endpause = false;
+                            else if (attributeKey === "endpause" && attributeValue === "false") c.endWithPause = false;
                         }
                     }
                 } else if (tokens[i].slice(0, "title".length) === "title") {
