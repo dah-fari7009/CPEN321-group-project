@@ -1,6 +1,3 @@
-const presManager = require("../../presManager/presManager");
+const presManMocks = require(presManager.mocks);
 
-// mocking presManager.js
-
-const mockStoreImportedPres = jest.fn();
 
