@@ -2,6 +2,8 @@ const express = require('express')
 const presentationManager = require('../presManager/presManager')
 const userStore = require('../userStore/userStore')
 const parser = require('../parser/parser')
+const exporter = require('../parser/export')
+
 const router = express.Router()
 
 //Pres manager routes
@@ -18,7 +20,10 @@ router.put("/addPresToUser", userStore.addPresToUser);
 //Parser routes
 router.put("/import", (req, res) => {
     console.log(req.body.userID + " " + req.body.text);
-    res.send(parser.parse(req.body.userID, req.body.text));
+    // res.send(parser.parse(req.body.userID, req.body.text));
+    res.send("yo")
 });
+
+router.post("/export", exporter.unParsePresentation);
 
 module.exports = router;
