@@ -145,13 +145,13 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
 
     //dynamically create a textview
     //modified from https://stackoverflow.com/questions/4203506/how-to-add-a-textview-to-a-linearlayout-dynamically-in-android
-    public TextView createTextView(Presentation pres, int cardIndex, int contentIndex, boolean isOnFront) {
+    public TextView createTextView(Presentation pres, int cardIndex, boolean isOnFront) {
         TextView textView1 = new TextView(Presenting.this);
         textView1.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         if (isOnFront) {
-            textView1.setText(pres.cueCards.get(cardIndex).front.content[contentIndex].message);
+            textView1.setText(pres.cueCards.get(cardIndex).front.content.message);
         } else {
-            textView1.setText(pres.cueCards.get(cardIndex).back.content[contentIndex].message);
+            textView1.setText(pres.cueCards.get(cardIndex).back.content.message);
         }
         textView1.setBackgroundColor(0xffffffff); // hex color 0xAARRGGBB
         textView1.setPadding(20, 20, 20, 20);// in pixels (left, top, right, bottom)
@@ -162,13 +162,10 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
     //populate a linear layout with all messages in a content array
     public void fillLayout (LinearLayout linearLayout, Presentation pres, int cardIndex, boolean isOnFront) {
         if (isOnFront) {
-            for (int i = 0; i < pres.cueCards.get(currentCard).front.content.length; i++) {
-                linearLayout.addView(createTextView(pres, cardIndex, i, isOnFront));
-            }
+            linearLayout.addView(createTextView(pres, cardIndex, isOnFront));
         } else {
-            for (int i = 0; i < pres.cueCards.get(currentCard).back.content.length; i++) {
-                linearLayout.addView(createTextView(pres, cardIndex, i, isOnFront));
-            }
+
+            linearLayout.addView(createTextView(pres, cardIndex,  isOnFront));
         }
     }
 //    private void checkPermission() {

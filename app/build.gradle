@@ -8,6 +8,7 @@ android {
     packagingOptions {
         exclude 'META-INF/NOTICE' // It is not include NOTICE file
         exclude 'META-INF/LICENSE' // It is not include LICENSE file
+        exclude 'META-INF/DEPENDENCIES'
     }
 
     defaultConfig {
@@ -50,4 +51,10 @@ dependencies {
     implementation 'com.android.volley:volley:1.2.1'
     implementation 'com.pusher:pusher-java-client:1.4.0'
     implementation 'com.google.code.gson:gson:2.7'
+    implementation 'com.google.api-client:google-api-client:1.33.0'
+    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.32.1'
+    implementation 'com.google.apis:google-api-services-drive:v3-rev20211107-1.32.1'
+    implementation 'com.google.api-client:google-api-client-android:1.20.0'
+    implementation 'tech.gusavila92:java-android-websocket-client:1.2.2'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }

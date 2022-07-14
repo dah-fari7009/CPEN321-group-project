@@ -58,11 +58,11 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     Content contentCard2Back2 = new Content("font", "style", 5, Color.BLUE, "Then, deliver on your promise");
     Content contentCard2Front1 = new Content("font", "style", 5, Color.BLUE, "Bottom line upfront");
 
-    Front sideFront1 = new Front(Color.WHITE, new Content[]{contentCard1Front1});
-    Back sideBack1 = new Back(Color.WHITE, new Content[]{contentCard1Back1, contentCard1Back2, contentCard1Back3});
+    Front sideFront1 = new Front(Color.WHITE, contentCard1Front1);
+    Back sideBack1 = new Back(Color.WHITE, contentCard1Back1);
 
-    Front sideFront2 = new Front(Color.WHITE, new Content[]{contentCard2Front1});
-    Back sideBack2 = new Back(Color.WHITE, new Content[]{contentCard2Back1, contentCard2Back2});
+    Front sideFront2 = new Front(Color.WHITE, contentCard2Front1 );
+    Back sideBack2 = new Back(Color.WHITE, contentCard2Back1);
 
     Cards card1 = new Cards(Color.WHITE, "Knowing target audience leads to better hooks", 0, sideFront1, sideBack1);
     Cards card2 = new Cards(Color.WHITE, "Then, deliver on your promise", 1, sideFront2, sideBack2);
@@ -101,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent presentingIntent = new Intent(MainActivity.this, Presenting.class);
-                startActivity(presentingIntent);
+//                Intent presentingIntent = new Intent(MainActivity.this, Presenting.class);
+//                startActivity(presentingIntent);
             }
         });
 

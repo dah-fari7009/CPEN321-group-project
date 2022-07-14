@@ -101,7 +101,7 @@ public class EditPres extends AppCompatActivity {
         liveCollabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent shareIntent = new Intent(EditPres.this, Share.class);
+                Intent shareIntent = new Intent(EditPres.this, LiveCollaboration.class);
                 startActivity(shareIntent);
             }
         });
@@ -236,9 +236,9 @@ public class EditPres extends AppCompatActivity {
 
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-            Intent presentingIntent = new Intent(EditPres.this, Presenting.class);
-            presentingIntent.putExtra("Presentation", presentation);
-            startActivity(presentingIntent);
+//            Intent presentingIntent = new Intent(EditPres.this, Presenting.class);
+//            presentingIntent.putExtra("Presentation", presentation);
+//            startActivity(presentingIntent);
         } else {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
                 Toast.makeText(this, "We need these location permissions to run!", Toast.LENGTH_LONG).show();

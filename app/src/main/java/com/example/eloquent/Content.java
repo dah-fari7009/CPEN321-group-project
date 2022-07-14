@@ -2,9 +2,7 @@ package com.example.eloquent;
 
 import android.telephony.IccOpenLogicalChannelResponse;
 
-import java.io.Serializable;
-
-public class Content implements Serializable {
+public class Content {
     public String font;
     public String style;
     public int size;
@@ -26,6 +24,10 @@ public class Content implements Serializable {
         this.message = message;
     }
 
+    public Content() {
+
+    }
+
     public int getColor() {return colour;}
 
     public String getMessage() {return message; }
@@ -38,3 +40,4 @@ public class Content implements Serializable {
         this.message = message;
     }
 }
+
