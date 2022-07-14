@@ -13,5 +13,8 @@
     "express": "^4.18.1",
     "google-auth-library": "^8.1.0",
     "mongoose": "^6.4.2"
+  },
+  "devDependencies": {
+    "jest": "^28.1.3"
   }
 }
