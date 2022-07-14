@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -16,10 +15,8 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -112,7 +109,7 @@ public class Preparation extends AppCompatActivity {
 
         content = findViewById(R.id.cueCard);
         helper = new TextViewUndoRedo(content);
-        content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+        content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
 //        Log.w("TAG", "background color success"+"|| cue card number is " +Integer.toString(cueCards_num));
 //        Log.w("TAG", "background color is " +Integer.toString(presentation.getCards(cueCards_num).getFront().getBackground_color()));
         String text = presentation.cueCards.get(cueCards_num).front.getContent(content_num).getMessage();
@@ -150,7 +147,7 @@ public class Preparation extends AppCompatActivity {
                 if(cueCards_num<cueCards_max-1){
                     cueCards_num = cueCards_num+1;
                     cardFace=0;
-                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getFront().getContent(0).getMessage();
                     int color = presentation.getCards(cueCards_num).getFront().getContent(0).getColor();
                     content.setText(getColoredtext(color,text));
@@ -193,7 +190,7 @@ public class Preparation extends AppCompatActivity {
                 if(cueCards_num>0){
                     cueCards_num = cueCards_num-1;
                     cardFace=0;
-                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getFront().getContent(0).getMessage();
                     int color = presentation.getCards(cueCards_num).getFront().getContent(0).getColor();
                     content.setText(getColoredtext(color,text));
@@ -231,7 +228,7 @@ public class Preparation extends AppCompatActivity {
                     presentation.cueCards.set(cueCards_num,tmp);
 //                    Log.w("TAG", "save success");
                     cardFace = 0;
-                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getFront().getContent(0).getMessage();
                     int color = presentation.getCards(cueCards_num).getFront().getContent(0).getColor();
                     content.setText(getColoredtext(color,text));
@@ -284,7 +281,7 @@ public class Preparation extends AppCompatActivity {
                 presentation.cueCards.set(cueCards_num, new_card);
 
                 cardFace=0;
-                content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                 String text = presentation.getCards(cueCards_num).getFront().getContent(0).getMessage();
                 int color = presentation.getCards(cueCards_num).getFront().getContent(0).getColor();
                 content.setText(getColoredtext(color,text));
@@ -332,7 +329,7 @@ public class Preparation extends AppCompatActivity {
 //                Log.w("TAG", "get num : " + (cueCards_num+1));
 
                 cardFace=0;
-                content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                 String text = presentation.getCards(cueCards_num).getFront().getContent(0).getMessage();
                 int color = presentation.getCards(cueCards_num).getFront().getContent(0).getColor();
                 content.setText(getColoredtext(color,text));
@@ -375,7 +372,7 @@ public class Preparation extends AppCompatActivity {
                     presentation.cueCards.set(cueCards_num+1,temp);
 
                     cardFace = 0;
-                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getFront().getContent(0).getMessage();
                     int color = presentation.getCards(cueCards_num).getFront().getContent(0).getColor();
                     content.setText(getColoredtext(color,text));
@@ -425,7 +422,7 @@ public class Preparation extends AppCompatActivity {
                     presentation.cueCards.set(cueCards_num-1,temp);
 
                     cardFace = 0;
-                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getFront().getContent(0).getMessage();
                     int color = presentation.getCards(cueCards_num).getFront().getContent(0).getColor();
                     content.setText(getColoredtext(color,text));
@@ -500,7 +497,7 @@ public class Preparation extends AppCompatActivity {
 //                Log.w("TAG", "get num : " + (cueCards_num+1));
 
                 cardFace=0;
-                content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                 String text = presentation.getCards(cueCards_num).getFront().getContent(0).getMessage();
                 int color = presentation.getCards(cueCards_num).getFront().getContent(0).getColor();
                 content.setText(getColoredtext(color,text));

@@ -140,6 +140,12 @@ public class Router {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, response);
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    Presentation pres = objectMapper.readValue(response, Presentation.class);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
