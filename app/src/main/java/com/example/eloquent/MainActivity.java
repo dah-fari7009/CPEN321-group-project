@@ -143,13 +143,27 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
 //    }
 
     @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.add) {
+            Intent addPres = new Intent(this, AddPres.class);
+            startActivity(addPres);
+        }
+        if(item.getItemId() == R.id.search) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.add_menu, menu);
         getMenuInflater().inflate(R.menu.add_menu, menu);
         MenuItem menuitem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) menuitem.getActionView();
-        searchView.setQueryHint("Type here to search");
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -159,25 +173,14 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                String searchStr = newText;
 
-                //arrayAdapter.getFilter().filter(newText);
+                adapter.getFilter().filter(newText);
                 return false;
             }
         });
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.add) {
-            Intent addPres = new Intent(this, AddPres.class);
-            startActivity(addPres);
-            Toast.makeText(this, "Add btt is clicked", Toast.LENGTH_SHORT).show();
-        }
-        if(item.getItemId() == R.id.search) {
-
-        }
-        return super.onOptionsItemSelected(item);
+        return super.onCreateOptionsMenu(menu);
     }
 
 

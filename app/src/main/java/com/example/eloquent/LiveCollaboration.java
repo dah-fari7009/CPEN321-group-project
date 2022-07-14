@@ -60,7 +60,7 @@ public class LiveCollaboration extends AppCompatActivity {
     private int cueCards_max = 0;
     private int content_num = 0;
     private int cardFace = 0;//0: front | 1: back
-    private int userID = 110;
+    private int userID = 120;
     private String title = "0";
     ObjectMapper objectMapper = new ObjectMapper();
     private WebSocketClient webSocketClient;
@@ -167,7 +167,7 @@ public class LiveCollaboration extends AppCompatActivity {
 
                 JSONObject obj =  new JSONObject();
                 try{
-                    obj.put("userid",Integer.toString(userID));
+                    obj.put("userID",Integer.toString(userID));
                     obj.put("presentationID",presentationID);
                     obj.put("cueCards_num",Integer.toString(cueCards_num));
                     obj.put("cardFace",Integer.toString(cardFace));
@@ -364,6 +364,7 @@ public class LiveCollaboration extends AppCompatActivity {
                         }
 
                         if (userID == change_userID){
+                            Log.w("TAG", "==");
 
                         }
                         else{
@@ -395,7 +396,8 @@ public class LiveCollaboration extends AppCompatActivity {
                                 e.printStackTrace();
                             }
 
-                            if(change_presentationID == presentationID){
+                            Log.w("TAG", "111");
+                            if(change_presentationID.equals(presentationID) ){
 
                                 Cards tmp = presentation.cueCards.get(change_cueCards_num);
 
@@ -436,6 +438,7 @@ public class LiveCollaboration extends AppCompatActivity {
                             }
                             else{
                                 // do nothing if the presentationID is different
+                                Log.w("TAG", "222");
                             }
                         }
 
@@ -548,7 +551,7 @@ public class LiveCollaboration extends AppCompatActivity {
                         }
 
                         if (userID == change_userID){ // do nothing if user ID the same
-
+                            Log.w("TAG", "==");
                         }
                         else{
                             String change_presentationID = null;
@@ -579,7 +582,8 @@ public class LiveCollaboration extends AppCompatActivity {
                                 e.printStackTrace();
                             }
 
-                            if(change_presentationID == presentationID){
+                            if(change_presentationID.equals(presentationID)){
+                                Log.w("TAG", "111");
 
                                 Cards tmp = presentation.cueCards.get(change_cueCards_num);
 
@@ -618,6 +622,9 @@ public class LiveCollaboration extends AppCompatActivity {
                             }
                             else{
                                 // do nothing if the presentationID is different
+                                Log.w("TAG", "222");
+                                Log.w("TAG", change_presentationID);
+                                Log.w("TAG", presentationID);
                             }
                         }
 
