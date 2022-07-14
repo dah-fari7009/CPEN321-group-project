@@ -70,6 +70,7 @@
     </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/LB"
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_marginBottom="5dp"

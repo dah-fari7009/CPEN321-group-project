@@ -47,6 +47,8 @@ public class AddPres extends AppCompatActivity {
         presTitle = findViewById(R.id.presTitle);
         presDescription = findViewById(R.id.presDescription);
 
+        // it detects when the presentation title is edited, it will change the title on the app
+
         presTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -83,6 +85,7 @@ public class AddPres extends AppCompatActivity {
         currentTime = pad(calendar.get(Calendar.HOUR)) + ":" + pad(calendar.get(Calendar.MINUTE));
     }
 
+    // this will start a import activity and is invoked by pressing the import button
     ActivityResultLauncher<Intent> sActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -105,12 +108,15 @@ public class AddPres extends AppCompatActivity {
         return String.valueOf(i);
     }
 
+    // return the menu with the add and save button
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.save_menu, menu);
         return true;
     }
+
+    // when the save or delete button is clicked, it will create or delete the presentation
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -137,7 +143,7 @@ public class AddPres extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+    // open the choose file window and let user choose the data
     public void openFileDialog(View view) {
         Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         data.addCategory(Intent.CATEGORY_OPENABLE);

@@ -26,6 +26,10 @@ public class Content implements Serializable {
         this.message = message;
     }
 
+    public Content() {
+
+    }
+
     public int getColor() {return colour;}
 
     public String getMessage() {return message; }
@@ -38,3 +42,4 @@ public class Content implements Serializable {
         this.message = message;
     }
 }
+

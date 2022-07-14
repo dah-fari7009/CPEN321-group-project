@@ -42,12 +42,8 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     List<Presentation> presentations;
-    private String url = "http://20.104.77.70:8081/";
-    // private ListView listView;
-    // String[] name = {"Alice", "Bob", "Cathy", "Cherry", "Chritopher", "Dog", "Eddy"};
     Adapter adapter;
-   // ArrayAdapter<String> arrayAdapter;
-    private Button test;
+
     Presentation presentation = new Presentation("test1");
     Presentation presentation2 = new Presentation("test2");
     Presentation passedPres;
@@ -62,11 +58,11 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     Content contentCard2Back2 = new Content("font", "style", 5, Color.BLUE, "Then, deliver on your promise");
     Content contentCard2Front1 = new Content("font", "style", 5, Color.BLUE, "Bottom line upfront");
 
-    Front sideFront1 = new Front(Color.WHITE, new Content[]{contentCard1Front1});
-    Back sideBack1 = new Back(Color.WHITE, new Content[]{contentCard1Back1, contentCard1Back2, contentCard1Back3});
+    Front sideFront1 = new Front(Color.WHITE, contentCard1Front1);
+    Back sideBack1 = new Back(Color.WHITE, contentCard1Back1);
 
-    Front sideFront2 = new Front(Color.WHITE, new Content[]{contentCard2Front1});
-    Back sideBack2 = new Back(Color.WHITE, new Content[]{contentCard2Back1, contentCard2Back2});
+    Front sideFront2 = new Front(Color.WHITE, contentCard2Front1 );
+    Back sideBack2 = new Back(Color.WHITE, contentCard2Back1);
 
     Cards card1 = new Cards(Color.WHITE, "Knowing target audience leads to better hooks", 0, sideFront1, sideBack1);
     Cards card2 = new Cards(Color.WHITE, "Then, deliver on your promise", 1, sideFront2, sideBack2);
@@ -86,7 +82,9 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
 
         recyclerView = findViewById(R.id.listOfPres);
         presentations = new ArrayList<>();
-        extractPresentations();
+
+        adapter = new Adapter(this, presentations, this::selectedPres);
+        //extractPresentations();
 
         // put here to test the add functionality
         passedPres = (Presentation) getIntent().getSerializableExtra("Presentation");
@@ -99,15 +97,6 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
 
 
 
-        test = findViewById(R.id.button2);
-        test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent presentingIntent = new Intent(MainActivity.this, Presenting.class);
-                startActivity(presentingIntent);
-            }
-        });
-
 //        listView = findViewById(R.id.listView);
 //        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, name);
 //        listView.setAdapter(arrayAdapter);
@@ -118,41 +107,40 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         presentations.add(presentation);
         presentations.add(presentation2);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        adapter = new Adapter(getApplicationContext(), presentations, this::OnPresClick);
         recyclerView.setAdapter(adapter);
     }
 
-    private void extractPresentations() {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                for (int i = 0; i < response.length(); i++) {
-                    try {
-                        JSONObject presentationObject = response.getJSONObject(i);
-
-                        Presentation presentation = new Presentation();
-                        presentation.setTitle(presentationObject.getString("title").toString());
-                        presentations.add(presentation);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                //adapter = new Adapter(getApplicationContext(), presentations, this);
-                recyclerView.setAdapter(adapter);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("tag", "onErrorResponse: " + error.getMessage());
-            }
-        });
-
-        queue.add(jsonArrayRequest);
-    }
+//    private void extractPresentations() {
+//        RequestQueue queue = Volley.newRequestQueue(this);
+//        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+//            @Override
+//            public void onResponse(JSONArray response) {
+//                for (int i = 0; i < response.length(); i++) {
+//                    try {
+//                        JSONObject presentationObject = response.getJSONObject(i);
+//
+//                        Presentation presentation = new Presentation();
+//                        presentation.setTitle(presentationObject.getString("title").toString());
+//                        presentations.add(presentation);
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+//                //adapter = new Adapter(getApplicationContext(), presentations, this);
+//                recyclerView.setAdapter(adapter);
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.d("tag", "onErrorResponse: " + error.getMessage());
+//            }
+//        });
+//
+//        queue.add(jsonArrayRequest);
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -192,11 +180,11 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
-    public void OnPresClick(int position) {
-        Presentation pres = presentations.get(position);
-        Intent intent = new Intent(MainActivity.this, EditPres.class);
-        intent.putExtra("Presentation", pres);
+    public void selectedPres(Presentation presentation) {
+        Intent intent = new Intent(this, EditPres.class);
+        intent.putExtra("Presentation", presentation);
         startActivity(intent);
     }
 }

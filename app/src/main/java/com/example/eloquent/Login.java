@@ -36,11 +36,21 @@ public class Login extends AppCompatActivity {
     private Integer RC_SIGN_IN = 1;
     final static String TAG = "Login";
     private Router router;
+    private Button loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        loginButton = findViewById(R.id.LB);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent usingIntent = new Intent(Login.this, MainActivity.class);
+                startActivity(usingIntent);
+            }
+        });
 
         router = Router.getInstance(getApplicationContext());
 

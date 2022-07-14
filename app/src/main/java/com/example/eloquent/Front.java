@@ -3,18 +3,18 @@ package com.example.eloquent;
 import java.io.Serializable;
 
 public class Front implements Serializable {
-    public int backgroundColor;
-    public Content[] content;
 
-    public Front(int backgroundColour, Content[] content) {
-        this.backgroundColor = backgroundColour;
+    public int backgroundColor;
+    public Content content;
+
+    public Front(int backgroundColor, Content content) {
+        this.backgroundColor = backgroundColor;
         this.content = content;
     }
 
     public Front(int backgroundColor) {
-
         this.backgroundColor = backgroundColor;
-        this.content = new Content[1];
+        this.content = new Content();
     }
 
     // empty constructor for Jackson
@@ -22,13 +22,13 @@ public class Front implements Serializable {
 
     public int getBackgroundColor() {return backgroundColor;}
 
-    public Content getContent(int index) {return content[index]; }
+    public Content getContent() {return content; }
 
     public void setBackgroundColor(int backgroundColor) {
         this.backgroundColor = backgroundColor;
     }
 
     public void setContent(Content content, int index) {
-        this.content[index] = content;
+        this.content = content;
     }
 }

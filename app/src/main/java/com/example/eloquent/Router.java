@@ -141,8 +141,9 @@ public class Router {
             public void onResponse(String response) {
                 Log.d(TAG, response);
                 ObjectMapper objectMapper = new ObjectMapper();
+                Presentation pres;
                 try {
-                    Presentation pres = objectMapper.readValue(response, Presentation.class);
+                    pres = objectMapper.readValue(response, Presentation.class);
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }

@@ -2,6 +2,7 @@ package com.example.eloquent;
 
 import java.io.Serializable;
 
+
 public class Cards implements Serializable {
 
     public Front front;

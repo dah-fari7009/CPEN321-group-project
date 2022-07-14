@@ -3,28 +3,31 @@ package com.example.eloquent;
 import java.io.Serializable;
 
 public class Back implements Serializable {
-    public int background_color;
-    public Content[] content;
+    public int backgroundColor;
+    public Content content;
 
-    public Back(int backgroundColour, Content[] content) {
-        this.background_color = backgroundColour;
+    public Back(int backgroundColor, Content content) {
+        this.backgroundColor = backgroundColor;
         this.content = content;
     }
 
-    public Back(int background_color) {
-        this.background_color = background_color;
-        this.content = new Content[1];
+    public Back(int backgroundColor) {
+        this.backgroundColor = backgroundColor;
+        this.content = new Content();
     }
 
-    public int getBackground_color() {return background_color;}
+    // empty constructor for Jackson
+    public Back() {}
 
-    public Content getContent(int index) {return content[index]; }
+    public int getBackgroundColor() {return backgroundColor;}
 
-    public void setBackground_color(int background_color) {
-        this.background_color = background_color;
+    public Content getContent() {return content;}
+
+    public void setBackgroundColor(int backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 
     public void setContent(Content content, int index) {
-        this.content[index] = content;
+        this.content = content;
     }
 }
