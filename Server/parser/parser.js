@@ -1,4 +1,4 @@
-//var presentationManager = require("PresManager");
+var presentationManager = require("../presManager/presManager");
 
 var colors = {
     "black":        0x000000,
@@ -109,7 +109,8 @@ function parse(userID, text) {
         var tokenNoWhitespace = tokens[i].replace(/\s/g, "");
         var attributesStartIndex = tokenNoWhitespace.indexOf("[");
         var attributesEndIndex = tokenNoWhitespace.indexOf("]");
-        if (contexts["presentation"] == true) {
+        
+	if (contexts["presentation"] == true) {
             if (contexts["cuecard"] == true) {
                 if (contexts["details"] == true) {
                     if (tokenNoWhitespace === keywords["end"] + "{details}") {
@@ -186,7 +187,8 @@ function parse(userID, text) {
 
     p.addUser(userID, "owner");
 
-    // console.log(JSON.stringify(p));
+    console.log(JSON.stringify(p));
+    p = presentationManager.storeImportedPres(p);    
     return JSON.stringify(p);
 }
 

@@ -1,7 +1,9 @@
 const User = require('../models/users');
+const presManager = require('../presManager/presManager')
 const {OAuth2Client} = require('google-auth-library');
 
-const CLIENT_ID = "588466351198-96mgu43b4k81evnf387c5gpa2vc4d587.apps.googleusercontent.com";
+//const CLIENT_ID = "588466351198-96mgu43b4k81evnf387c5gpa2vc4d587.apps.googleusercontent.com";
+const CLIENT_ID = "9332959347-o8lhle1t6p7oanp5rq08vosu7vct3as3.apps.googleusercontent.com"; // Aswin's Google OAuth2 web client id
 
 //from https://developers.google.com/identity/sign-in/web/backend-auth
 const client = new OAuth2Client(CLIENT_ID);
@@ -34,10 +36,14 @@ login = (req, res) => {
                     username: req.body.username,
                     presentations: []
                 }).then((data) => {
-                    return res.status(200).json({ success: true, data: data });
+                    return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations });
                 })
             } else {
-                return res.status(200).json({ data: data });
+		var presentationTitles = [];
+		for (let i = 0; i < data.presentations.length; i++) {
+		    presentationTitles.push(presManager.getPresTitle(data.presentations[i], req.body.userID));
+		}
+                return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: presentationTitles });
             }
         })
     }).catch((error) => {
