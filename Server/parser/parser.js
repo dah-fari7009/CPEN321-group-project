@@ -36,6 +36,9 @@ function Cuecard() {
     this.transitionPhrase = ""; // If empty transition phrase, default to manual cuecard transition
     this.endWithPause = true;
     this.front = {
+        font: "Times New Roman",
+        style: "normalfont",
+        size: "12",
         backgroundColor: colors["white"], 
         content: {
             // TODO add font, size, and style attributes
@@ -49,6 +52,9 @@ function Cuecard() {
 function CuecardBack() {
     this.backgroundColor = colors["white"];
     this.content = {
+        font: "Times New Roman",
+        style: "normalfont",
+        size: "12",
         colour: colors["black"],
         message: ""
     };
