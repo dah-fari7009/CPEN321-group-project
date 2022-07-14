@@ -24,7 +24,11 @@
 
         <activity
             android:name=".EditPres"
-            android:exported="true" />
+            android:exported="true" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".Presenting"
             android:exported="false"
