@@ -1,29 +1,22 @@
 package com.example.eloquent;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,14 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.text.Editable;
-import android.text.Selection;
-import android.text.TextWatcher;
-import android.text.style.UnderlineSpan;
-import android.widget.TextView;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -134,13 +119,13 @@ public class LiveCollaboration extends AppCompatActivity {
         back.setBackgroundColor(65280);
 
         if(cardFace == 0){
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
             String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
             int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
             content.setText(getColoredtext(color,text));
         }
         else{
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
             String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
             int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
             content.setText(getColoredtext(color,text));
@@ -210,7 +195,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 if(cueCards_num<cueCards_max-1){
                     cueCards_num = cueCards_num+1;
                     cardFace=0;
-                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getFront().getContent().getMessage();
                     int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
                     content.setText(getColoredtext(color,text));
@@ -252,7 +237,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 if(cueCards_num>0){
                     cueCards_num = cueCards_num-1;
                     cardFace=0;
-                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getFront().getContent().getMessage();
                     int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
                     content.setText(getColoredtext(color,text));
@@ -279,7 +264,7 @@ public class LiveCollaboration extends AppCompatActivity {
                     presentation.cueCards.set(cueCards_num,tmp);
 //                    Log.w("TAG", "save success");
                     cardFace = 1;
-                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getBack().getContent().getMessage();
                     int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                     content.setText(getColoredtext(color,text));
@@ -289,7 +274,7 @@ public class LiveCollaboration extends AppCompatActivity {
                     presentation.cueCards.set(cueCards_num,tmp);
 //                    Log.w("TAG", "save success");
                     cardFace = 0;
-                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getFront().getContent().getMessage();
                     int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
                     content.setText(getColoredtext(color,text));
@@ -418,13 +403,13 @@ public class LiveCollaboration extends AppCompatActivity {
                                 LiveCollaboration.this.runOnUiThread(new Runnable() {
                                     public void run() {
                                         if(cardFace == 0){
-                                            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                                            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                                             String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
                                             int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
                                             content.setText(getColoredtext(color,text));
                                         }
                                         else{
-                                            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                                            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                                             String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
                                             int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                                             content.setText(getColoredtext(color,text));
@@ -486,13 +471,13 @@ public class LiveCollaboration extends AppCompatActivity {
                         LiveCollaboration.this.runOnUiThread(new Runnable() {
                             public void run() {
                                 if(cardFace == 0){
-                                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                                     String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
                                     int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
                                     content.setText(getColoredtext(color,text));
                                 }
                                 else{
-                                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                                     String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
                                     int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                                     content.setText(getColoredtext(color,text));
@@ -604,13 +589,13 @@ public class LiveCollaboration extends AppCompatActivity {
                                 LiveCollaboration.this.runOnUiThread(new Runnable() {
                                     public void run() {
                                         if(cardFace == 0){
-                                            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                                            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                                             String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
                                             int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
                                             content.setText(getColoredtext(color,text));
                                         }
                                         else{
-                                            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                                            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                                             String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
                                             int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                                             content.setText(getColoredtext(color,text));
@@ -672,13 +657,13 @@ public class LiveCollaboration extends AppCompatActivity {
                         LiveCollaboration.this.runOnUiThread(new Runnable() {
                             public void run() {
                                 if(cardFace == 0){
-                                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                                     String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
                                     int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
                                     content.setText(getColoredtext(color,text));
                                 }
                                 else{
-                                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackground_color(), PorterDuff.Mode.SRC_ATOP);
+                                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                                     String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
                                     int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                                     content.setText(getColoredtext(color,text));
