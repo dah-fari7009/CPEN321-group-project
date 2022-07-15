@@ -82,3 +82,7 @@ const mockStoreImportedPres = jest.fn((presObj) => {
 //	});
 });
 
+module.exports = {
+	mockStoreImportedPres,
+	validPresObj
+}

@@ -1,3 +1,4 @@
-const presManMocks = require(presManager.mocks);
+const presManMocks = require("./presManager.mocks");
 
 
+test('Store imported presesntation', () => {});
