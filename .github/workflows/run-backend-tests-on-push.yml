@@ -31,4 +31,5 @@ jobs:
       - name: Run a multi-line script
         run: |
           cd ./Server
+          npm install --save-dev jest
           npm test
