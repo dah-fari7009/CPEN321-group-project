@@ -1,0 +1,5 @@
+name: run-backend-tests-on-push
+on: [push]
+jobs:
+        - run: cd Server
+        - run: npm test
