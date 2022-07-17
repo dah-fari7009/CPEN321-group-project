@@ -52,16 +52,19 @@ login = (req, res) => {
     })
 }
 
-addPresToUser = (req, res) => {
-    User.findOneAndUpdate(
-        {userID: req.body.userID},
-        {$push: {presentations: req.body.presID}},
-        {new: true}
-    ).then((data) => {
-        return res.status(200).json({ data: data });
-    }).catch((err) => {
-        return res.status(500).json({ success: false, err: err });
-    })
+// internal - called from presManager.js's createPres()
+addPresToUser = (userId, presID) => {
+    return new Promise((resolve, reject) => {
+	    User.findOneAndUpdate(
+        	{userID: userID},
+        	{$push: {presentations: presID}},
+        	{new: true}
+    	).then((data) => {
+        	resolve(200);
+    	}).catch((err) => {
+        	reject(500);
+    	})
+    });
 
     //edit presentation to add user to array
 }

@@ -1,4 +1,5 @@
 const Presentation = require('../models/presentations');
+const userStore = require('../userStore/userStore');
 
 //@TODO should this also have a title in the request body
 createPres = (req, res) => {
@@ -14,6 +15,7 @@ createPres = (req, res) => {
             feedback: [],
             users: [{id: req.body.userID, permission: "owner"}]     
         }).then((data) => {
+	    userStore.addPresToUser(req.body.userID, data._id);
             return res.status(200).send( data._id );
         }).catch((err) => {
             return res.status(500).json({ err: err });
