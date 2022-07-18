@@ -13,6 +13,9 @@ router.post("/presentation", presentationManager.getPres); // Changed from get t
 router.post("/search", presentationManager.search); // Changed from get to post, as get requests aren't supposed to have a body.
 router.delete("/presentation", presentationManager.deletePres);
 
+router.put("/save", presentationManager.save);
+router.post("/allPresentation", presentationManager.getAllPresOfUser);
+
 //User store routes
 router.put("/login", userStore.login);
 router.put("/addPresToUser", userStore.addPresToUser);
