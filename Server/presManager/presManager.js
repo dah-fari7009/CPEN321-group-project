@@ -120,6 +120,37 @@ deletePres = (req, res) => {
     })
 }
 
+
+savePres = (req, res) => {
+    const filter = {"_id": req.body.presID};
+    const update = {
+        "title": req.body.title,
+        "cards": req.body.cards,
+        "feedback": req.body.feedback,
+        "users": req.body.users
+    }
+    Presentation.findOneAndUpdate(filter, update, {new: true})
+        .then((pres) => {
+            return res.status(200).json({data: pres});
+        }).catch((err) => {
+            return res.status(500).json({err: err});
+        })
+}
+
+getAllPresOfUser = (req, res) => {
+    Presentation.find({
+        "users.id": req.body.userID
+    }).then((data) => {
+        var titleArr = [];
+        for (var i = 0; i < data.length; i++) {
+            titleArr.push({[data[i].title]: data[i]._id})
+        }
+        return res.status(200).json({data: titleArr});
+    }).catch((err) => {
+        return res.status(500).json({err: err});
+    })
+}
+
 module.exports = {
     createPres,
     storeImportedPres,

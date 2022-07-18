@@ -60,8 +60,10 @@ addPresToUser = (userId, presID) => {
         	{$push: {presentations: presID}},
         	{new: true}
     	).then((data) => {
+		console.log("Added pres " + presID + " to user " + userID);
         	resolve(200);
     	}).catch((err) => {
+		console.log("Error when adding pres " + presID " to user " + userID);
         	reject(500);
     	})
     });
