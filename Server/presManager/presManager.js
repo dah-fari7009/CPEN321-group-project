@@ -17,10 +17,11 @@ createPres = (req, res) => {
             users: [{id: req.body.userID, permission: "owner"}]     
         }).then((data) => {
             presID = data._id;
-	        return userStore.addPresToUser(req.body.userID, data._id);
-        }).then((statusCode) => {
+	    return userStore.addPresToUser(req.body.userID, data._id);
+        }).then((statusCode) => { 
             return res.status(statusCode).send( presID );
-        }).catch((err) => {
+	}).catch((err) => {
+	    console.log(err);
             return res.status(500).json({ err: err });
         })
     } else {
@@ -120,7 +121,8 @@ deletePres = (req, res) => {
     })
 }
 
-save = (req, res) => {
+
+savePres = (req, res) => {
     const filter = {"_id": req.body.presID};
     const update = {
         "title": req.body.title,
@@ -158,6 +160,6 @@ module.exports = {
     editPres,
     search,
     deletePres,
-    save,
+    savePres,
     getAllPresOfUser
 }
