@@ -18,11 +18,11 @@ createPres = (req, res) => {
         }).then((data) => {
             presID = data._id;
 	    return userStore.addPresToUser(req.body.userID, data._id);
-        }).then((statusCode) => { 
-            return res.status(statusCode).send( presID );
+        }).then((result) => { 
+            return res.status(200).send(presID);
 	}).catch((err) => {
 	    console.log(err);
-            return res.status(500).json({ err: err });
+            return res.status(500).json(err);
         })
     } else {
         Presentation.create(req.body.presObj).then((data) => {

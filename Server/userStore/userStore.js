@@ -56,16 +56,25 @@ login = (req, res) => {
 addPresToUser = (userId, presID) => {
     console.log("Adding presentation " + presID + " to user " + userId);
     return new Promise((resolve, reject) => {
-	    User.findOneAndUpdate(
+	    User.findOne(
         	{userID: userId},
-        	{$push: {presentations: presID}},
-        	{new: true}
-    	).then((data) => {
+    	).then((user) => {
+		console.log(user.presentations);
+		if (user.presentations.includes(presID) == false) {
+			return User.findOneAndUpdate(
+				{userID: userId},
+				{$push: {presentations: presID}},
+				{new: true}
+			);
+		} else {
+			throw {err: "addPresToUser: Presentation " + presID  + " already included in user."};
+		}
+	}).then((data) => {
 		console.log("Added pres " + presID + " to user " + userId);
-        	resolve(200);
+        	resolve(data);
     	}).catch((err) => {
-		console.log("Error when adding pres " + presID + " to user " + userId);
-        	reject(500);
+		console.log(err);
+        	reject(err);
     	})
     });
 
