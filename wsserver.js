@@ -39,7 +39,7 @@ wss.on("connection",(ws) => {
 //         console.log("received: %s, %s", data, typeof data);
         var obj = JSON.parse(data);
 //         console.log(obj);
-        if(obj.hasOwnProperty('cueCards_num') && obj.hasOwnProperty('cardFace')){//send change to all other client
+        if(Object.prototype.hasOwnProperty.call(obj, "cueCards_num") && Object.prototype.hasOwnProperty.call(obj, "cardFace")){//send change to all other client
 //             console.log("Change!");
             wss.clients.forEach(function each(client){
                 if(client !== ws && client.readyState === WebSocket.OPEN){
@@ -71,7 +71,7 @@ wss.on("connection",(ws) => {
 var presentationMessage = {
     presentation:"0",
   };
-                        client.send(JSON.stringify(msg_presentation));
+                        client.send(JSON.stringify(presentationMessage));
                     }
                 });
                 var index = map1.get(PID)+1;
