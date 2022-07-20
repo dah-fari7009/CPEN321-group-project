@@ -49,7 +49,8 @@ getPres = (req, res) => {
 
 // Internal - for calls from login() of userStore.js, rather than
 // for responding to requests from the frontend.
-getPresTitle = (presentationID, userID) => {
+module.exports.getPresTitle = (presentationID, userID) => {
+    console.log("presManager: getPresTitle: Retrieving title of presentation " + presentationID + " for user " + userID);
     Presentation.find({
         "_id": presentationID,
         "users.id": userID
@@ -170,13 +171,13 @@ getAllPresOfUser = (req, res) => {
 }
 
 module.exports = {
-    createPres,
-    storeImportedPres,
-    getPres,
-    getPresTitle,
-    editPres,
-    search,
-    deletePres,
-    savePres,
-    getAllPresOfUser
+    createPres        : createPres,
+    storeImportedPres : storeImportedPres,
+    getPres           : getPres,
+    //getPresTitle      : getPresTitle,
+    editPres          : editPres,
+    search            : search,
+    deletePres        : deletePres,
+    savePres          : savePres,
+    getAllPresOfUser  : getAllPresOfUser
 }

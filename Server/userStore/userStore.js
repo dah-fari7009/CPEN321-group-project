@@ -41,7 +41,8 @@ login = (req, res) => {
             } else {
 		var presentationTitles = [];
 		for (let i = 0; i < data.presentations.length; i++) {
-		    presentationTitles.push(presManager.getPresTitle(data.presentations[i], req.body.userID));
+		    var title = presManager.getPresTitle(data.presentations[i], req.body.userID);
+		    presentationTitles.push(title);
 		}
                 return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: presentationTitles });
             }
@@ -99,7 +100,7 @@ removePresFromUser = (userID, presID) => {
 }
 
 module.exports = {
-    login,
-    addPresToUser,
-    removePresFromUser
+    login: login,
+    addPresToUser: addPresToUser,
+    removePresFromUser: removePresFromUser
 }
