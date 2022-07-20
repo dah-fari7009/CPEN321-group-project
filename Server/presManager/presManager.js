@@ -1,11 +1,13 @@
 const Presentation = require('../models/presentations');
+const userStore = require('../userStore/userStore');
 
 //@TODO should this also have a title in the request body
 createPres = (req, res) => {
     console.log("Create presentation request received!");
     if (!req.body.presObj) {
-        var presTitle = "unnamed";
-        if (req.body.title) presTitle = req.body.title;
+	var presID;
+    var presTitle = "unnamed";
+	if (req.body.title) presTitle = req.body.title;
         
 	//@TODO check for userID
         Presentation.create({
@@ -14,7 +16,10 @@ createPres = (req, res) => {
             feedback: [],
             users: [{id: req.body.userID, permission: "owner"}]     
         }).then((data) => {
-            return res.status(200).send( data._id );
+            presID = data._id;
+	        return userStore.addPresToUser(req.body.userID, data._id);
+        }).then((statusCode) => {
+            return res.status(statusCode).send( presID );
         }).catch((err) => {
             return res.status(500).json({ err: err });
         })
