@@ -17,10 +17,11 @@ createPres = (req, res) => {
             users: [{id: req.body.userID, permission: "owner"}]     
         }).then((data) => {
             presID = data._id;
-	        return userStore.addPresToUser(req.body.userID, data._id);
-        }).then((statusCode) => 
+	    return userStore.addPresToUser(req.body.userID, data._id);
+        }).then((statusCode) => { 
             return res.status(statusCode).send( presID );
-        ).catch((err) => {
+	}).catch((err) => {
+	    console.log(err);
             return res.status(500).json({ err: err });
         })
     } else {
@@ -158,5 +159,7 @@ module.exports = {
     getPresTitle,
     editPres,
     search,
-    deletePres
+    deletePres,
+    savePres,
+    getAllPresOfUser
 }

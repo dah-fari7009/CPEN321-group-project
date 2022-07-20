@@ -54,16 +54,17 @@ login = (req, res) => {
 
 // internal - called from presManager.js's createPres()
 addPresToUser = (userId, presID) => {
+    console.log("Adding presentation " + presID + " to user " + userId);
     return new Promise((resolve, reject) => {
 	    User.findOneAndUpdate(
-        	{userID: userID},
+        	{userID: userId},
         	{$push: {presentations: presID}},
         	{new: true}
     	).then((data) => {
-		console.log("Added pres " + presID + " to user " + userID);
+		console.log("Added pres " + presID + " to user " + userId);
         	resolve(200);
     	}).catch((err) => {
-		console.log("Error when adding pres " + presID " to user " + userID);
+		console.log("Error when adding pres " + presID + " to user " + userId);
         	reject(500);
     	})
     });
