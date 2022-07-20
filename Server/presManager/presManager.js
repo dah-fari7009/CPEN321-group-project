@@ -68,11 +68,12 @@ storeImportedPres = (presObj) => {
     })
 }
 
-checkPermission = (userID, presID) => {
+checkPermission = (userID, presID, permission) => {
+    console.log("presManager: checkPermission: Checking if user " + userID + " has " + permission + " permission for presentation " + presID );
     return new Promise(async (resolve,reject)=>{
         await Presentation.findById(presID).then((pres) => {
             for (var i = 0; i < pres.users.length; i++) {
-                if (pres.users[i].id == userID) {
+                if (pres.users[i].id === userID && pres.users[i].permission === permission) {
                     resolve(true)
                     return
                 }
@@ -115,9 +116,17 @@ search = (req, res) => {
 
 deletePres = (req, res) => {
     var deletedPres;
-    Presentation.findOneAndDelete({
-        "_id": req.body.presID,
-        "users.id": req.body.userID
+    checkPermission(req.body.userID, req.body.presID, "owner")
+    .then((permissionToDelete) => {
+        if (permissionToDelete) {
+	    Presentation.findOneAndDelete({
+                "_id": req.body.presID,
+                "users.id": req.body.userID
+            });
+        } else {
+            console.log("presManager: deletePres: User " + req.body.userID + " does not have adequate permission to delete presentation " + req.body.presID);
+	    throw {err: "presManager: deletePres: User " + req.body.userID + " does not have adequate permission to delete presentation " + req.body.presID};
+        }
     }).then((pres) => {
         deletedPres = pres;
         console.log("presManager: deletePres: Calling userStore.removePresFromUser( " + req.body.userID + " , " + req.body.presID + " )");

@@ -54,7 +54,7 @@ login = (req, res) => {
 
 // internal - called from presManager.js's createPres()
 addPresToUser = (userId, presID) => {
-    console.log("Adding presentation " + presID + " to user " + userId);
+    console.log("userStore: addPresToUser: Adding presentation " + presID + " to user " + userId);
     return new Promise((resolve, reject) => {
 	    User.findOne(
         	{userID: userId},
@@ -67,10 +67,10 @@ addPresToUser = (userId, presID) => {
 				{new: true}
 			);
 		} else {
-			throw {err: "addPresToUser: Presentation " + presID  + " already included in user."};
+			throw {err: "userStore: addPresToUser: Presentation " + presID  + " already included in user."};
 		}
 	}).then((data) => {
-		console.log("Added pres " + presID + " to user " + userId);
+		console.log("userStore: addPresToUser: Added pres " + presID + " to user " + userId);
         	resolve(data);
     	}).catch((err) => {
 		console.log(err);
@@ -83,13 +83,13 @@ addPresToUser = (userId, presID) => {
 
 // internal - called from presManager.js's deletePres()
 removePresFromUser = (userID, presID) => {
-    console.log("Deleting presentation " + presID + " from user " + userID);    
+    console.log("userStore: removePresFromUser: Deleting presentation " + presID + " from user " + userID);    
     return new Promise((resolve, reject) => {
         User.updateOne(
 	    {userID: userID},
             {$pull: {presentations: presID}}
         ).then((data) => {
-            console.log("Deleted presentation " + presID + " from user " + userID);
+            console.log("userStore: removePresFromUser: Deleted presentation " + presID + " from user " + userID);
 	    resolve(data);
         }).catch((err) => {
             console.log(err);
