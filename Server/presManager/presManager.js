@@ -18,15 +18,18 @@ createPres = (req, res) => {
         }).then((data) => {
             presID = data._id;
 	    return userStore.addPresToUser(req.body.userID, data._id);
-        }).then((statusCode) => { 
-            return res.status(statusCode).send( presID );
+        }).then((result) => { 
+            return res.status(200).send( presID );
 	}).catch((err) => {
 	    console.log(err);
             return res.status(500).json({ err: err });
         })
     } else {
         Presentation.create(req.body.presObj).then((data) => {
-            return res.status(200).send( data._id );
+	    presID = data._id;
+	    return userStore.addPresToUser(req.body.userID, data._id);
+	}).then((result) => {
+            return res.status(200).send( presID );
         }).catch((err) => {
             return res.status(500).json({ err: err });
         })
@@ -47,7 +50,8 @@ getPres = (req, res) => {
 
 // Internal - for calls from login() of userStore.js, rather than
 // for responding to requests from the frontend.
-getPresTitle = (presentationID, userID) => {
+module.exports.getPresTitle = (presentationID, userID) => {
+    console.log("presManager: getPresTitle: Retrieving title of presentation " + presentationID + " for user " + userID);
     Presentation.find({
         "_id": presentationID,
         "users.id": userID
@@ -60,17 +64,27 @@ getPresTitle = (presentationID, userID) => {
 
 // Internal - for calls from parse() of parser.js, rather than 
 // for responding to requests form the frontend.
-storeImportedPres = (presObj) => {
+storeImportedPres = (presObj, userID) => {
+    console.log("presManager: storeImportedPresentation: Storing imported presentation for user " + userID);
+    var presID;
     return new Promise ((resolve, reject) => {
-        Presentation.create(presObj).then((data) => {resolve(data)});
-    })
+        Presentation.create(presObj).then((data) => {
+            presID = data._id;
+            return userStore.addPresToUser(userID, data._id);
+        }).then((result) => {
+            resolve( presID );
+        }).catch((err) => {
+            reject( err );
+        })
+    });
 }
 
-checkPermission = (userID, presID) => {
+checkPermission = (userID, presID, permission) => {
+    console.log("presManager: checkPermission: Checking if user " + userID + " has " + permission + " permission for presentation " + presID );
     return new Promise(async (resolve,reject)=>{
         await Presentation.findById(presID).then((pres) => {
             for (var i = 0; i < pres.users.length; i++) {
-                if (pres.users[i].id == userID) {
+                if (pres.users[i].id === userID && pres.users[i].permission === permission) {
                     resolve(true)
                     return
                 }
@@ -113,11 +127,24 @@ search = (req, res) => {
 }
 
 deletePres = (req, res) => {
-    Presentation.findOneAndDelete({
-        "_id": req.body.presID,
-        "users.id": req.body.userID
+    var deletedPres;
+    checkPermission(req.body.userID, req.body.presID, "owner")
+    .then((permissionToDelete) => {
+        if (permissionToDelete) {
+	    Presentation.findOneAndDelete({
+                "_id": req.body.presID,
+                "users.id": req.body.userID
+            });
+        } else {
+            console.log("presManager: deletePres: User " + req.body.userID + " does not have adequate permission to delete presentation " + req.body.presID);
+	    throw {err: "presManager: deletePres: User " + req.body.userID + " does not have adequate permission to delete presentation " + req.body.presID};
+        }
     }).then((pres) => {
-        return res.status(200).json({ deletedDoc: pres });
+        deletedPres = pres;
+        console.log("presManager: deletePres: Calling userStore.removePresFromUser( " + req.body.userID + " , " + req.body.presID + " )");
+        return userStore.removePresFromUser(req.body.userID, req.body.presID);
+    }).then((data) => {
+        return res.status(200).json({ deletedDoc: deletedPres });
     }).catch((err) => {
         return res.status(500).json({ err: err });
     })
@@ -156,13 +183,13 @@ getAllPresOfUser = (req, res) => {
 }
 
 module.exports = {
-    createPres,
-    storeImportedPres,
-    getPres,
-    getPresTitle,
-    editPres,
-    search,
-    deletePres,
-    savePres,
-    getAllPresOfUser
+    createPres        : createPres,
+    storeImportedPres : storeImportedPres,
+    getPres           : getPres,
+    //getPresTitle      : getPresTitle,
+    editPres          : editPres,
+    search            : search,
+    deletePres        : deletePres,
+    savePres          : savePres,
+    getAllPresOfUser  : getAllPresOfUser
 }

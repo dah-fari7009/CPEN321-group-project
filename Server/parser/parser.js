@@ -184,7 +184,7 @@ parse = (req, res) => {
     p.addUser(userID, "owner");
 
     // console.log(p);
-    presentationManager.storeImportedPres(p).then((data) => {
+    presentationManager.storeImportedPres(p, userID).then((data) => {
         return res.status(200).json( data );
     }).catch((err) => {
         return res.status(500).json({ err: err });
