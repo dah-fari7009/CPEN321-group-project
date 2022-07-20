@@ -15,10 +15,6 @@ router.delete("/presentation", presentationManager.deletePres);
 router.post("/allPresentationsOfUser", presentationManager.getAllPresOfUser);
 router.put("/savePresentation", presentationManager.savePres);
 
-
-router.put("/save", presentationManager.save);
-router.post("/allPresentation", presentationManager.getAllPresOfUser);
-
 //User store routes
 router.put("/login", userStore.login);
 router.put("/addPresToUser", userStore.addPresToUser);
