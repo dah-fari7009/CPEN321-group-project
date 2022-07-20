@@ -26,7 +26,10 @@ createPres = (req, res) => {
         })
     } else {
         Presentation.create(req.body.presObj).then((data) => {
-            return res.status(200).send( data._id );
+	    presID = data._id;
+	    return userStore.addPresToUser(req.body.userID, data._id);
+	}).then((result) => {
+            return res.status(200).send( presID );
         }).catch((err) => {
             return res.status(500).json({ err: err });
         })
