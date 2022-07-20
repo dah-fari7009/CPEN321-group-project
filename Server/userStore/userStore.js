@@ -81,7 +81,25 @@ addPresToUser = (userId, presID) => {
     //edit presentation to add user to array
 }
 
+// internal - called from presManager.js's deletePres()
+removePresFromUser = (userID, presID) => {
+    console.log("Deleting presentation " + presID + " from user " + userID);    
+    return new Promise((resolve, reject) => {
+        User.updateOne(
+	    {userID: userID},
+            {$pull: {presentations: presID}}
+        ).then((data) => {
+            console.log("Deleted presentation " + presID + " from user " + userID);
+	    resolve(data);
+        }).catch((err) => {
+            console.log(err);
+	    reject(err);
+        })
+    });
+}
+
 module.exports = {
     login,
-    addPresToUser
+    addPresToUser,
+    removePresFromUser
 }

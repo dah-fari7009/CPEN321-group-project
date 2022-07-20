@@ -19,10 +19,10 @@ createPres = (req, res) => {
             presID = data._id;
 	    return userStore.addPresToUser(req.body.userID, data._id);
         }).then((result) => { 
-            return res.status(200).send(presID);
+            return res.status(200).send( presID );
 	}).catch((err) => {
 	    console.log(err);
-            return res.status(500).json(err);
+            return res.status(500).json({ err: err });
         })
     } else {
         Presentation.create(req.body.presObj).then((data) => {
@@ -114,11 +114,16 @@ search = (req, res) => {
 }
 
 deletePres = (req, res) => {
+    var deletedPres;
     Presentation.findOneAndDelete({
         "_id": req.body.presID,
         "users.id": req.body.userID
     }).then((pres) => {
-        return res.status(200).json({ deletedDoc: pres });
+        deletedPres = pres;
+        console.log("presManager: deletePres: Calling userStore.removePresFromUser( " + req.body.userID + " , " + req.body.presID + " )");
+        return userStore.removePresFromUser(req.body.userID, req.body.presID);
+    }).then((data) => {
+        return res.status(200).json({ deletedDoc: deletedPres });
     }).catch((err) => {
         return res.status(500).json({ err: err });
     })
