@@ -63,10 +63,19 @@ module.exports.getPresTitle = (presentationID, userID) => {
 
 // Internal - for calls from parse() of parser.js, rather than 
 // for responding to requests form the frontend.
-storeImportedPres = (presObj) => {
+storeImportedPres = (presObj, userID) => {
+    console.log("presManager: storeImportedPresentation: Storing imported presentation for user " + userID);
+    var presID;
     return new Promise ((resolve, reject) => {
-        Presentation.create(presObj).then((data) => {resolve(data)});
-    })
+        Presentation.create(presObj).then((data) => {
+            presID = data._id;
+            return userStore.addPresToUser(userID, data._id);
+        }).then((result) => {
+            resolve( presID );
+        }).catch((err) => {
+            reject( err );
+        })
+    });
 }
 
 checkPermission = (userID, presID, permission) => {
