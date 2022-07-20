@@ -33,10 +33,11 @@ createPres = (req, res) => {
     }
 }
 
+// expects presID and userID in query
 getPres = (req, res) => {
     Presentation.find({
-        "_id": req.body.presID,
-        "users.id": req.body.userID
+        "_id": req.query.presID,
+        "users.id": req.query.userID
     }).then((pres) => {
         return res.status(200).json({ data: pres });
     }).catch((err) => {
@@ -96,13 +97,14 @@ editPres = (req, res) => {
     })
 }
 
+// expects query and userID in query
 search = (req, res) => {
     Presentation.find({
         "title": {
-            "$regex": req.body.query,
+            "$regex": req.query.query,
             "$options": "i"
           },
-        "users.id": req.body.userID
+        "users.id": req.query.userID
     }).then((pres) => {
         return res.status(200).json({ data: pres });
     }).catch((err) => {
@@ -138,9 +140,10 @@ savePres = (req, res) => {
         })
 }
 
+// expects userID in query
 getAllPresOfUser = (req, res) => {
     Presentation.find({
-        "users.id": req.body.userID
+        "users.id": req.query.userID
     }).then((data) => {
         var titleArr = [];
         for (var i = 0; i < data.length; i++) {
