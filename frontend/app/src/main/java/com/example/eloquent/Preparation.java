@@ -25,22 +25,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Preparation extends AppCompatActivity {
 
-    private ImageButton nextButton;
-    private ImageButton backButton;
-    private ImageButton flipButton;
-    private ImageButton addButton;
-    private ImageButton deleteButton;
-    private ImageButton swapnextButton;
-    private ImageButton swaplastButton;
-    private ImageButton redoButton;
-    private ImageButton undoButton;
+
     private TextView pageNumber;
     private EditText content;
     private TextViewUndoRedo helper;
     private Presentation presentation = new Presentation();
     private int cueCards_num = 0;
     private int cueCards_max = 0;
-    private int content_num = 0;
     private int cardFace = 0;//0: front | 1: back
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -64,6 +55,16 @@ public class Preparation extends AppCompatActivity {
 
 
         //then change json to pres obj
+
+        ImageButton nextButton;
+        ImageButton backButton;
+        ImageButton flipButton;
+        ImageButton addButton;
+        ImageButton deleteButton;
+        ImageButton swapnextButton;
+        ImageButton swaplastButton;
+        ImageButton redoButton;
+        ImageButton undoButton;
 
 
         cueCards_max = 3;

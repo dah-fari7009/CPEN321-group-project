@@ -62,14 +62,18 @@ public class OnSwipeTouchListener implements OnTouchListener {
     }
 
     public void onSwipeRight() {
+        // nothing to be done here
     }
 
     public void onSwipeLeft() {
+        // nothing to be done here
     }
 
     public void onSwipeTop() {
+        // nothing to be done here
     }
 
     public void onSwipeBottom() {
+        // nothing to be done here
     }
 }

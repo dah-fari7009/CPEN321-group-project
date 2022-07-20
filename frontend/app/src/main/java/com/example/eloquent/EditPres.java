@@ -48,22 +48,26 @@ import java.util.Collections;
 
 public class EditPres extends AppCompatActivity {
 
-    private Toolbar toolbar;
-    private EditText presTitle, presDescription;
-    private Calendar calendar;
-    private String todaysDate;
-    private String currentTime;
-    private Button preparationBtn;
-    private Button presentingBtn;
-    private Button liveCollabBtn;
-    private DriverServiceHelper driverServiceHelper;
+
+    private EditText presTitle;
+//    private Calendar calendar;
+//    private String todaysDate;
+//    private String currentTime;
+
 
     Presentation presentation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_pres);
+
+        Button preparationBtn;
+        Button presentingBtn;
+        Button liveCollabBtn;
+        Toolbar toolbar;
+        EditText presDescription;
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
 
@@ -109,7 +113,7 @@ public class EditPres extends AppCompatActivity {
         presTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                // nothing to be done here
             }
 
             @Override
@@ -121,41 +125,28 @@ public class EditPres extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                //nothing to be done here
             }
         });
 
         //get current date and time
-        calendar = Calendar.getInstance();
-        todaysDate = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH)+1) + "/" + calendar.get(Calendar.DAY_OF_MONTH);
-        currentTime = pad(calendar.get(Calendar.HOUR)) + ":" + pad(calendar.get(Calendar.MINUTE));
+//        calendar = Calendar.getInstance();
+//        todaysDate = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH)+1) + "/" + calendar.get(Calendar.DAY_OF_MONTH);
+//        currentTime = pad(calendar.get(Calendar.HOUR)) + ":" + pad(calendar.get(Calendar.MINUTE));
     }
 
-//    ActivityResultLauncher<Intent> sActivityResultLauncher = registerForActivityResult(
-//            new ActivityResultContracts.StartActivityForResult(),
-//            new ActivityResultCallback<ActivityResult>() {
-//                @Override
-//                public void onActivityResult(ActivityResult result) {
-//                    if(result.getResultCode() == Activity.RESULT_OK) {
-//                        Intent data = result.getData();
-//                        Uri uri = data.getData();
-//                    }
-//                }
-//            }
+
+//    private void requestSignIn() {
+//        GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestEmail()
+//                .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
+//                .build();
 //
-//    );
-
-    private void requestSignIn() {
-        GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
-                .build();
-
-        GoogleSignInClient client = GoogleSignIn.getClient(this, signInOptions);
-
-        startActivityForResult(client.getSignInIntent(),400);
-
-    }
+//        GoogleSignInClient client = GoogleSignIn.getClient(this, signInOptions);
+//
+//        startActivityForResult(client.getSignInIntent(),400);
+//
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -168,12 +159,14 @@ public class EditPres extends AppCompatActivity {
                     handleSignInIntent(data);
                 }
                 break;
+            default: // nothing to be done here
         }
     }
 
     private void handleSignInIntent(Intent data) {
         GoogleSignIn.getSignedInAccountFromIntent(data)
                 .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
+                    DriverServiceHelper driverServiceHelper;
                     @Override
                     public void onSuccess(GoogleSignInAccount googleSignInAccount) {
                         GoogleAccountCredential credential = GoogleAccountCredential.

@@ -221,11 +221,7 @@ public class TextViewUndoRedo {
         }
 
         mEditHistory.mmPosition = sp.getInt(prefix + ".position", -1);
-        if (mEditHistory.mmPosition == -1) {
-            return false;
-        }
-
-        return true;
+        return mEditHistory.mmPosition != -1;
     }
 
     // =================================================================== //
@@ -281,12 +277,12 @@ public class TextViewUndoRedo {
          * Set the maximum history size. If size is negative, then history size
          * is only limited by the device memory.
          */
-        private void setMaxHistorySize(int maxHistorySize) {
-            mmMaxHistorySize = maxHistorySize;
-            if (mmMaxHistorySize >= 0) {
-                trimHistory();
-            }
-        }
+//        private void setMaxHistorySize(int maxHistorySize) {
+//            mmMaxHistorySize = maxHistorySize;
+//            if (mmMaxHistorySize >= 0) {
+//                trimHistory();
+//            }
+//        }
 
         /**
          * Trim history when it exceeds max history size.

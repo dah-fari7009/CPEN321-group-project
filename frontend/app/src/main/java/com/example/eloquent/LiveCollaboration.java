@@ -34,16 +34,13 @@ import tech.gusavila92.websocketclient.WebSocketClient;
 
 public class LiveCollaboration extends AppCompatActivity {
 
-    private ImageButton nextButton;
-    private ImageButton backButton;
-    private ImageButton flipButton;
+
     private TextView pageNumber;
     private EditText content;
     private Presentation presentation;
     private String presentationID = "10000";
     private int cueCards_num = 0;
     private int cueCards_max = 0;
-    private int content_num = 0;
     private int cardFace = 0;//0: front | 1: back
     private int userID = 120;
     private String title = "0";
@@ -64,6 +61,10 @@ public class LiveCollaboration extends AppCompatActivity {
 
 
         //then change json to pres obj
+
+        ImageButton nextButton;
+        ImageButton backButton;
+        ImageButton flipButton;
 
 
         cueCards_max = 3;
@@ -333,7 +334,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 }
                 if(tmpjson.has("presentation")){
                     //pack recent presentation obj to json and send to server
-                    webSocketClient.send(s.toString());
+                    webSocketClient.send(s);
                     Log.w("TAG", "PRESENTATION");
                 }
                 else{
@@ -722,11 +723,11 @@ public class LiveCollaboration extends AppCompatActivity {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             Log.d("TAG", "back button pressed");
             webSocketClient.close();
-            try {
-                String presentationJson = objectMapper.writeValueAsString(presentation);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                String presentationJson = objectMapper.writeValueAsString(presentation);
+//            } catch (JsonProcessingException e) {
+//                e.printStackTrace();
+//            }
         }
         return super.onKeyDown(keyCode, event);
     }

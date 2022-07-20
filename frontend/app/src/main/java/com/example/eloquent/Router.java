@@ -36,7 +36,7 @@ public class Router {
     }
 
     public void createUser(String IdToken, String userID, String username) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        //ObjectMapper objectMapper = new ObjectMapper();
         String url = BACKEND_HOST_AND_PORT + "/api/login";
         StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
             @Override
@@ -140,13 +140,12 @@ public class Router {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, response);
-                ObjectMapper objectMapper = new ObjectMapper();
-                Presentation pres;
-                try {
-                    pres = objectMapper.readValue(response, Presentation.class);
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+//                ObjectMapper objectMapper = new ObjectMapper();
+//                try {
+//                    Presentation pres = objectMapper.readValue(response, Presentation.class);
+//                } catch (JsonProcessingException e) {
+//                    e.printStackTrace();
+//                }
             }
         }, new Response.ErrorListener() {
             @Override

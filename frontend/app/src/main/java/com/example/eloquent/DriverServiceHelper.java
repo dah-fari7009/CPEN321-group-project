@@ -26,7 +26,7 @@ public class DriverServiceHelper {
             com.google.api.services.drive.model.File fileMetaData = new com.google.api.services.drive.model.File();
             fileMetaData.setName("Presentation");
 
-            java.io.File file = new java.io.File(filePath);
+            File file = new File(filePath);
 
             FileContent mediaContent = new FileContent("application/txt", file);
 

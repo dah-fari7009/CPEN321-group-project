@@ -39,7 +39,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Adapter.OnPresListener {
 
-    private Toolbar toolbar;
+
     private RecyclerView recyclerView;
     List<Presentation> presentations;
     Adapter adapter;
@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         presentation.cueCards.add(card1);
         presentation.cueCards.add(card2);
 
+        Toolbar toolbar;
+
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -110,37 +112,6 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         recyclerView.setAdapter(adapter);
     }
 
-//    private void extractPresentations() {
-//        RequestQueue queue = Volley.newRequestQueue(this);
-//        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-//            @Override
-//            public void onResponse(JSONArray response) {
-//                for (int i = 0; i < response.length(); i++) {
-//                    try {
-//                        JSONObject presentationObject = response.getJSONObject(i);
-//
-//                        Presentation presentation = new Presentation();
-//                        presentation.setTitle(presentationObject.getString("title").toString());
-//                        presentations.add(presentation);
-//
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-//                //adapter = new Adapter(getApplicationContext(), presentations, this);
-//                recyclerView.setAdapter(adapter);
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Log.d("tag", "onErrorResponse: " + error.getMessage());
-//            }
-//        });
-//
-//        queue.add(jsonArrayRequest);
-//    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -173,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                String searchStr = newText;
+//                String searchStr = newText;
 
                 adapter.getFilter().filter(newText);
                 return false;

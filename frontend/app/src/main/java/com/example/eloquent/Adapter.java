@@ -122,7 +122,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements
 
         @Override
         public void onClick(View v) {
-
+            // This will be over written by the onclick listener of the presentation list
         }
     }
 

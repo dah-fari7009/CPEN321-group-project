@@ -29,18 +29,21 @@ import java.util.Calendar;
 
 public class AddPres extends AppCompatActivity {
 
-    private Toolbar toolbar;
-    private EditText presTitle, presDescription;
-    private Button importButton;
-    private Calendar calendar;
-    private String todaysDate;
-    private String currentTime;
-    private String importText;
+
+    private EditText presTitle;
+//    private Calendar calendar;
+//    private String todaysDate;
+//    private String currentTime;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_pres);
+
+        EditText presDescription;
+        Toolbar toolbar;
+        Button importButton;
 
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
@@ -68,7 +71,7 @@ public class AddPres extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                // nothing needs to be done here
             }
         });
 
@@ -84,15 +87,16 @@ public class AddPres extends AppCompatActivity {
         });
 
         //get current date and time
-        calendar = Calendar.getInstance();
-        todaysDate = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH)+1) + "/" + calendar.get(Calendar.DAY_OF_MONTH);
-        currentTime = pad(calendar.get(Calendar.HOUR)) + ":" + pad(calendar.get(Calendar.MINUTE));
+//        calendar = Calendar.getInstance();
+//        todaysDate = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH)+1) + "/" + calendar.get(Calendar.DAY_OF_MONTH);
+//        currentTime = pad(calendar.get(Calendar.HOUR)) + ":" + pad(calendar.get(Calendar.MINUTE));
     }
 
     // this will start a import activity and is invoked by pressing the import button
     ActivityResultLauncher<Intent> sActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
+                String importText;
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if(result.getResultCode() == Activity.RESULT_OK) {
