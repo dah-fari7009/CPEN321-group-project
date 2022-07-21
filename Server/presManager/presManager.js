@@ -81,8 +81,8 @@ storeImportedPres = (presObj, userID) => {
 
 checkPermission = (userID, presID, permission) => {
     console.log("presManager: checkPermission: Checking if user " + userID + " has " + permission + " permission for presentation " + presID );
-    return new Promise(async (resolve,reject)=>{
-        await Presentation.findById(presID).then((pres) => {
+    return new Promise((resolve,reject)=>{
+        Presentation.findById(presID).then((pres) => {
             for (var i = 0; i < pres.users.length; i++) {
                 if (pres.users[i].id === userID && pres.users[i].permission === permission) {
                     resolve(true)
@@ -91,7 +91,8 @@ checkPermission = (userID, presID, permission) => {
             }
             resolve(false)
             return
-        }).catch(() => {
+        }).catch((err) => {
+            console.log(err)
             //@TODO throw error if presentation is not found?
             resolve(false)
             return
@@ -131,7 +132,7 @@ deletePres = (req, res) => {
     checkPermission(req.body.userID, req.body.presID, "owner")
     .then((permissionToDelete) => {
         if (permissionToDelete) {
-            Presentation.findOneAndDelete({
+            return Presentation.findOneAndDelete({
                 "_id": req.body.presID,
                 "users.id": req.body.userID
             });

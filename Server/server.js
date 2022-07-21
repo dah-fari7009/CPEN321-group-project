@@ -1,5 +1,6 @@
 const express = require("express");
 const router = require('./router/router')
+require('./db/connection')
 
 const app = express();
 const port = 8081;
