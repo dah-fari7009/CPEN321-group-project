@@ -26,6 +26,7 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // Dev login button, to bypass google sign-in
         Button loginButton = findViewById(R.id.LB);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,6 +43,10 @@ public class Login extends AppCompatActivity {
                 .requestIdToken(getString(R.string.google_oauth2_web_client_id))
                 .requestEmail()
                 .build();
+
+        // check for already signed-in Google user
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        updateUI(account);
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
@@ -78,8 +83,6 @@ public class Login extends AppCompatActivity {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             // Signed in successfully, show authenticated UI.
             updateUI(account);
-            router.createUser(account.getIdToken(), account.getId(), account.getEmail());
-            openNewWindow();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
@@ -99,23 +102,30 @@ public class Login extends AppCompatActivity {
     }
 
     private void updateUI(GoogleSignInAccount account) {
-        if(account == null) {
-            Log.d(TAG, "There is no user signed in!");
-        }
-        else {
-            Log.d(TAG, "Pref name: " + account.getDisplayName());
-            Log.d(TAG, "Email: " + account.getEmail());
-            Log.d(TAG, "Family name: " + account.getFamilyName());
-            Log.d(TAG, "Given name: " + account.getGivenName());
-            Log.d(TAG, "Display URL: " + account.getPhotoUrl());
+        if (account != null) {
+            // Create user from account
+            router.createUser(account.getIdToken(), account.getId(), account.getEmail());
 
+            // Logging for debugging
+            if (account == null) {
+                Log.d(TAG, "There is no user signed in!");
+            } else {
+                Log.d(TAG, "Pref name: " + account.getDisplayName());
+                Log.d(TAG, "Email: " + account.getEmail());
+                Log.d(TAG, "Family name: " + account.getFamilyName());
+                Log.d(TAG, "Given name: " + account.getGivenName());
+                Log.d(TAG, "Display URL: " + account.getPhotoUrl());
+            }
 
+            // Go to main activity
+            openMainActivity();
+        } else {
+            Log.d(TAG, "User is not signed in yet.");
         }
     }
 
 
-    private void openNewWindow() {
-
+    private void openMainActivity() {
         Intent usingIntent = new Intent(Login.this, MainActivity.class);
         startActivity(usingIntent);
     }

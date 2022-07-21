@@ -52,20 +52,24 @@ getPres = (req, res) => {
 // for responding to requests from the frontend.
 module.exports.getPresTitle = (presentationID, userID) => {
     console.log("presManager: getPresTitle: Retrieving title of presentation " + presentationID + " for user " + userID);
-    Presentation.find({
-        "_id": presentationID,
-        "users.id": userID
-    }).then((pres) => {
-        return pres.title;
-    }).catch((err) => {
-        return err;
-    })	
+    return new Promise ((resolve, reject) => {
+        Presentation.findById(
+            presentationID
+        ).then((pres) => {
+            resolve(pres.title);
+        }).catch((err) => {
+            reject(err);
+        })
+    });
 }
 
 // Internal - for calls from parse() of parser.js, rather than 
 // for responding to requests form the frontend.
 storeImportedPres = (presObj, userID) => {
+    /* Expects a presentation object, and a string (e.g. "104866131128716891939") */
     console.log("presManager: storeImportedPresentation: Storing imported presentation for user " + userID);
+    console.log(presObj);
+    console.log(presObj.cards[0]);
     var presID;
     return new Promise ((resolve, reject) => {
         Presentation.create(presObj).then((data) => {

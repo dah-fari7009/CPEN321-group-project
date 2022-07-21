@@ -35,82 +35,92 @@
             android:textSize="20sp" />
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/llLoginPanel"
-        android:layout_width="366dp"
-        android:layout_height="317dp"
-        android:layout_marginTop="56dp"
-        android:background="@drawable/shape_login_panel"
-        android:orientation="vertical"
-        android:paddingLeft="50dp"
-        android:paddingTop="70dp"
-        android:paddingRight="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rlHeader">
+<!--    <LinearLayout-->
+<!--        android:id="@+id/llLoginPanel"-->
+<!--        android:layout_width="366dp"-->
+<!--        android:layout_height="317dp"-->
+<!--        android:layout_marginTop="56dp"-->
+<!--        android:background="@drawable/shape_login_panel"-->
+<!--        android:orientation="vertical"-->
+<!--        android:paddingLeft="50dp"-->
+<!--        android:paddingTop="70dp"-->
+<!--        android:paddingRight="50dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/rlHeader">-->
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:hint="Email" />
+<!--        <EditText-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:hint="Email" />-->
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:hint="Password"
-            android:inputType="textPassword" />
+<!--        <EditText-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:hint="Password"-->
+<!--            android:inputType="textPassword" />-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:gravity="right"
-            android:text="Forget password?" />
+<!--        <TextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="15dp"-->
+<!--            android:gravity="right"-->
+<!--            android:text="Forget password?" />-->
 
-    </LinearLayout>
+<!--    </LinearLayout>-->
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/LB"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="5dp"
-        android:background="@drawable/shape_login_button"
-        android:text="Login"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="@id/llLoginPanel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/loginButtons"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:padding="20dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Don't have an account?" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:text="SIGN UP"
-            android:textColor="@color/pink"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/llLoginPanel" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/LB"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/shape_login_button"
+            android:text="Dev Login"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </LinearLayout>>
+<!--    <LinearLayout-->
+<!--        android:id="@+id/linearLayout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:gravity="center_horizontal"-->
+<!--        android:padding="20dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent">-->
+
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Don't have an account?" />-->
+
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginLeft="15dp"-->
+<!--            android:text="SIGN UP"-->
+<!--            android:textColor="@color/pink"-->
+<!--            android:textSize="20sp" />-->
+<!--    </LinearLayout>-->
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

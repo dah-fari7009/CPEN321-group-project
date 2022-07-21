@@ -40,12 +40,15 @@ login = (req, res) => {
                     return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations });
                 })
             } else {
-                var presTitles = [];
-                for (let i = 0; i < data.presentations.length; i++) {
-                    var title = presManager.getPresTitle(data.presentations[i], req.body.userID);
-                    presTitles.push(title);
-                }
-                return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: presTitles });
+                // var presTitles = [];
+                // for (let i = 0; i < data.presentations.length; i++) {
+		//     presManager.getPresTitle(data.presentations[i], req.body.userID).then((title) => {
+                //         console.log("userStore: login: title of presentation " + data.presentations[i] + " is '" + title + "'");
+                //         presTitles.push(title);
+		//     });
+                // }
+                // console.log(presTitles);
+                return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: []});
             }
         })
     }).catch((error) => {
