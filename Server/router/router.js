@@ -13,6 +13,8 @@ router.get("/search", presentationManager.search);
 router.delete("/presentation", presentationManager.deletePres);
 router.get("/allPresentationsOfUser", presentationManager.getAllPresOfUser);
 router.put("/savePresentation", presentationManager.savePres);
+router.put("/share", presentationManager.share);
+router.put("/unshare", presentationManager.unShare);
 
 //User store routes
 router.put("/login", userStore.login);

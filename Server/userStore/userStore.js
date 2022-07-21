@@ -61,7 +61,7 @@ addPresToUser = (userID, presID) => {
         User.findOne(
             { userID },
         ).then((user) => {
-            console.log(user.presentations);
+            //console.log(user.presentations);
             if (user.presentations.includes(presID) == false) {
                 return User.findOneAndUpdate(
                     { userID },

@@ -183,6 +183,49 @@ getAllPresOfUser = (req, res) => {
     })
 }
 
+// expects the userID of the user being added, and presID
+share = (req, res) => {
+    let addedUser = {id: req.body.userID, permission: "collaborator"}
+    Presentation.findById(req.body.presID).then((pres) => {
+        if (!pres) {
+            throw "no presentation found";
+        }
+        return userStore.addPresToUser(req.body.userID, req.body.presID)
+    }).then(() => {
+        return Presentation.findOneAndUpdate(
+            { 
+                "_id": req.body.presID,
+                "users.id": { $ne: req.body.userID }
+            },
+            {$push: {users: addedUser}},
+            {new: true}
+        );
+    }).then((updatedPres) => {
+        return res.status(200).json({data: updatedPres});
+    }).catch((err) => {
+        return res.status(500).json({err});
+    })
+}
+
+unShare = (req, res) => {
+    Presentation.findById(req.body.presID).then((pres) => {
+        if (!pres) {
+            throw "no presentation found";
+        }
+        return userStore.removePresFromUser(req.body.userID, req.body.presID)
+    }).then(() => {
+        return Presentation.findOneAndUpdate(
+            { "_id": req.body.presID },
+            {$pull: {users: { id: req.body.userID }}},
+            {new: true}
+        );
+    }).then((updatedPres) => {
+        return res.status(200).json({data: updatedPres});
+    }).catch((err) => {
+        return res.status(500).json({err});
+    })
+}
+
 module.exports = {
     createPres,
     storeImportedPres,
@@ -192,5 +235,7 @@ module.exports = {
     search,
     deletePres,
     savePres,
-    getAllPresOfUser
+    getAllPresOfUser,
+    share,
+    unShare
 }
