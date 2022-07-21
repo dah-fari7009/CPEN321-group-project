@@ -52,14 +52,15 @@ getPres = (req, res) => {
 // for responding to requests from the frontend.
 module.exports.getPresTitle = (presentationID, userID) => {
     console.log("presManager: getPresTitle: Retrieving title of presentation " + presentationID + " for user " + userID);
-    Presentation.find({
-        "_id": presentationID,
-        "users.id": userID
-    }).then((pres) => {
-        return pres.title;
-    }).catch((err) => {
-        return err;
-    })	
+    return new Promise ((resolve, reject) => {
+        Presentation.findById(
+            presentationID
+        ).then((pres) => {
+            resolve(pres.title);
+        }).catch((err) => {
+            reject(err);
+        })
+    });
 }
 
 // Internal - for calls from parse() of parser.js, rather than 
