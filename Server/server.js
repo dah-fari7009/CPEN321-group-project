@@ -1,6 +1,4 @@
 const express = require("express");
-
-const db = require('./db/connection')
 const router = require('./router/router')
 
 const app = express();
@@ -15,9 +13,9 @@ app.get("/", (req, res) => {
     res.send("Hello World");
 })
 
-var server = app.listen(8081, (req, res) => {
+var server = app.listen(port, (req, res) => {
     var host = server.address().address;
-    var port = server.address().port;
-    console.log("running at http://%s:%s", host, port);
+    var serverPort = server.address().port;
+    console.log("running at http://%s:%s", host, serverPort);
     console.log(server.address())
 })
