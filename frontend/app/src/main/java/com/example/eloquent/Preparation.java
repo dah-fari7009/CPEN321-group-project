@@ -537,11 +537,11 @@ public class Preparation extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             Log.d("TAG", "back button pressed");
-            try {
-                String presentationJson = objectMapper.writeValueAsString(presentation);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                String presentationJson = objectMapper.writeValueAsString(presentation);
+//            } catch (JsonProcessingException e) {
+//                e.printStackTrace();
+//            }
         }
         return super.onKeyDown(keyCode, event);
     }

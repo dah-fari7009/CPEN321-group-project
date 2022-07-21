@@ -55,7 +55,7 @@ public class EditPres extends AppCompatActivity {
         Button presentingBtn;
         Button liveCollabBtn;
         Toolbar toolbar;
-        EditText presDescription;
+//        EditText presDescription;
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
 
@@ -66,7 +66,7 @@ public class EditPres extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         presTitle = findViewById(R.id.presTitle);
-        presDescription = findViewById(R.id.presDescription);
+//        presDescription = findViewById(R.id.presDescription);
         preparationBtn = findViewById(R.id.preparationButton);
         presentingBtn = findViewById(R.id.presentingButton);
         liveCollabBtn = findViewById(R.id.liveCollabButton);
