@@ -1,6 +1,5 @@
 package com.example.eloquent;
 
-import android.telephony.IccOpenLogicalChannelResponse;
 
 import java.io.Serializable;
 
