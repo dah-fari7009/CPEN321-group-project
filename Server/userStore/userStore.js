@@ -40,31 +40,31 @@ login = (req, res) => {
                     return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations });
                 })
             } else {
-                var presentationTitles = [];
+                var presTitles = [];
                 for (let i = 0; i < data.presentations.length; i++) {
                     var title = presManager.getPresTitle(data.presentations[i], req.body.userID);
-                    presentationTitles.push(title);
+                    presTitles.push(title);
                 }
-                return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: presentationTitles });
+                return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: presTitles });
             }
         })
     }).catch((error) => {
         console.log(error)
-        return res.status(500).json({ error: error });
+        return res.status(500).json({ error });
     })
 }
 
 // internal - called from presManager.js's createPres()
-addPresToUser = (userId, presID) => {
-    console.log("userStore: addPresToUser: Adding presentation " + presID + " to user " + userId);
+addPresToUser = (userID, presID) => {
+    console.log("userStore: addPresToUser: Adding presentation " + presID + " to user " + userID);
     return new Promise((resolve, reject) => {
         User.findOne(
-            {userID: userId},
+            { userID },
         ).then((user) => {
             console.log(user.presentations);
             if (user.presentations.includes(presID) == false) {
                 return User.findOneAndUpdate(
-                    {userID: userId},
+                    { userID },
                     {$push: {presentations: presID}},
                     {new: true}
                 );
@@ -72,7 +72,7 @@ addPresToUser = (userId, presID) => {
                 throw {err: "userStore: addPresToUser: Presentation " + presID  + " already included in user."};
             }
         }).then((data) => {
-            console.log("userStore: addPresToUser: Added pres " + presID + " to user " + userId);
+            console.log("userStore: addPresToUser: Added pres " + presID + " to user " + userID);
             resolve(data);
         }).catch((err) => {
             console.log(err);
@@ -87,7 +87,7 @@ removePresFromUser = (userID, presID) => {
     console.log("userStore: removePresFromUser: Deleting presentation " + presID + " from user " + userID);    
     return new Promise((resolve, reject) => {
         User.updateOne(
-            {userID: userID},
+            { userID },
             {$pull: {presentations: presID}}
         ).then((data) => {
             console.log("userStore: removePresFromUser: Deleted presentation " + presID + " from user " + userID);
@@ -100,7 +100,7 @@ removePresFromUser = (userID, presID) => {
 }
 
 module.exports = {
-    login: login,
-    addPresToUser: addPresToUser,
-    removePresFromUser: removePresFromUser
+    login,
+    addPresToUser,
+    removePresFromUser
 }

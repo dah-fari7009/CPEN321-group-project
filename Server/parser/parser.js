@@ -66,8 +66,8 @@ Presentation.prototype.addCard = function(card) {
     this.cards.push(card);
 }
 
-Presentation.prototype.addUser = function(userID, permission) {
-    this.users.push({id: userID, permission: permission});
+Presentation.prototype.addUser = function(userID, role) {
+    this.users.push({id: userID, permission: role});
 }
 
 
@@ -187,7 +187,7 @@ parse = (req, res) => {
     presentationManager.storeImportedPres(p, userID).then((data) => {
         return res.status(200).json( data );
     }).catch((err) => {
-        return res.status(500).json({ err: err });
+        return res.status(500).json({ err });
     })
 }
 
