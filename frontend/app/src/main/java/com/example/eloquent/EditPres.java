@@ -180,12 +180,12 @@ public class EditPres extends AppCompatActivity {
     }
 
     // if the hour or minute is less than 10, add 0 before it
-    private String pad(int i) {
-        if(i < 10) {
-            return "0" + i;
-        }
-        return String.valueOf(i);
-    }
+//    private String pad(int i) {
+//        if(i < 10) {
+//            return "0" + i;
+//        }
+//        return String.valueOf(i);
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
