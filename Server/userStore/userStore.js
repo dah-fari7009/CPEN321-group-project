@@ -69,7 +69,7 @@ addPresToUser = (userID, presID) => {
                     {new: true}
                 );
             } else {
-                throw {err: "userStore: addPresToUser: Presentation " + presID  + " already included in user."};
+                throw "userStore: addPresToUser: Presentation " + presID  + " already included in user.";
             }
         }).then((data) => {
             console.log("userStore: addPresToUser: Added pres " + presID + " to user " + userID);
