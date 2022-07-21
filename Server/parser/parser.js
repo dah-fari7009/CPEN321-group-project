@@ -114,7 +114,7 @@ parse = (req, res) => {
                     } else if (i == tokens.length - 3) {
                         throw {err: "No \\end{details} token found after \\begin{details}."};
                     } else {
-                        var tokenNoKeyword = tokens[i].slice("item".length - tokens[i].length);
+                        let tokenNoKeyword = tokens[i].slice("item".length - tokens[i].length);
                         if (tokenNoKeyword[0] === "[" && tokenNoKeyword.slice(1, tokenNoKeyword.indexOf("=")) === "color") { 
                             var color = tokenNoKeyword.slice(tokenNoKeyword.indexOf("=") + 1, tokenNoKeyword.indexOf("]"));
                             if (color in colors) {
@@ -133,7 +133,7 @@ parse = (req, res) => {
                         || tokenNoWhitespace === keywords["begin"] + "{details}") {
                         contexts["details"] = true;
                     } else if (tokenNoWhitespace.slice(0, "point".length) === "point") {
-                        var tokenNoKeyword = tokens[i].slice("point".length - tokens[i].length);
+                        let tokenNoKeyword = tokens[i].slice("point".length - tokens[i].length);
                         c.front.content["message"] = tokenNoKeyword;
                     }
                 }
