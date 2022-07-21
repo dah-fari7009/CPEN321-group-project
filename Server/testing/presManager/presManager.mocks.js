@@ -1,5 +1,3 @@
-const presManager = require("../../presManager/presManager");
-
 // mocking presManager.js
 
 
