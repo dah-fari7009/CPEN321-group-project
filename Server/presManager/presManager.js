@@ -44,7 +44,7 @@ getPres = (req, res) => {
     }).then((pres) => {
         return res.status(200).json({ data: pres });
     }).catch((err) => {
-        return res.status(500).json({ err: err });
+        return res.status(500).json({ err });
     })
 }
 
@@ -107,7 +107,7 @@ editPres = (req, res) => {
     }, {[req.body.field]: req.body.content}, {new: true}).then((pres) => {
         return res.status(200).json({ data: pres });
     }).catch((err) => {
-        return res.status(500).json({ err: err });
+        return res.status(500).json({ err });
     })
 }
 
@@ -122,7 +122,7 @@ search = (req, res) => {
     }).then((pres) => {
         return res.status(200).json({ data: pres });
     }).catch((err) => {
-        return res.status(500).json({ err: err });
+        return res.status(500).json({ err });
     })
 }
 
@@ -146,7 +146,7 @@ deletePres = (req, res) => {
     }).then((data) => {
         return res.status(200).json({ deletedDoc: deletedPres });
     }).catch((err) => {
-        return res.status(500).json({ err: err });
+        return res.status(500).json({ err });
     })
 }
 
@@ -163,7 +163,7 @@ savePres = (req, res) => {
         .then((pres) => {
             return res.status(200).json({data: pres});
         }).catch((err) => {
-            return res.status(500).json({err: err});
+            return res.status(500).json({err});
         })
 }
 
@@ -178,7 +178,7 @@ getAllPresOfUser = (req, res) => {
         }
         return res.status(200).json({data: titleArr});
     }).catch((err) => {
-        return res.status(500).json({err: err});
+        return res.status(500).json({err});
     })
 }
 
