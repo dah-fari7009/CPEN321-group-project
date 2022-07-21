@@ -58,7 +58,7 @@ public class AddPres extends AppCompatActivity {
         presTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                // nothing needs to be done here
             }
 
             @Override
