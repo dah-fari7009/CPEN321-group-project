@@ -354,28 +354,13 @@ public class LiveCollaboration extends AppCompatActivity {
                         }
                         else{
                             String change_presentationID = null;
-                            try {
-                                change_presentationID = tmpjson.getString("presentationID");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
                             int change_cueCards_num = 0;
-                            try {
-                                change_cueCards_num = Integer.valueOf(tmpjson.getString("cueCards_num"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
                             int change_cardFace = 0;
-                            try {
-                                change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
                             String change_recent_text = null;
                             try {
+                                change_presentationID = tmpjson.getString("presentationID");
+                                change_cueCards_num = Integer.valueOf(tmpjson.getString("cueCards_num"));
+                                change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
                                 change_recent_text = tmpjson.getString("recent_text");
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -435,33 +420,33 @@ public class LiveCollaboration extends AppCompatActivity {
                         //change json to presentation obj
 
                         Presentation tmp_pres = new Presentation();
-                        Content content1 = new Content(Color.BLUE,"1Fronttest");
-                        Content content2 = new Content(Color.BLUE,"1Backtest");
-                        Back back1 = new Back(Color.BLACK);
-                        back1.content=content2;
-                        Front front1 = new Front(Color.WHITE);
-                        front1.content=content1;
-                        Cards card1 = new Cards(front1,back1,Color.WHITE);
-
-                        Content content3 = new Content(Color.BLUE,"2Fronttest");
-                        Content content4 = new Content(Color.BLUE,"2Backtest");
-                        Back back2 = new Back(Color.BLACK);
-                        back2.content=content4;
-                        Front front2 = new Front(Color.WHITE);
-                        front2.content=content3;
-                        Cards card2 = new Cards(front2,back2,Color.WHITE);
-
-                        Content content5 = new Content(Color.BLUE,"3Fronttest");
-                        Content content6 = new Content(Color.BLUE,"3Backtest");
-                        Back back3 = new Back(Color.BLACK);
-                        back3.content=content6;
-                        Front front3 = new Front(Color.WHITE);
-                        front3.content=content5;
-                        Cards card3 = new Cards(front3,back3,Color.WHITE);
-
-                        tmp_pres.cueCards.add(card1);
-                        tmp_pres.cueCards.add(card2);
-                        tmp_pres.cueCards.add(card3);
+//                        Content content1 = new Content(Color.BLUE,"1Fronttest");
+//                        Content content2 = new Content(Color.BLUE,"1Backtest");
+//                        Back back1 = new Back(Color.BLACK);
+//                        back1.content=content2;
+//                        Front front1 = new Front(Color.WHITE);
+//                        front1.content=content1;
+//                        Cards card1 = new Cards(front1,back1,Color.WHITE);
+//
+//                        Content content3 = new Content(Color.BLUE,"2Fronttest");
+//                        Content content4 = new Content(Color.BLUE,"2Backtest");
+//                        Back back2 = new Back(Color.BLACK);
+//                        back2.content=content4;
+//                        Front front2 = new Front(Color.WHITE);
+//                        front2.content=content3;
+//                        Cards card2 = new Cards(front2,back2,Color.WHITE);
+//
+//                        Content content5 = new Content(Color.BLUE,"3Fronttest");
+//                        Content content6 = new Content(Color.BLUE,"3Backtest");
+//                        Back back3 = new Back(Color.BLACK);
+//                        back3.content=content6;
+//                        Front front3 = new Front(Color.WHITE);
+//                        front3.content=content5;
+//                        Cards card3 = new Cards(front3,back3,Color.WHITE);
+//
+//                        tmp_pres.cueCards.add(card1);
+//                        tmp_pres.cueCards.add(card2);
+//                        tmp_pres.cueCards.add(card3);
 
                         //reset presentation
 
@@ -540,28 +525,13 @@ public class LiveCollaboration extends AppCompatActivity {
                         }
                         else{
                             String change_presentationID = null;
-                            try {
-                                change_presentationID = tmpjson.getString("presentationID");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
                             int change_cueCards_num = 0;
-                            try {
-                                change_cueCards_num = Integer.valueOf(tmpjson.getString("cueCards_num"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
                             int change_cardFace = 0;
-                            try {
-                                change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
                             String change_recent_text = null;
                             try {
+                                change_presentationID = tmpjson.getString("presentationID");
+                                change_cueCards_num = Integer.valueOf(tmpjson.getString("cueCards_num"));
+                                change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
                                 change_recent_text = tmpjson.getString("recent_text");
                             } catch (JSONException e) {
                                 e.printStackTrace();
