@@ -25,7 +25,6 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Calendar;
 
 public class AddPres extends AppCompatActivity {
 

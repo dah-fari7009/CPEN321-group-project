@@ -22,7 +22,7 @@ createPres = (req, res) => {
             return res.status(200).send( presID );
         }).catch((err) => {
             console.log(err);
-            return res.status(500).json({ err: err });
+            return res.status(500).json({ err });
         })
     } else {
         Presentation.create(req.body.presObj).then((data) => {
@@ -183,13 +183,13 @@ getAllPresOfUser = (req, res) => {
 }
 
 module.exports = {
-    createPres        : createPres,
-    storeImportedPres : storeImportedPres,
-    getPres           : getPres,
-    //getPresTitle      : getPresTitle,
-    editPres          : editPres,
-    search            : search,
-    deletePres        : deletePres,
-    savePres          : savePres,
-    getAllPresOfUser  : getAllPresOfUser
+    createPres,
+    storeImportedPres,
+    getPres,
+    //getPresTitle,
+    editPres,
+    search,
+    deletePres,
+    savePres,
+    getAllPresOfUser
 }

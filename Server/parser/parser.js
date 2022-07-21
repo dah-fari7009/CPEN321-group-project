@@ -1,25 +1,25 @@
 var presentationManager = require("../presManager/presManager");
 
 var colors = {
-    "black":        0x000000,
-    "white":        0xffffff,
-    "red":          0xff0000,    
-    "green":        0x00ff00,
-    "blue":         0x0000ff,
-    "silver":       0xc0c0c0,
-    "gray":         0x808080,
-    "maroon":       0x800000,
-    "olive":        0x808000,
-    "lime":         0x00ff00,
-    "aqua":         0x00ffff,
-    "teal":         0x008080,
-    "navy":         0x000080,
-    "fuschia":      0xff00ff,
-    "purple":       0x800080,
-    "indianred":    0xcd5c5c,
-    "salmon":       0xfa8072,
-    "darksalmon":   0xe9967a,
-    "lightsalmon":  0xffa07a
+    "black":        0,
+    "white":        1,
+    "red":          2,    
+    "green":        3,
+    "blue":         4,
+    "silver":       5,
+    "gray":         6,
+    "maroon":       7,
+    "olive":        8,
+    "lime":         9,
+    "aqua":         10,
+    "teal":         11,
+    "navy":         12,
+    "fuschia":      13,
+    "purple":       14,
+    "indianred":    15,
+    "salmon":       16,
+    "darksalmon":   17,
+    "lightsalmon":  18
 }
 
 
@@ -66,8 +66,8 @@ Presentation.prototype.addCard = function(card) {
     this.cards.push(card);
 }
 
-Presentation.prototype.addUser = function(userID, permission) {
-    this.users.push({id: userID, permission: permission});
+Presentation.prototype.addUser = function(userID, role) {
+    this.users.push({id: userID, permission: role});
 }
 
 
@@ -106,9 +106,9 @@ parse = (req, res) => {
         var attributesStartIndex = tokenNoWhitespace.indexOf("[");
         var attributesEndIndex = tokenNoWhitespace.indexOf("]");
         
-	if (contexts["presentation"] == true) {
-            if (contexts["cuecard"] == true) {
-                if (contexts["details"] == true) {
+	if (contexts["presentation"] === true) {
+            if (contexts["cuecard"] === true) {
+                if (contexts["details"] === true) {
                     if (tokenNoWhitespace === keywords["end"] + "{details}") {
                         contexts["details"] = false;
                     } else if (i == tokens.length - 3) {
@@ -187,7 +187,7 @@ parse = (req, res) => {
     presentationManager.storeImportedPres(p, userID).then((data) => {
         return res.status(200).json( data );
     }).catch((err) => {
-        return res.status(500).json({ err: err });
+        return res.status(500).json({ err });
     })
 }
 
