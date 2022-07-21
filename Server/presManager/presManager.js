@@ -65,7 +65,10 @@ module.exports.getPresTitle = (presentationID, userID) => {
 // Internal - for calls from parse() of parser.js, rather than 
 // for responding to requests form the frontend.
 storeImportedPres = (presObj, userID) => {
+    /* Expects a presentation object, and a string (e.g. "104866131128716891939") */
     console.log("presManager: storeImportedPresentation: Storing imported presentation for user " + userID);
+    console.log(presObj);
+    console.log(presObj.cards[0]);
     var presID;
     return new Promise ((resolve, reject) => {
         Presentation.create(presObj).then((data) => {
