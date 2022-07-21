@@ -45,7 +45,7 @@ public class LiveCollaboration extends AppCompatActivity {
     private String title = "0";
     ObjectMapper objectMapper = new ObjectMapper();
     private WebSocketClient webSocketClient;
-
+    private static String TAG = "LiveCollaboration";
 
 
 
@@ -96,7 +96,7 @@ public class LiveCollaboration extends AppCompatActivity {
         presentation.cueCards.add(card1);
         presentation.cueCards.add(card2);
         presentation.cueCards.add(card3);
-        Log.w("TAG", "set success");
+        Log.w(TAG, "set success");
 
         //start page
 
@@ -178,7 +178,7 @@ public class LiveCollaboration extends AppCompatActivity {
 
                 String change = content.getText().toString();
                 Cards tmp = presentation.cueCards.get(cueCards_num);
-//                Log.w("TAG", "get success" + change);
+//                Log.w(TAG, "get success" + change);
 
                 if(cardFace==0) {//front
                     tmp.front.content.setMessage(change);
@@ -230,7 +230,7 @@ public class LiveCollaboration extends AppCompatActivity {
                     tmp.back.content.setMessage(change);
                     presentation.cueCards.set(cueCards_num,tmp);
                 }
-                Log.w("TAG", "save success");
+                Log.w(TAG, "save success");
 
                 //second, change to the last page
 
@@ -262,7 +262,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 if(cardFace==0) { //front
                     tmp.front.content.setMessage(change);
                     presentation.cueCards.set(cueCards_num,tmp);
-//                    Log.w("TAG", "save success");
+//                    Log.w(TAG, "save success");
                     cardFace = 1;
                     content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getBack().getContent().getMessage();
@@ -272,7 +272,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 else{ // back
                     tmp.back.content.setMessage(change);
                     presentation.cueCards.set(cueCards_num,tmp);
-//                    Log.w("TAG", "save success");
+//                    Log.w(TAG, "save success");
                     cardFace = 0;
                     content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.getCards(cueCards_num).getFront().getContent().getMessage();
@@ -301,7 +301,7 @@ public class LiveCollaboration extends AppCompatActivity {
         webSocketClient = new WebSocketClient(uri) {
             @Override
             public void onOpen() {
-                Log.i("WebSocket", "Session is starting");
+                Log.i(TAG + " :WebSocket", "Session is starting");
                 JSONObject obj =  new JSONObject();
                 try{
                     obj.put("presentationID",presentationID);
@@ -323,8 +323,8 @@ public class LiveCollaboration extends AppCompatActivity {
 
 
 
-                Log.i("WebSocket", "Message received");
-                Log.i("WebSocket", s);
+                Log.i(TAG + " :WebSocket", "Message received");
+                Log.i(TAG + " :WebSocket", s);
                 JSONObject tmpjson = null;
                 try {
                     tmpjson = new JSONObject(s);
@@ -334,12 +334,12 @@ public class LiveCollaboration extends AppCompatActivity {
                 if(tmpjson.has("presentation")){
                     //pack recent presentation obj to json and send to server
                     webSocketClient.send(s);
-                    Log.w("TAG", "PRESENTATION");
+                    Log.w(TAG, "PRESENTATION");
                 }
                 else{
 
                     if(tmpjson.has("cueCards_num")&&tmpjson.has("cardFace")){  // This is a change
-                        Log.w("TAG", "Change");
+                        Log.w(TAG, "Change");
 
                         int change_userID = 0;
                         try {
@@ -349,7 +349,7 @@ public class LiveCollaboration extends AppCompatActivity {
                         }
 
                         if (userID == change_userID){
-                            Log.w("TAG", "==");
+                            Log.w(TAG, "==");
 
                         }
                         else{
@@ -381,7 +381,7 @@ public class LiveCollaboration extends AppCompatActivity {
                                 e.printStackTrace();
                             }
 
-                            Log.w("TAG", "111");
+                            Log.w(TAG, "111");
                             if(change_presentationID.equals(presentationID) ){
 
                                 Cards tmp = presentation.cueCards.get(change_cueCards_num);
@@ -396,7 +396,7 @@ public class LiveCollaboration extends AppCompatActivity {
                                     tmp.back.content.setMessage(change_recent_text);
                                     presentation.cueCards.set(cueCards_num,tmp);
                                 }
-                                Log.w("TAG", "change save");
+                                Log.w(TAG, "change save");
 
                                 //refresh editText
 
@@ -414,7 +414,7 @@ public class LiveCollaboration extends AppCompatActivity {
                                             int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                                             content.setText(getColoredtext(color,text));
                                         }
-                                        Log.w("TAG", "change refresh");
+                                        Log.w(TAG, "change refresh");
                                     }
                                 });
 
@@ -423,7 +423,7 @@ public class LiveCollaboration extends AppCompatActivity {
                             }
                             else{
                                 // do nothing if the presentationID is different
-                                Log.w("TAG", "222");
+                                Log.w(TAG, "222");
                             }
                         }
 
@@ -466,7 +466,7 @@ public class LiveCollaboration extends AppCompatActivity {
                         //reset presentation
 
                         presentation = tmp_pres;
-                        Log.w("TAG", "newPresentation save");
+                        Log.w(TAG, "newPresentation save");
 
                         LiveCollaboration.this.runOnUiThread(new Runnable() {
                             public void run() {
@@ -482,13 +482,13 @@ public class LiveCollaboration extends AppCompatActivity {
                                     int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                                     content.setText(getColoredtext(color,text));
                                 }
-                                Log.w("TAG", "newPresentation refresh");
+                                Log.w(TAG, "newPresentation refresh");
                             }
                         });
 
                     }
                     else{
-
+                        Log.d(TAG, "not a new presentation, or a change");
                     }
 
 
@@ -507,9 +507,9 @@ public class LiveCollaboration extends AppCompatActivity {
 
             @Override
             public void onBinaryReceived(byte[] data) {
-                Log.i("WebSocket", "Bin received");
+                Log.i(TAG + " :WebSocket", "Bin received");
                 String s = new String(data);
-                Log.i("WebSocket", s);
+                Log.i(TAG + " :WebSocket", s);
                 JSONObject tmpjson = null;
                 try {
                     tmpjson = new JSONObject(s);
@@ -520,12 +520,12 @@ public class LiveCollaboration extends AppCompatActivity {
                 if(tmpjson.has("presentation")){
                     //pack recent presentation obj to json and send to server
                     webSocketClient.send(s.toString());
-                    Log.w("TAG", "PRESENTATION");
+                    Log.w(TAG, "PRESENTATION");
                 }
                 else{
 
                     if(tmpjson.has("cueCards_num")&&tmpjson.has("cardFace")){  // This is a change
-                        Log.w("TAG", "Change");
+                        Log.w(TAG, "Change");
 
 
                         int change_userID = 0;
@@ -536,7 +536,7 @@ public class LiveCollaboration extends AppCompatActivity {
                         }
 
                         if (userID == change_userID){ // do nothing if user ID the same
-                            Log.w("TAG", "==");
+                            Log.w(TAG, "==");
                         }
                         else{
                             String change_presentationID = null;
@@ -568,7 +568,7 @@ public class LiveCollaboration extends AppCompatActivity {
                             }
 
                             if(change_presentationID.equals(presentationID)){
-                                Log.w("TAG", "111");
+                                Log.w(TAG, "111");
 
                                 Cards tmp = presentation.cueCards.get(change_cueCards_num);
 
@@ -582,7 +582,7 @@ public class LiveCollaboration extends AppCompatActivity {
                                     tmp.back.content.setMessage(change_recent_text);
                                     presentation.cueCards.set(cueCards_num,tmp);
                                 }
-                                Log.w("TAG", "change save");
+                                Log.w(TAG, "change save");
 
                                 //refresh editText
 
@@ -600,23 +600,23 @@ public class LiveCollaboration extends AppCompatActivity {
                                             int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                                             content.setText(getColoredtext(color,text));
                                         }
-                                        Log.w("TAG", "change refresh");
+                                        Log.w(TAG, "change refresh");
                                     }
                                 });
 
                             }
                             else{
                                 // do nothing if the presentationID is different
-                                Log.w("TAG", "222");
-                                Log.w("TAG", change_presentationID);
-                                Log.w("TAG", presentationID);
+                                Log.w(TAG, "222");
+                                Log.w(TAG, change_presentationID);
+                                Log.w(TAG, presentationID);
                             }
                         }
 
                     }
                     else if(tmpjson.has("title")){// this is a presentation json
 
-                        Log.w("TAG", "newPresentation");
+                        Log.w(TAG, "newPresentation");
                         //change json to presentation obj
 
                         Presentation tmp_pres = new Presentation();
@@ -650,7 +650,7 @@ public class LiveCollaboration extends AppCompatActivity {
 
 
                         //reset presentation
-                        Log.w("TAG", "newPresentation save");
+                        Log.w(TAG, "newPresentation save");
 
                         presentation = tmp_pres;
 
@@ -668,7 +668,7 @@ public class LiveCollaboration extends AppCompatActivity {
                                     int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                                     content.setText(getColoredtext(color,text));
                                 }
-                                Log.w("TAG", "newPresentation refresh");
+                                Log.w(TAG, "newPresentation refresh");
                             }
                         });
 
@@ -685,23 +685,23 @@ public class LiveCollaboration extends AppCompatActivity {
 
             @Override
             public void onPingReceived(byte[] data) {
-                Log.i("WebSocket", "Pin received");
+                Log.i(TAG + " :WebSocket", "Pin received");
             }
 
             @Override
             public void onPongReceived(byte[] data) {
-                Log.i("WebSocket", "Pon received");
+                Log.i(TAG + " :WebSocket", "Pon received");
             }
 
             @Override
             public void onException(Exception e) {
                 System.out.println(e.getMessage());
-                Log.i("WebSocket", "Error");
+                Log.i(TAG + " :WebSocket", "Error");
             }
 
             @Override
             public void onCloseReceived() {
-                Log.i("WebSocket", "Closed ");
+                Log.i(TAG + " :WebSocket", "Closed ");
                 System.out.println("onCloseReceived");
             }
         };
@@ -720,7 +720,7 @@ public class LiveCollaboration extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            Log.d("TAG", "back button pressed");
+            Log.d(TAG, "back button pressed");
             webSocketClient.close();
 //            try {
 //                String presentationJson = objectMapper.writeValueAsString(presentation);

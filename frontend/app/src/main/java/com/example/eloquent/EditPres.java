@@ -198,7 +198,7 @@ public class EditPres extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.delete) {
-
+            Log.d(TAG, "onOptionsItemSelected: delete button pressed.");
         }
         if(item.getItemId() == R.id.save) {
             if(presentation.title != null) {
