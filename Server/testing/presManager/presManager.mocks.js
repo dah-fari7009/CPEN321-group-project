@@ -57,24 +57,24 @@ const validPresObj = {
     }],
     "feedback": [{
         "date": "today",
-	    "duration": 1,
-	    "pauses": [{
+        "duration": 1,
+        "pauses": [{
             "start": 0,
             "end": 2
-	    }],
-	    "pacing": [{
+        }],
+        "pacing": [{
             "cueCardStartTime": 0,
             "cueCardEndTime": 2
-	    }]
+        }]
     }],
     "users": [{
-	    "id": "this guy", 
-	    "permission": "owner"
+        "id": "this guy", 
+        "permission": "owner"
     }]
 };
 
 const mockStoreImportedPres = jest.fn((presObj) => {
-	console.log(validPresObj);
+    console.log(validPresObj);
 //	return new Promise ((resolve, reject) => {
 //		switch (presObj) {
 //			case validObject: 
@@ -83,6 +83,6 @@ const mockStoreImportedPres = jest.fn((presObj) => {
 });
 
 module.exports = {
-	mockStoreImportedPres,
-	validPresObj
+    mockStoreImportedPres,
+    validPresObj
 }

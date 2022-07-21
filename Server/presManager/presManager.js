@@ -5,30 +5,30 @@ const userStore = require('../userStore/userStore');
 createPres = (req, res) => {
     console.log("Create presentation request received!");
     if (!req.body.presObj) {
-	var presID;
+    var presID;
     var presTitle = "unnamed";
-	if (req.body.title) presTitle = req.body.title;
+    if (req.body.title) presTitle = req.body.title;
         
-	//@TODO check for userID
+    //@TODO check for userID
         Presentation.create({
             title: presTitle,
             cards: [],
             feedback: [],
-            users: [{id: req.body.userID, permission: "owner"}]     
+            users: [{id: req.body.userID, permission: "owner"}]
         }).then((data) => {
             presID = data._id;
             return userStore.addPresToUser(req.body.userID, data._id);
         }).then((result) => { 
             return res.status(200).send( presID );
-	    }).catch((err) => {
+        }).catch((err) => {
             console.log(err);
             return res.status(500).json({ err: err });
         })
     } else {
         Presentation.create(req.body.presObj).then((data) => {
             presID = data._id;
-	        return userStore.addPresToUser(req.body.userID, data._id);
-	    }).then((result) => {
+            return userStore.addPresToUser(req.body.userID, data._id);
+        }).then((result) => {
             return res.status(200).send( presID );
         }).catch((err) => {
             return res.status(500).json({ err: err });
