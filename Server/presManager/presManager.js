@@ -17,18 +17,18 @@ createPres = (req, res) => {
             users: [{id: req.body.userID, permission: "owner"}]     
         }).then((data) => {
             presID = data._id;
-	    return userStore.addPresToUser(req.body.userID, data._id);
+            return userStore.addPresToUser(req.body.userID, data._id);
         }).then((result) => { 
             return res.status(200).send( presID );
-	}).catch((err) => {
-	    console.log(err);
+	    }).catch((err) => {
+            console.log(err);
             return res.status(500).json({ err: err });
         })
     } else {
         Presentation.create(req.body.presObj).then((data) => {
-	    presID = data._id;
-	    return userStore.addPresToUser(req.body.userID, data._id);
-	}).then((result) => {
+            presID = data._id;
+	        return userStore.addPresToUser(req.body.userID, data._id);
+	    }).then((result) => {
             return res.status(200).send( presID );
         }).catch((err) => {
             return res.status(500).json({ err: err });
@@ -131,13 +131,13 @@ deletePres = (req, res) => {
     checkPermission(req.body.userID, req.body.presID, "owner")
     .then((permissionToDelete) => {
         if (permissionToDelete) {
-	    Presentation.findOneAndDelete({
+            Presentation.findOneAndDelete({
                 "_id": req.body.presID,
                 "users.id": req.body.userID
             });
         } else {
             console.log("presManager: deletePres: User " + req.body.userID + " does not have adequate permission to delete presentation " + req.body.presID);
-	    throw {err: "presManager: deletePres: User " + req.body.userID + " does not have adequate permission to delete presentation " + req.body.presID};
+            throw {err: "presManager: deletePres: User " + req.body.userID + " does not have adequate permission to delete presentation " + req.body.presID};
         }
     }).then((pres) => {
         deletedPres = pres;

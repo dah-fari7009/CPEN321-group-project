@@ -22,7 +22,8 @@ async function verify(token) {
 
 
 login = (req, res) => {
-    verify(req.body.token).then(() => {
+    verify(req.body.token)
+    .then(() => {
         User.findOne({userID: req.body.userID}, (err, data) => {
             if (err) {
                 console.log(err);
@@ -31,7 +32,7 @@ login = (req, res) => {
     
             // create user if it's not already in the DB, otherwise return user
             if (!data) {
-                User.create({
+                User.create({ //@TODO need a .catch
                     userID: req.body.userID,
                     username: req.body.username,
                     presentations: []
@@ -39,11 +40,11 @@ login = (req, res) => {
                     return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations });
                 })
             } else {
-		var presentationTitles = [];
-		for (let i = 0; i < data.presentations.length; i++) {
-		    var title = presManager.getPresTitle(data.presentations[i], req.body.userID);
-		    presentationTitles.push(title);
-		}
+		        var presentationTitles = [];
+                for (let i = 0; i < data.presentations.length; i++) {
+                    var title = presManager.getPresTitle(data.presentations[i], req.body.userID);
+                    presentationTitles.push(title);
+                }
                 return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: presentationTitles });
             }
         })
@@ -57,26 +58,26 @@ login = (req, res) => {
 addPresToUser = (userId, presID) => {
     console.log("userStore: addPresToUser: Adding presentation " + presID + " to user " + userId);
     return new Promise((resolve, reject) => {
-	    User.findOne(
-        	{userID: userId},
-    	).then((user) => {
-		console.log(user.presentations);
-		if (user.presentations.includes(presID) == false) {
-			return User.findOneAndUpdate(
-				{userID: userId},
-				{$push: {presentations: presID}},
-				{new: true}
-			);
-		} else {
-			throw {err: "userStore: addPresToUser: Presentation " + presID  + " already included in user."};
-		}
-	}).then((data) => {
-		console.log("userStore: addPresToUser: Added pres " + presID + " to user " + userId);
-        	resolve(data);
-    	}).catch((err) => {
-		console.log(err);
-        	reject(err);
-    	})
+        User.findOne(
+            {userID: userId},
+        ).then((user) => {
+            console.log(user.presentations);
+            if (user.presentations.includes(presID) == false) {
+                return User.findOneAndUpdate(
+                    {userID: userId},
+                    {$push: {presentations: presID}},
+                    {new: true}
+                );
+            } else {
+                throw {err: "userStore: addPresToUser: Presentation " + presID  + " already included in user."};
+            }
+	    }).then((data) => {
+		    console.log("userStore: addPresToUser: Added pres " + presID + " to user " + userId);
+            resolve(data);
+        }).catch((err) => {
+		    console.log(err);
+            reject(err);
+        })
     });
 
     //edit presentation to add user to array
@@ -87,14 +88,14 @@ removePresFromUser = (userID, presID) => {
     console.log("userStore: removePresFromUser: Deleting presentation " + presID + " from user " + userID);    
     return new Promise((resolve, reject) => {
         User.updateOne(
-	    {userID: userID},
+            {userID: userID},
             {$pull: {presentations: presID}}
         ).then((data) => {
             console.log("userStore: removePresFromUser: Deleted presentation " + presID + " from user " + userID);
-	    resolve(data);
+            resolve(data);
         }).catch((err) => {
             console.log(err);
-	    reject(err);
+            reject(err);
         })
     });
 }

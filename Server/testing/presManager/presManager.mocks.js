@@ -57,19 +57,19 @@ const validPresObj = {
     }],
     "feedback": [{
         "date": "today",
-	"duration": 1,
-	"pauses": [{
+	    "duration": 1,
+	    "pauses": [{
             "start": 0,
-	    "end": 2
-	}],
-	"pacing": [{
-	    "cueCardStartTime": 0,
-	    "cueCardEndTime": 2
-	}]
+            "end": 2
+	    }],
+	    "pacing": [{
+            "cueCardStartTime": 0,
+            "cueCardEndTime": 2
+	    }]
     }],
     "users": [{
-	"id": "this guy", 
-	"permission": "owner"
+	    "id": "this guy", 
+	    "permission": "owner"
     }]
 };
 
