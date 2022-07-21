@@ -40,7 +40,7 @@ public class AddPres extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_pres);
 
-        EditText presDescription;
+//        EditText presDescription;
         Toolbar toolbar;
         Button importButton;
 
@@ -51,7 +51,7 @@ public class AddPres extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         presTitle = findViewById(R.id.presTitle);
-        presDescription = findViewById(R.id.presDescription);
+//        presDescription = findViewById(R.id.presDescription);
 
         // it detects when the presentation title is edited, it will change the title on the app
 
@@ -110,12 +110,12 @@ public class AddPres extends AppCompatActivity {
     );
 
     // if the hour or minute is less than 10, add 0 before it
-    private String pad(int i) {
-        if(i < 10) {
-            return "0" + i;
-        }
-        return String.valueOf(i);
-    }
+//    private String pad(int i) {
+//        if(i < 10) {
+//            return "0" + i;
+//        }
+//        return String.valueOf(i);
+//    }
 
     // return the menu with the add and save button
     @Override

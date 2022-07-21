@@ -55,7 +55,7 @@ public class EditPres extends AppCompatActivity {
         Button presentingBtn;
         Button liveCollabBtn;
         Toolbar toolbar;
-        EditText presDescription;
+//        EditText presDescription;
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
 
@@ -66,7 +66,7 @@ public class EditPres extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         presTitle = findViewById(R.id.presTitle);
-        presDescription = findViewById(R.id.presDescription);
+//        presDescription = findViewById(R.id.presDescription);
         preparationBtn = findViewById(R.id.preparationButton);
         presentingBtn = findViewById(R.id.presentingButton);
         liveCollabBtn = findViewById(R.id.liveCollabButton);
@@ -180,12 +180,12 @@ public class EditPres extends AppCompatActivity {
     }
 
     // if the hour or minute is less than 10, add 0 before it
-    private String pad(int i) {
-        if(i < 10) {
-            return "0" + i;
-        }
-        return String.valueOf(i);
-    }
+//    private String pad(int i) {
+//        if(i < 10) {
+//            return "0" + i;
+//        }
+//        return String.valueOf(i);
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

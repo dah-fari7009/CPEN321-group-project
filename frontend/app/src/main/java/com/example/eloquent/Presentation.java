@@ -36,9 +36,9 @@ public class Presentation implements Serializable {
         return title;
     }
 
-    private String getPresentationID(){
-        return presentationID;
-    }
+//    private String getPresentationID(){
+//        return presentationID;
+//    }
 
     public Feedback getFeedback(int index) {
         return feedback.get(index);
