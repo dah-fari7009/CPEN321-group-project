@@ -106,9 +106,9 @@ parse = (req, res) => {
         var attributesStartIndex = tokenNoWhitespace.indexOf("[");
         var attributesEndIndex = tokenNoWhitespace.indexOf("]");
         
-	if (contexts["presentation"] == true) {
-            if (contexts["cuecard"] == true) {
-                if (contexts["details"] == true) {
+	if (contexts["presentation"] === true) {
+            if (contexts["cuecard"] === true) {
+                if (contexts["details"] === true) {
                     if (tokenNoWhitespace === keywords["end"] + "{details}") {
                         contexts["details"] = false;
                     } else if (i == tokens.length - 3) {

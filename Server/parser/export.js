@@ -77,7 +77,7 @@ function getParams(obj) {
 
 //turns an array of paramaters into a string of params ie. [colour=salmon, endpause=true]
 function writeParams(obj, arr) {
-    if (arr.length == 0) {
+    if (arr.length === 0) {
         return "";
     }
 
