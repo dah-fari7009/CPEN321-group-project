@@ -675,9 +675,6 @@ public class LiveCollaboration extends AppCompatActivity {
 
 
                     }
-                    else{
-
-                    }
 
 
                 }
