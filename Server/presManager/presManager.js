@@ -31,7 +31,7 @@ createPres = (req, res) => {
         }).then((result) => {
             return res.status(200).send( presID );
         }).catch((err) => {
-            return res.status(500).json({ err: err });
+            return res.status(500).json({ err });
         })
     }
 }
