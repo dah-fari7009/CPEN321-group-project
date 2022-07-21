@@ -519,7 +519,7 @@ public class LiveCollaboration extends AppCompatActivity {
 
                 if(tmpjson.has("presentation")){
                     //pack recent presentation obj to json and send to server
-                    webSocketClient.send(s.toString());
+                    webSocketClient.send(s);
                     Log.w(TAG, "PRESENTATION");
                 }
                 else{
