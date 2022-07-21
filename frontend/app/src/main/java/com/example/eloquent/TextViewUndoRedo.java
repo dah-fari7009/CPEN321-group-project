@@ -379,6 +379,7 @@ public class TextViewUndoRedo {
         }
 
         public void afterTextChanged(Editable s) {
+            // do something after text changes
         }
     }
 }

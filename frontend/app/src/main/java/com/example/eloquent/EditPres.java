@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,7 +42,7 @@ public class EditPres extends AppCompatActivity {
 //    private Calendar calendar;
 //    private String todaysDate;
 //    private String currentTime;
-
+    private static String TAG = "EditPres";
 
     Presentation presentation;
 
@@ -174,7 +175,7 @@ public class EditPres extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-
+                        Log.d(TAG, "handleSignInIntent: Failed to get signed-in Google account from intent.");
                     }
                 });
     }
