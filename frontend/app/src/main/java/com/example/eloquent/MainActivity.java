@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     Presentation presentation = new Presentation("test1");
     Presentation presentation2 = new Presentation("test2");
     Presentation passedPres;
-    private String TAG = "MainActivity.this";
+    private String TAG = "MainActivity";
 
     Content contentCard1Front1 = new Content("font", "style", 5, Color.BLUE, "Speeches often start with a hook");
     Content contentCard1Back1 = new Content("font", "style", 5, Color.BLUE, "A hook is anything that grabs the audience's attention");

@@ -102,26 +102,25 @@ public class Login extends AppCompatActivity {
     }
 
     private void updateUI(GoogleSignInAccount account) {
-        if (account != null) {
-            // Create user from account
-            router.createUser(account.getIdToken(), account.getId(), account.getEmail());
-
-            // Logging for debugging
-            if (account == null) {
-                Log.d(TAG, "There is no user signed in!");
-            } else {
-                Log.d(TAG, "Pref name: " + account.getDisplayName());
-                Log.d(TAG, "Email: " + account.getEmail());
-                Log.d(TAG, "Family name: " + account.getFamilyName());
-                Log.d(TAG, "Given name: " + account.getGivenName());
-                Log.d(TAG, "Display URL: " + account.getPhotoUrl());
-            }
-
-            // Go to main activity
-            openMainActivity();
+        // Create user from account
+        if (account == null) {
+            // No Google account already signed into on the device.
+            router.createUser(account.getIdToken(), false, account.getId(), account.getEmail());
         } else {
-            Log.d(TAG, "User is not signed in yet.");
+            // The account.getIdToken() method will get an old (expired) Id token, since the user
+            // remains signed-in from before.
+            router.createUser(account.getIdToken(), true, account.getId(), account.getEmail());
         }
+        // Logging for debugging
+        Log.d(TAG, "Id token: " + account.getIdToken());
+        Log.d(TAG, "Pref name: " + account.getDisplayName());
+        Log.d(TAG, "Email: " + account.getEmail());
+        Log.d(TAG, "Family name: " + account.getFamilyName());
+        Log.d(TAG, "Given name: " + account.getGivenName());
+        Log.d(TAG, "Display URL: " + account.getPhotoUrl());
+
+        // Go to main activity
+        openMainActivity();
     }
 
 

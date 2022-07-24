@@ -29,7 +29,7 @@ public class Router {
         return self;
     }
 
-    public void createUser(String IdToken, String userID, String username) {
+    public void createUser(String IdToken, Boolean googleAccountSignedIn, String userID, String username) {
         //ObjectMapper objectMapper = new ObjectMapper();
         String url = BACKEND_HOST_AND_PORT + "/api/login";
         StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
@@ -52,6 +52,11 @@ public class Router {
                 params.put("token", IdToken);
                 params.put("userID", userID);
                 params.put("username", username);
+                if (googleAccountSignedIn) {
+                    params.put("verifiedDevice", "true");
+                } else {
+                    params.put("verifiedDevice", "false");
+                }
                 return params;
             }
             @Override
