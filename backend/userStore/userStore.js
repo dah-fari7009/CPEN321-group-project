@@ -1,5 +1,5 @@
 const User = require('../models/users');
-//const presManager = require('../presManager/presManager')
+const presManager = require('../presManager/presManager')
 const {OAuth2Client} = require('google-auth-library');
 
 //const CLIENT_ID = "588466351198-96mgu43b4k81evnf387c5gpa2vc4d587.apps.googleusercontent.com";
@@ -23,38 +23,43 @@ async function verify(token) {
 
 
 login = (req, res) => {
-    verify(req.body.token)
-    .then(() => {
-        User.findOne({userID: req.body.userID}, (err, data) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({ error: err });
-            }
-            // create user if it's not already in the DB, otherwise return user
-            if (!data) {
-                User.create({ //@TODO need a .catch
-                    userID: req.body.userID,
-                    username: req.body.username,
-                    presentations: []
-                }).then((data) => {
-                    return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations });
-                })
-            } else {
-                // var presTitles = [];
-                // for (let i = 0; i < data.presentations.length; i++) {
-		//     presManager.getPresTitle(data.presentations[i], req.body.userID).then((title) => {
-                //         console.log("userStore: login: title of presentation " + data.presentations[i] + " is '" + title + "'");
-                //         presTitles.push(title);
-		//     });
-                // }
-                // console.log(presTitles);
-                return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: []});
-            }
-        })
-    }).catch((error) => {
-        console.log(error)
-        return res.status(500).json({ error });
-    })
+    if (req.body.verifiedDevice === "false") {
+        verify(req.body.token)
+        .then(() => {
+            return retreiveUserInfo(req, res);    
+        }).catch((error) => {
+            console.log(error)
+            return res.status(500).json({ error });
+        });
+    } else {
+        return retreiveUserInfo(req, res);
+    }
+}
+
+// helper function - retrieve user info, called by login
+retreiveUserInfo = (req, res) => {
+    User.findOne({userID: req.body.userID}, (err, data) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: err });
+        }
+        // create user if it's not already in the DB, otherwise return user
+        if (!data) {
+            User.create({ //@TODO need a .catch
+                userID: req.body.userID,
+                username: req.body.username,
+                presentations: []
+            }).then((data) => {
+                return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: [] });
+            })
+        } else {
+    	    // presManager.getPresTitle(req.body.userID).then((titles) => {
+            //     console.log("userStore: login: user " + req.body.userID + "'s presentations: " + titles);
+            //     return res.status(200).json({ userID: data.userID, username: data.username, presentations: data.presentations, presentationTitles: titles});
+            // });
+            return res.status(200).json({userID: data.userID, username: data.username});
+        }
+    });
 }
 
 // internal - called from presManager.js's createPres()

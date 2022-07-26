@@ -50,13 +50,19 @@ getPres = (req, res) => {
 
 // Internal - for calls from login() of userStore.js, rather than
 // for responding to requests from the frontend.
-module.exports.getPresTitle = (presentationID, userID) => {
-    console.log("presManager: getPresTitle: Retrieving title of presentation " + presentationID + " for user " + userID);
+module.exports.getPresTitle = (userID) => {
+    /* Expects a userID (string) */
+    console.log("presManager: getPresTitle: Retrieving the titles of user " + userID + "'s presentations");
     return new Promise ((resolve, reject) => {
-        Presentation.findById(
-            presentationID
-        ).then((pres) => {
-            resolve(pres.title);
+        Presentation.find(
+            {"users.id": userID}
+        ).then((presentations) => {
+            var titles = [];
+            var numPresentations = presentations.length;
+            for (let i = 0; i < numPresentations; i++) {
+                titles.push(presentations[i].title)
+            }
+            resolve(titles);
         }).catch((err) => {
             reject(err);
         })
@@ -177,11 +183,11 @@ getAllPresOfUser = (req, res) => {
     Presentation.find({
         "users.id": req.query.userID
     }).then((data) => {
-        var titleArr = [];
-        for (var i = 0; i < data.length; i++) {
-            titleArr.push({[data[i].title]: data[i]._id})
-        }
-        return res.status(200).json({data: titleArr});
+        // var titleArr = [];
+        // for (var i = 0; i < data.length; i++) {
+        //     titleArr.push({[data[i].title]: data[i]._id})
+        // }
+        return res.status(200).json(data);
     }).catch((err) => {
         return res.status(500).json({err});
     })
