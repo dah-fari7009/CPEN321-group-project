@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,56 +24,61 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AddPres extends AppCompatActivity {
 
 
     private EditText presTitle;
-//    private Calendar calendar;
-//    private String todaysDate;
-//    private String currentTime;
-
+    private static final String TAG = "AddPres";
+    private static final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private static RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_pres);
 
-//        EditText presDescription;
-        Toolbar toolbar;
+        /* Toolbar */
         Button importButton;
-
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("New Presentation");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        /* Edit the new presentation's title */
         presTitle = findViewById(R.id.presTitle);
-//        presDescription = findViewById(R.id.presDescription);
-
         // it detects when the presentation title is edited, it will change the title on the app
-
         presTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // nothing needs to be done here
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(s.length() != 0) {
                     getSupportActionBar().setTitle(s);
                 }
             }
-
             @Override
             public void afterTextChanged(Editable s) {
                 // nothing needs to be done here
             }
         });
+
+        /* Set up for sending HTTP requests */
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         importButton = findViewById(R.id.importButton);
         importButton.setOnClickListener(new View.OnClickListener() {
@@ -84,11 +90,6 @@ public class AddPres extends AppCompatActivity {
                 );
             }
         });
-
-        //get current date and time
-//        calendar = Calendar.getInstance();
-//        todaysDate = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH)+1) + "/" + calendar.get(Calendar.DAY_OF_MONTH);
-//        currentTime = pad(calendar.get(Calendar.HOUR)) + ":" + pad(calendar.get(Calendar.MINUTE));
     }
 
     // this will start a import activity and is invoked by pressing the import button
@@ -106,16 +107,7 @@ public class AddPres extends AppCompatActivity {
                     }
                 }
             }
-
     );
-
-    // if the hour or minute is less than 10, add 0 before it
-//    private String pad(int i) {
-//        if(i < 10) {
-//            return "0" + i;
-//        }
-//        return String.valueOf(i);
-//    }
 
     // return the menu with the add and save button
     @Override
@@ -130,20 +122,14 @@ public class AddPres extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.delete) {
-            Toast.makeText(this, "Delete btt is clicked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Delete button is clicked", Toast.LENGTH_SHORT).show();
         }
         if(item.getItemId() == R.id.save) {
             if(presTitle.getText().toString()!= null) {
                 Presentation presentation = new Presentation(presTitle.getText().toString());
 
                 // Create new presentation in backend
-                Router router = Router.getInstance(this);
-                router.createEmptyPresentation(User.getInstance().getData().getUserID(), presTitle.getText().toString(), presentation);
-
-                // Send new presentation to main activity
-                Intent savingIntent = new Intent(AddPres.this, MainActivity.class);
-                savingIntent.putExtra("Presentation", presentation);
-                startActivity(savingIntent);
+                createEmptyPresentation(User.getInstance().getData().getUserID(), presTitle.getText().toString());
             }
             else {
                 Toast.makeText(getApplicationContext(),"Please enter a title", Toast.LENGTH_SHORT).show();
@@ -178,7 +164,40 @@ public class AddPres extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
+    }
+
+    private void createEmptyPresentation(String userID, String title/*, Presentation presentation*/) {
+        String url = BACKEND_HOST_AND_PORT + "/api/presentation"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
+        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+//                presentation.setPresentationID(response);
+                Intent savingIntent = new Intent(AddPres.this, MainActivity.class);
+                startActivity(savingIntent);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("userID", userID);
+                params.put("title", title);
+                return params;
+            }
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
     }
 }

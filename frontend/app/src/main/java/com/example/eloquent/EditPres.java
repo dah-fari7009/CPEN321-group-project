@@ -24,6 +24,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -34,15 +40,16 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EditPres extends AppCompatActivity {
 
 
     private EditText presTitle;
-//    private Calendar calendar;
-//    private String todaysDate;
-//    private String currentTime;
-    private static String TAG = "EditPres";
+    private static final String TAG = "EditPres";
+    private static final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private static RequestQueue requestQueue;
 
     Presentation presentation;
 
@@ -56,18 +63,21 @@ public class EditPres extends AppCompatActivity {
         Button presentingBtn;
         Button liveCollabBtn;
         Toolbar toolbar;
-//        EditText presDescription;
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
 
+        /* Set up toolbar */
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(presentation.getTitle());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        /* Set up for sending HTTP requests */
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        /* Set up presentation title box and navigation buttons */
         presTitle = findViewById(R.id.presTitle);
-//        presDescription = findViewById(R.id.presDescription);
         preparationBtn = findViewById(R.id.preparationButton);
         presentingBtn = findViewById(R.id.presentingButton);
         liveCollabBtn = findViewById(R.id.liveCollabButton);
@@ -97,8 +107,8 @@ public class EditPres extends AppCompatActivity {
             }
         });
 
+        /* Display and edit presentation title */
         presTitle.setText(presentation.getTitle());
-
         presTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -117,11 +127,6 @@ public class EditPres extends AppCompatActivity {
                 //nothing to be done here
             }
         });
-
-        //get current date and time
-//        calendar = Calendar.getInstance();
-//        todaysDate = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH)+1) + "/" + calendar.get(Calendar.DAY_OF_MONTH);
-//        currentTime = pad(calendar.get(Calendar.HOUR)) + ":" + pad(calendar.get(Calendar.MINUTE));
     }
 
 
@@ -180,14 +185,6 @@ public class EditPres extends AppCompatActivity {
                 });
     }
 
-    // if the hour or minute is less than 10, add 0 before it
-//    private String pad(int i) {
-//        if(i < 10) {
-//            return "0" + i;
-//        }
-//        return String.valueOf(i);
-//    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -199,6 +196,7 @@ public class EditPres extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.delete) {
             Log.d(TAG, "onOptionsItemSelected: delete button pressed.");
+            deletePresentation(User.getInstance().getData().getUserID(), presentation.presentationID);
         }
         if(item.getItemId() == R.id.save) {
             if(presentation.title != null) {
@@ -244,5 +242,24 @@ public class EditPres extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.RECORD_AUDIO}, 1);
             }
         }
+    }
+
+    private void deletePresentation(String userID, String presID) {
+        String url = BACKEND_HOST_AND_PORT + "/api/presentation?userID=" + userID + "&presID=" + presID;
+        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+                Intent changingIntent = new Intent(EditPres.this, MainActivity.class);
+                startActivity(changingIntent);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, error.toString());
+            }
+        });
+
+        requestQueue.add(stringRequest);
     }
 }

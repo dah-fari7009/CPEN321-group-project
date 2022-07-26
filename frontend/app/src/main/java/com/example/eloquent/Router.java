@@ -74,68 +74,68 @@ public class Router {
 //        requestQueue.add(stringRequest);
 //    }
 
-    public void getPresentation(String userID, String presID) {
-        String url = BACKEND_HOST_AND_PORT + "/api/presentation";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, error.toString());
-            }
-        }) {
-            @Override
-            public Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("userID", userID);
-                params.put("presID", presID);
-                return params;
-            }
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/x-www-form-urlencoded");
-                return headers;
-            }
-        };
+//    public void getPresentation(String userID, String presID) {
+//        String url = BACKEND_HOST_AND_PORT + "/api/presentation";
+//        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                Log.d(TAG, response);
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.d(TAG, error.toString());
+//            }
+//        }) {
+//            @Override
+//            public Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("userID", userID);
+//                params.put("presID", presID);
+//                return params;
+//            }
+//            @Override
+//            public Map<String, String> getHeaders() {
+//                Map<String, String> headers = new HashMap<String, String>();
+//                headers.put("Content-Type", "application/x-www-form-urlencoded");
+//                return headers;
+//            }
+//        };
+//
+//        requestQueue.add(stringRequest);
+//    }
 
-        requestQueue.add(stringRequest);
-    }
-
-    public void createEmptyPresentation(String userID, String title, Presentation presentation) {
-        String url = BACKEND_HOST_AND_PORT + "/api/presentation"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
-        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, response);
-                presentation.setPresentationID(response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG,error.toString());
-            }
-        }) {
-            @Override
-            public Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("userID", userID);
-                params.put("title", title);
-                return params;
-            }
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/x-www-form-urlencoded");
-                return headers;
-            }
-        };
-
-        requestQueue.add(stringRequest);
-    }
+//    public void createEmptyPresentation(String userID, String title, Presentation presentation) {
+//        String url = BACKEND_HOST_AND_PORT + "/api/presentation"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
+//        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                Log.d(TAG, response);
+//                presentation.setPresentationID(response);
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.d(TAG,error.toString());
+//            }
+//        }) {
+//            @Override
+//            public Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("userID", userID);
+//                params.put("title", title);
+//                return params;
+//            }
+//            @Override
+//            public Map<String, String> getHeaders() {
+//                Map<String, String> headers = new HashMap<String, String>();
+//                headers.put("Content-Type", "application/x-www-form-urlencoded");
+//                return headers;
+//            }
+//        };
+//
+//        requestQueue.add(stringRequest);
+//    }
 
     public void importPresentation(String userID, String presentationTextRep) {
         String url = BACKEND_HOST_AND_PORT + "/api/import"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
