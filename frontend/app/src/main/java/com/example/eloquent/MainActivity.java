@@ -51,17 +51,12 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         /* Set up for sending HTTP requests */
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
+        /* Set up for displaying a list of the user's presentations on the main page */
         recyclerView = findViewById(R.id.listOfPres);
         presentations = new ArrayList<>();
         adapter = new Adapter(this, presentations, this::selectedPres);
 
-        // put here to test the add functionality
-//        passedPres = (Presentation) getIntent().getSerializableExtra("Presentation");
-//        if(passedPres != null) {
-//            Log.d(TAG, passedPres.getTitle());
-//            presentations.add(passedPres);
-//        }
-
+        /* Get an array of the user's presentations from the backend */
         getAllPresentationsOfUser(User.getInstance().getData().getUserID(), presentations);
     }
 
@@ -69,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setAdapter(adapter);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
