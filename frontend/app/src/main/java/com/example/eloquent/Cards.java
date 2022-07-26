@@ -1,8 +1,10 @@
 package com.example.eloquent;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Cards implements Serializable {
 
     public Front front;

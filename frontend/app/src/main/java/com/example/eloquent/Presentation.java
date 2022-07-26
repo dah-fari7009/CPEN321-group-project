@@ -1,12 +1,18 @@
 package com.example.eloquent;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Presentation implements Serializable {
     public String title;
+    @JsonProperty("_id")
     public String presentationID;
+    @JsonProperty("cards")
     public ArrayList<Cards> cueCards;
     public ArrayList<Feedback> feedback;
 

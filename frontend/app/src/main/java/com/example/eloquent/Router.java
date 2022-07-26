@@ -29,41 +29,50 @@ public class Router {
         return self;
     }
 
-    public void createUser(String IdToken, String userID, String username) {
-        //ObjectMapper objectMapper = new ObjectMapper();
-        String url = BACKEND_HOST_AND_PORT + "/api/login";
-        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, response);
-                User user = User.getInstance();
-                user.setData(response);
-                Log.d(TAG, user.getData().getUserID() + " " + user.getData().getUsername());
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG,error.toString());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("token", IdToken);
-                params.put("userID", userID);
-                params.put("username", username);
-                return params;
-            }
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/x-www-form-urlencoded");
-                return headers;
-            }
-        };
+//    public String getBackendHostAndPort() {
+//        return BACKEND_HOST_AND_PORT;
+//    }
 
-        requestQueue.add(stringRequest);
-    }
+//    public void createUser(String IdToken, Boolean googleAccountSignedIn, String userID, String username) {
+//        //ObjectMapper objectMapper = new ObjectMapper();
+//        String url = BACKEND_HOST_AND_PORT + "/api/login";
+//        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                Log.d(TAG, response);
+//                User user = User.getInstance();
+//                user.setData(response);
+//                Log.d(TAG, user.getData().getUserID() + " " + user.getData().getUsername());
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.d(TAG,error.toString());
+//            }
+//        }) {
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("token", IdToken);
+//                params.put("userID", userID);
+//                params.put("username", username);
+//                if (googleAccountSignedIn) {
+//                    params.put("verifiedDevice", "true");
+//                } else {
+//                    params.put("verifiedDevice", "false");
+//                }
+//                return params;
+//            }
+//            @Override
+//            public Map<String, String> getHeaders() {
+//                Map<String, String> headers = new HashMap<String, String>();
+//                headers.put("Content-Type", "application/x-www-form-urlencoded");
+//                return headers;
+//            }
+//        };
+//
+//        requestQueue.add(stringRequest);
+//    }
 
     public void getPresentation(String userID, String presID) {
         String url = BACKEND_HOST_AND_PORT + "/api/presentation";
