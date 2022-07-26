@@ -161,13 +161,9 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
 
     //populate a linear layout with all messages in a content array
     public void fillLayout (LinearLayout linearLayout, Presentation pres, int cardIndex, boolean isOnFront) {
-        if (isOnFront) {
-            linearLayout.addView(createTextView(pres, cardIndex, isOnFront));
-        } else {
-
-            linearLayout.addView(createTextView(pres, cardIndex,  isOnFront));
-        }
+        linearLayout.addView(createTextView(pres, cardIndex, isOnFront));
     }
+
 //    private void checkPermission() {
 //        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},RecordAudioRequestCode);
 //    }

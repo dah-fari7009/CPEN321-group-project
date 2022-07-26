@@ -8,86 +8,64 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Adapter.OnPresListener {
 
 
     private RecyclerView recyclerView;
-    List<Presentation> presentations;
+    ArrayList<Presentation> presentations;
     Adapter adapter;
+    private String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private static RequestQueue requestQueue;
 
-    Presentation presentation = new Presentation("test1");
-    Presentation presentation2 = new Presentation("test2");
-    Presentation passedPres;
     private String TAG = "MainActivity";
-
-    Content contentCard1Front1 = new Content("font", "style", 5, Color.BLUE, "Speeches often start with a hook");
-    Content contentCard1Back1 = new Content("font", "style", 5, Color.BLUE, "A hook is anything that grabs the audience's attention");
-    Content contentCard1Back2 = new Content("font", "style", 5, Color.BLUE, "Examples of hooks are anecdotes, jokes, hot takes");
-    Content contentCard1Back3 = new Content("font", "style", 5, Color.BLUE, "Knowing target audience leads to better hooks");
-
-    Content contentCard2Back1 = new Content("font", "style", 5, Color.BLUE, "The audience needs to first know why they should pay attention to your speech");
-    Content contentCard2Back2 = new Content("font", "style", 5, Color.BLUE, "Then, deliver on your promise");
-    Content contentCard2Front1 = new Content("font", "style", 5, Color.BLUE, "Bottom line upfront");
-
-    Front sideFront1 = new Front(Color.WHITE, contentCard1Front1);
-    Back sideBack1 = new Back(Color.WHITE, contentCard1Back1);
-
-    Front sideFront2 = new Front(Color.WHITE, contentCard2Front1 );
-    Back sideBack2 = new Back(Color.WHITE, contentCard2Back1);
-
-    Cards card1 = new Cards(Color.WHITE, "Knowing target audience leads to better hooks", 0, sideFront1, sideBack1);
-    Cards card2 = new Cards(Color.WHITE, "Then, deliver on your promise", 1, sideFront2, sideBack2);
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        presentation.cueCards.add(card1);
-        presentation.cueCards.add(card2);
-
-        Toolbar toolbar;
-
-
-        toolbar = findViewById(R.id.toolbar);
+        /* Set up toolbar */
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        /* Set up for sending HTTP requests */
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         recyclerView = findViewById(R.id.listOfPres);
         presentations = new ArrayList<>();
-
         adapter = new Adapter(this, presentations, this::selectedPres);
-        //extractPresentations();
 
         // put here to test the add functionality
-        passedPres = (Presentation) getIntent().getSerializableExtra("Presentation");
-        if(passedPres != null) {
-            Log.d(TAG, passedPres.getTitle());
-            presentations.add(passedPres);
-        }
+//        passedPres = (Presentation) getIntent().getSerializableExtra("Presentation");
+//        if(passedPres != null) {
+//            Log.d(TAG, passedPres.getTitle());
+//            presentations.add(passedPres);
+//        }
 
-        showPresentation();
-
-
-
-//        listView = findViewById(R.id.listView);
-//        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, name);
-//        listView.setAdapter(arrayAdapter);
+        getAllPresentationsOfUser(User.getInstance().getData().getUserID(), presentations);
     }
 
-    private void showPresentation() {
-
-        presentations.add(presentation);
-        presentations.add(presentation2);
+    private void showPresentations() {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setAdapter(adapter);
     }
@@ -121,11 +99,8 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
             public boolean onQueryTextSubmit(String query) {
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
-//                String searchStr = newText;
-
                 adapter.getFilter().filter(newText);
                 return false;
             }
@@ -140,5 +115,60 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         Intent intent = new Intent(this, EditPres.class);
         intent.putExtra("Presentation", presentation);
         startActivity(intent);
+    }
+
+    private void getAllPresentationsOfUser(String userID, ArrayList<Presentation> presCollection) {
+        String url = BACKEND_HOST_AND_PORT + "/api/allPresentationsOfUser?userID=" + userID;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, User.getInstance().getData().getUsername() + " " + User.getInstance().getData().getUserID());
+                Log.d(TAG, response);
+                JSONArray presentations;
+                try {
+                    presentations = new JSONArray(response);
+                } catch (JSONException e) {
+                    presentations = null;
+                    e.printStackTrace();
+                }
+                if (presentations != null) {
+                    for (int i = 0; i < presentations.length(); i++) {
+                        String pres;
+                        Presentation p;
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        try {
+                            pres = presentations.getJSONObject(i).toString();
+                        } catch (JSONException e) {
+                            pres = null;
+                            e.printStackTrace();
+                        }
+                        try {
+                            p = objectMapper.readValue(pres, Presentation.class);
+                        } catch (JsonProcessingException e) {
+                            p = null;
+                            e.printStackTrace();
+                        }
+                        if (p != null) {
+                            presCollection.add(p);
+                        }
+                    }
+                }
+
+                // sanity check
+//                Log.d(TAG, presCollection.get(7).title);
+//                Log.d(TAG, presCollection.get(7).cueCards.get(0).front.content.message);
+//                Log.d(TAG, presCollection.get(7).feedback.toString());
+//                Log.d(TAG, String.valueOf(presCollection.get(7).presentationID));
+
+                showPresentations();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, error.toString());
+            }
+        });
+
+        requestQueue.add(stringRequest);
     }
 }
