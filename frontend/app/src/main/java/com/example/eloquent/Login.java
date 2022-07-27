@@ -43,9 +43,7 @@ public class Login extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent usingIntent = new Intent(Login.this, MainActivity.class);
-                startActivity(usingIntent);
-
+                createUserAndGoToMainActivity("0", true, "104866131128716891939", "aswin.sai009.dummy@gmail.com");
             }
         });
 
@@ -130,7 +128,7 @@ public class Login extends AppCompatActivity {
 
             // The account.getIdToken() method will get an old (expired) Id token if there exists a
             // signed-in Google account on the device from a previous session.
-            createUser(account.getIdToken(), previouslySignedIn, account.getId(), account.getEmail());
+            createUserAndGoToMainActivity(account.getIdToken(), previouslySignedIn, account.getId(), account.getEmail());
         }
     }
 
@@ -139,7 +137,7 @@ public class Login extends AppCompatActivity {
         startActivity(usingIntent);
     }
 
-    private void createUser(String IdToken, Boolean googleAccountPreviouslySignedIn, String userID, String username) {
+    private void createUserAndGoToMainActivity(String IdToken, Boolean googleAccountPreviouslySignedIn, String userID, String username) {
         //ObjectMapper objectMapper = new ObjectMapper();
         String url = BACKEND_HOST_AND_PORT + "/api/login";
         StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
