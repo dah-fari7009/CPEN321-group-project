@@ -137,23 +137,25 @@ search = (req, res) => {
     })
 }
 
+// expects userID and presID in query
 deletePres = (req, res) => {
     var deletedPres;
-    checkPermission(req.body.userID, req.body.presID, "owner")
+    console.log("presManager: deletePres: request query: ?userID=" + req.query.userID + "&presID=" + req.query.presID);
+    checkPermission(req.query.userID, req.query.presID, "owner")
     .then((permissionToDelete) => {
         if (permissionToDelete) {
             return Presentation.findOneAndDelete({
-                "_id": req.body.presID,
-                "users.id": req.body.userID
+                "_id": req.query.presID,
+                "users.id": req.query.userID
             });
         } else {
-            console.log("presManager: deletePres: User " + req.body.userID + " does not have adequate permission to delete presentation " + req.body.presID);
-            throw {err: "presManager: deletePres: User " + req.body.userID + " does not have adequate permission to delete presentation " + req.body.presID};
+            console.log("presManager: deletePres: User " + req.query.userID + " does not have adequate permission to delete presentation " + req.query.presID);
+            throw {err: "presManager: deletePres: User " + req.query.userID + " does not have adequate permission to delete presentation " + req.query.presID};
         }
     }).then((pres) => {
         deletedPres = pres;
-        console.log("presManager: deletePres: Calling userStore.removePresFromUser( " + req.body.userID + " , " + req.body.presID + " )");
-        return userStore.removePresFromUser(req.body.userID, req.body.presID);
+        console.log("presManager: deletePres: Calling userStore.removePresFromUser( " + req.query.userID + " , " + req.query.presID + " )");
+        return userStore.removePresFromUser(req.query.userID, req.query.presID);
     }).then((data) => {
         return res.status(200).json({ deletedDoc: deletedPres });
     }).catch((err) => {
