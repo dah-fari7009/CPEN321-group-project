@@ -13,16 +13,17 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  services:
-    mongodb:
-      image: mongo:3.4.23
-      ports:
-        - 27017:27017
+  
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    services:
+    mongodb:
+      image: mongo:3.4.23
+      ports:
+        - 27017:27017
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
