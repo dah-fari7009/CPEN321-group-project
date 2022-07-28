@@ -20,6 +20,7 @@ beforeAll(async() => {
 
 afterAll(async () => {
     await User.deleteOne({userID: "1"});
+    await mongoose.connection.close();
 });
 
 
