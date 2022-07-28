@@ -131,30 +131,13 @@ public class LiveCollaboration extends AppCompatActivity {
                 createWebSocketClient();
             }
         });
-
-
-
-
+        
         content = findViewById(R.id.cueCard);
 
         View back = findViewById(R.id.cueCard_background);
         back.setBackgroundColor(65280);
 
-        if(cardFace == 0){
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
-            String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
-            int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
-            content.setText(getColoredtext(color,text));
-        }
-        else{
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
-            String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
-            int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
-            content.setText(getColoredtext(color,text));
-        }
-
-        pageNumber = findViewById(R.id.pageNumber);
-        pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
+        refreshPage();
 
         content.addTextChangedListener(new TextWatcher() {
             @Override
@@ -292,9 +275,8 @@ public class LiveCollaboration extends AppCompatActivity {
         undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-
+                
+                undoButtonHelper();
             }
         });
 
@@ -302,12 +284,70 @@ public class LiveCollaboration extends AppCompatActivity {
         redoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                redoButtonHelper();
             }
         });
 
 
+    }
+    
+    private void redoButtonHelper() {
+        JSONObject obj =  new JSONObject();
+        try{
+            obj.put("redo","");
+            obj.put("userID",Integer.toString(userID));
+            obj.put("presentationID",presentationID);
+            obj.put("cueCards_num",Integer.toString(cueCards_num));
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        webSocketClient.send(obj.toString());
+    }
+    
+    private void redoHelper(int cueCards_num, String recent_text, int cardFace) {
+        Cards tmp = presentation.cueCards.get(cueCards_num);
+
+        // change variable in presentation Obj
+
+        if(cardFace==0) {//front
+            tmp.front.content.setMessage(recent_text);
+            presentation.cueCards.set(cueCards_num,tmp);
+        }
+        else{//back
+            tmp.back.content.setMessage(recent_text);
+            presentation.cueCards.set(cueCards_num,tmp);
+        }
+        refreshPage();
+    }
+    
+    private void undoButtonHelper() {
+        JSONObject obj =  new JSONObject();
+        try{
+            obj.put("undo","");
+            obj.put("userID",Integer.toString(userID));
+            obj.put("presentationID",presentationID);
+            obj.put("cueCards_num",Integer.toString(cueCards_num));
+            obj.put("cardFace",Integer.toString(cardFace));
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        webSocketClient.send(obj.toString());
+    }
+    
+    private void undoHelper(int cueCards_num, String recent_text, int cardFace) {
+        Cards tmp = presentation.cueCards.get(cueCards_num);
+
+        // change variable in presentation Obj
+
+        if(cardFace==0) {//front
+            tmp.front.content.setMessage(recent_text);
+            presentation.cueCards.set(cueCards_num,tmp);
+        }
+        else{//back
+            tmp.back.content.setMessage(recent_text);
+            presentation.cueCards.set(cueCards_num,tmp);
+        }
+        refreshPage();
     }
 
 
@@ -320,6 +360,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 obj.put("userID",Integer.toString(userID));
                 obj.put("presentationID",presentationID);
                 obj.put("cueCards_num",Integer.toString(cueCards_num));
+                obj.put("cardFace",Integer.toString(cardFace));
             }catch (JSONException e){
                 e.printStackTrace();
             }
@@ -642,7 +683,7 @@ public class LiveCollaboration extends AppCompatActivity {
         webSocketClient.connect();
     }
 
-    private void receiveMessage(String s) {
+    private void receiveMessage(String s){
         JSONObject tmpjson = null;
         try {
             tmpjson = new JSONObject(s);
@@ -650,109 +691,158 @@ public class LiveCollaboration extends AppCompatActivity {
             Log.w(TAG, "Not Json");
             e.printStackTrace();
         }
-
-        if(tmpjson.has("presentation")){
-            //pack recent presentation obj to json and send to server
-            webSocketClient.send(s);
-            Log.w(TAG, "PRESENTATION");
-        }
-        else{
-
-            if(tmpjson.has("cueCards_num")&&tmpjson.has("cardFace")){  // This is a change
-                Log.w(TAG, "Change");
-
-
-                int change_userID = 0;
-                try {
-                    change_userID = Integer.valueOf(tmpjson.getString("userID"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                if (userID == change_userID){ // do nothing if user ID the same
-                    Log.w(TAG, "==");
-                }
-                else{
-                    String change_presentationID = null;
-                    int change_cueCards_num = 0;
-                    int change_cardFace = 0;
-                    String change_recent_text = null;
-                    try {
-                        change_presentationID = tmpjson.getString("presentationID");
-                        change_cueCards_num = Integer.valueOf(tmpjson.getString("cueCards_num"));
-                        change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
-                        change_recent_text = tmpjson.getString("recent_text");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    if(change_presentationID.equals(presentationID)){
-                        Log.w(TAG, "111");
-
-                        Cards tmp = presentation.cueCards.get(change_cueCards_num);
-
-                        // change variable in presentation Obj
-
-                        if(change_cardFace==0) {//front
-                            tmp.front.content.setMessage(change_recent_text);
-                            presentation.cueCards.set(change_cueCards_num,tmp);
-                        }
-                        else{//back
-                            tmp.back.content.setMessage(change_recent_text);
-                            presentation.cueCards.set(cueCards_num,tmp);
-                        }
-                        Log.w(TAG, "change save");
-
-                        //refresh editText
-
-                        LiveCollaboration.this.runOnUiThread(new Runnable() {
-                            public void run() {
-                                refreshPage();
-                                Log.w(TAG, "change refresh");
-                            }
-                        });
-
-                    }
-                    else{
-                        // do nothing if the presentationID is different
-                        Log.w(TAG, "222");
-                        Log.w(TAG, change_presentationID);
-                        Log.w(TAG, presentationID);
-                    }
-                }
-
+        /**
+         * Check presentation ID same
+         */
+        String change_presentationID = null;
+        if(tmpjson.has("presentationID")){
+            try {
+                change_presentationID = tmpjson.getString("presentationID");
             }
-            else if(tmpjson.has("title")){// this is a presentation json
+            catch (JSONException e) {
+                Log.w(TAG, "No PID");
+                e.printStackTrace();
+                return;
+            }
+            
+            if(!change_presentationID.equals(presentationID)){
+                return;
+            }
 
-                Log.w(TAG, "newPresentation");
-                //change json to presentation obj
+        }
+        int change_userID = 0;
+        int change_cueCards_num = 0;
+        try {
+            change_userID = Integer.valueOf(tmpjson.getString("userID"));
+            change_cueCards_num = Integer.valueOf(tmpjson.getString("cueCards_num"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-                Presentation tmp_pres = new Presentation();
 
+        if(tmpjson.has("refreshPresentation")){//
+            /**
+             * pack recent presentation obj to json and send to server
+             */
+            presentation = presentation;//
+            refreshPage();
+        }
+        else if (tmpjson.has("add")){
+            addHelper(change_cueCards_num);
+            Log.w(TAG, "add");
+        }
+        else if (tmpjson.has("delete")){
+            deleteHelper(change_cueCards_num);
+            Log.w(TAG, "delete");
+        }
+        else if (tmpjson.has("deleteLast")){
+            deleteLastHelper();
+            Log.w(TAG, "deleteLast");
+        }
+        else if (tmpjson.has("swapLast")){
+            swapLastHelper(change_cueCards_num);
+            Log.w(TAG, "swapLast");
+        }
+        else if (tmpjson.has("swapNext")){
+            swapNextHelper(change_cueCards_num);
+            Log.w(TAG, "swapNext");
+        }
+        else if(tmpjson.has("edit")) {
+            Log.w(TAG, "edit");
+            int change_cardFace = 0;
+            String change_recent_text = null;
+            try {
+                change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
+                change_recent_text = tmpjson.getString("recent_text");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            
+            if (userID == change_userID){ // do nothing if user ID the same
+                Log.w(TAG, "==");
+            }
+            else{
+                Log.w(TAG, "!=");
+                Cards tmp = presentation.cueCards.get(change_cueCards_num);
 
-                //reset presentation
-                Log.w(TAG, "newPresentation save");
+                // change variable in presentation Obj
 
-                presentation = tmp_pres;
+                if(change_cardFace==0) {//front
+                    tmp.front.content.setMessage(change_recent_text);
+                    presentation.cueCards.set(change_cueCards_num,tmp);
+                }
+                else{//back
+                    tmp.back.content.setMessage(change_recent_text);
+                    presentation.cueCards.set(cueCards_num,tmp);
+                }
+                Log.w(TAG, "change save");
+
+                //refresh editText
 
                 LiveCollaboration.this.runOnUiThread(new Runnable() {
                     public void run() {
                         refreshPage();
-                        Log.w(TAG, "newPresentation refresh");
+                        Log.w(TAG, "change refresh");
                     }
                 });
 
-
-
             }
+
+        }
+        else if(tmpjson.has("undo")) {
+            Log.w(TAG, "edit");
+            int change_cardFace = 0;
+            String change_recent_text = null;
+            try {
+                change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
+                change_recent_text = tmpjson.getString("recent_text");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            undoHelper(change_cueCards_num,change_recent_text,change_cardFace);
+        }
+        else if(tmpjson.has("redo")) {
+            Log.w(TAG, "edit");
+            int change_cardFace = 0;
+            String change_recent_text = null;
+            try {
+                change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
+                change_recent_text = tmpjson.getString("recent_text");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            redoHelper(change_cueCards_num,change_recent_text,change_cardFace);
+        }
+        
+        else if(tmpjson.has("title")){// this is a presentation json
+
+            Log.w(TAG, "newPresentation");
+            //change json to presentation obj
+
+            Presentation tmp_pres = new Presentation();
+
+
+            //reset presentation
+            Log.w(TAG, "newPresentation save");
+
+            presentation = tmp_pres;
+
+            LiveCollaboration.this.runOnUiThread(new Runnable() {
+                public void run() {
+                    refreshPage();
+                    Log.w(TAG, "newPresentation refresh");
+                }
+            });
+
 
 
         }
+        
     }
-
-
+        
 
     private void refreshPage() {
+        sendOrNot = false;
         if(cardFace == 0){
             content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
             String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
@@ -768,13 +858,13 @@ public class LiveCollaboration extends AppCompatActivity {
 
         pageNumber = findViewById(R.id.pageNumber);
         pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
-
+        sendOrNot = true;
     }
 
     private void refreshPresentation() {
         JSONObject obj =  new JSONObject();
         try{
-            obj.put("refresh","");
+            obj.put("refreshPresentation","");
             obj.put("userID",Integer.toString(userID));
             obj.put("presentationID",presentationID);
         }catch (JSONException e){
