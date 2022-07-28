@@ -1,13 +1,25 @@
 const userStore = require("../userStore");
 const mongoose = require('mongoose');
+const User = require('../../models/users');
 
-beforeAll(() => {
-    mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
-    .then(() => {
+beforeAll(async() => {
+    try {
+        await mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
         console.log("connected to DB");
-    }).catch(e => {
-        console.error('Connection error', e.message)
-    })
+
+        await User.create({
+            userID: "1",
+            username: "jest user",
+            presentations: ["62c38d740afce8d7ea604043"]
+        })
+    } catch {
+        console.error('Connection error', e.message);
+        return;
+    }
+});
+
+afterAll(async () => {
+    await User.deleteOne({userID: "1"});
 });
 
 
@@ -16,17 +28,17 @@ beforeAll(() => {
  */
 describe("addPresToUser tests", () => {
     test("Add a valid presentation", async () => {
-        await expect(userStore.addPresToUser("3", "62c38d740afce8d7ea604044")).resolves.not.toThrow();
+        await expect(userStore.addPresToUser("1", "62c38d740afce8d7ea604044")).resolves.not.toThrow();
     })
     
     test("Add a presentation a user already has", async () => {
         let presID = "62c38d740afce8d7ea604043";
-        await expect(userStore.addPresToUser("3", presID))
+        await expect(userStore.addPresToUser("1", presID))
         .rejects.toEqual("userStore: addPresToUser: Presentation " + presID + " already included in user.")
     })
     
     test("Add an invalid presentation ID", async () => {
-        let userID = "3";
+        let userID = "1";
         let presID = "4";
         let errorMsg = "CastError: Cast to ObjectId failed for value \"" + presID + "\" (type string) at path \"presentations\" because of \"BSONTypeError\"";
         await expect(userStore.addPresToUser(userID, presID)).rejects.toEqual(errorMsg);
@@ -44,7 +56,7 @@ describe("addPresToUser tests", () => {
  */
 describe("removePresFromUser tests", () => {
     test("remove a presentation", async () => {
-        let documentsModified = await userStore.removePresFromUser("3", "62c38d740afce8d7ea604044");
+        let documentsModified = await userStore.removePresFromUser("1", "62c38d740afce8d7ea604044");
         expect(documentsModified.modifiedCount).toEqual(1);
         expect(documentsModified.matchedCount).toEqual(1);
 
@@ -57,7 +69,7 @@ describe("removePresFromUser tests", () => {
     })
 
     test("remove a presentation with invalid presID", async () => {
-        let documentsModified = await userStore.removePresFromUser("3", "62c38d740afce8d7ea60404c");
+        let documentsModified = await userStore.removePresFromUser("1", "62c38d740afce8d7ea60404c");
         expect(documentsModified.modifiedCount).toEqual(0);
         expect(documentsModified.matchedCount).toEqual(1);
     })
