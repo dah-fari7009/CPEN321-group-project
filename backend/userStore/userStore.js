@@ -21,10 +21,10 @@ async function verify(token) {
 // const domain = payload['hd'];
 }
 
-
+// expects token, userID, verifiedDevice and username
 login = (req, res) => {
     if (req.body.verifiedDevice === "false") {
-        verify(req.body.token)
+        verify(req.body.token) // not a promise?
         .then(() => {
             return retreiveUserInfo(req, res);    
         }).catch((error) => {
@@ -37,6 +37,7 @@ login = (req, res) => {
 }
 
 // helper function - retrieve user info, called by login
+// expects userID and username
 retreiveUserInfo = (req, res) => {
     User.findOne({userID: req.body.userID}, (err, data) => {
         if (err) {
@@ -84,7 +85,7 @@ addPresToUser = (userID, presID) => {
             resolve(data);
         }).catch((err) => {
             console.log(err);
-            reject(err);
+            reject(String(err)); // cast to string for easier jest tests
         })
     });
     //edit presentation to add user to array
