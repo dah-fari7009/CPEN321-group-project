@@ -80,33 +80,83 @@ describe("removePresFromUser tests", () => {
  * test for login
  */
  describe("login tests", () => {
+    let res = {
+        stat: 100,
+        msg: "null",
+        json: function(err){
+            this.msg = err;
+        },
+        status: function(responseStatus) {
+            this.stat = responseStatus;
+            return this; 
+        }
+    }
+
     test("valid login", async () => {
         let req = {body: {
-            token: "estimatedDocumentCount",
-            userID: "hi",
+            token: "estimatedDocumentCount", //@TODO
+            userID: "1",
             verifiedDevice: "false",
             username: "jest user"
         }};
-        let res = new myRes();
-        await userStore.login(req, res);
+        userStore.login(req, res);
+        expect(res.stat).toEqual(200);
+    })
+
+    test("login with bad token", async () => {
+        let req = {body: {
+            token: "badtoken",
+            userID: "3",
+            verifiedDevice: "false",
+            username: "jest user"
+        }};
+        userStore.login(req, res);
         expect(res.stat).toEqual(500);
-        expect(res.msg).toEqual(1);
+    })
+
+    test("verified login with returning user", async () => {
+        let req = {body: {
+            token: "estimatedDocumentCount",
+            userID: "1",
+            verifiedDevice: "true",
+            username: "jest user"
+        }};
+        userStore.login(req, res);
+        expect(res.stat).toEqual(200);
+    })
+
+    test("verified login with new user", async () => {
+        let req = {body: {
+            token: "estimatedDocumentCount",
+            userID: "newuser",
+            verifiedDevice: "true",
+            username: "jest user"
+        }};
+        userStore.login(req, res);
+        expect(res.stat).toEqual(200);
+    })
+
+    test("verified login with null userID", async () => {
+        let req = {body: {
+            token: "estimatedDocumentCount",
+            userID: null,
+            verifiedDevice: "false",
+            username: "jest user"
+        }};
+        userStore.login(req, res);
+        expect(res.stat).toEqual(500);
+    })
+
+    test("verified login with null username", async () => {
+        let req = {body: {
+            token: "estimatedDocumentCount",
+            userID: "1",
+            verifiedDevice: "false",
+            username: null
+        }};
+        userStore.login(req, res);
+        expect(res.stat).toEqual(500);
     })
 })
 
-class myRes {
-    constructor () {
-        this.stat = null;
-        this.msg = null;
-    }
 
-    status(num) {
-        this.stat = num;
-        return this
-    }
-
-    json(str) {
-        this.msg = str;
-        return;
-    }
-}
