@@ -62,7 +62,10 @@ retreiveUserInfo = (req, res) => {
     });
 }
 
-// internal - called from presManager.js's createPres()
+// Internal - called from presManager.js's createPres(). Expects user ID corresponding to 
+// to the userID field of a document in the users collection, and presentation ID 
+// corresponding to the _id field of a document in the presentations collection - 
+// both are strings.
 addPresToUser = (userID, presID) => {
     console.log("userStore: addPresToUser: Adding presentation " + presID + " to user " + userID);
     return new Promise((resolve, reject) => {
@@ -90,7 +93,10 @@ addPresToUser = (userID, presID) => {
     //edit presentation to add user to array
 }
 
-// internal - called from presManager.js's deletePres()
+// Internal - called from presManager.js's deletePres(). Expects user ID corresponding to 
+// to the userID field of a document in the users collection, and presentation ID 
+// corresponding to the _id field of a document in the presentations collection - 
+// both are strings.
 removePresFromUser = (userID, presID) => {
     console.log("userStore: removePresFromUser: Deleting presentation " + presID + " from user " + userID);    
     return new Promise((resolve, reject) => {
