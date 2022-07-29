@@ -2,11 +2,13 @@ const userStore = require("../userStore");
 const mongoose = require('mongoose');
 const User = require('../../models/users');
 
+jest.mock("../verify")
+
 beforeAll(async() => {
     try {
         await mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
         console.log("connected to DB");
-
+        await User.deleteMany({});
         await User.create({
             userID: "1",
             username: "jest user",
@@ -19,7 +21,6 @@ beforeAll(async() => {
 });
 
 afterAll(async () => {
-    await User.deleteOne({userID: "1"});
     await mongoose.connection.close();
 });
 
@@ -79,10 +80,10 @@ describe("removePresFromUser tests", () => {
 /**
  * test for login
  */
- describe("login tests", () => {
+describe("login tests", () => {
     let res = {
-        stat: 100,
-        msg: "null",
+        stat: null,
+        msg: null,
         json: function(err){
             this.msg = err;
         },
@@ -92,70 +93,88 @@ describe("removePresFromUser tests", () => {
         }
     }
 
-    test("valid login", async () => {
+    test("valid login with returning user and new device", async () => {
         let req = {body: {
-            token: "estimatedDocumentCount", //@TODO
+            token: "good token",
             userID: "1",
             verifiedDevice: "false",
             username: "jest user"
         }};
-        userStore.login(req, res);
+        await userStore.login(req, res)
         expect(res.stat).toEqual(200);
+        expect(res.msg).toEqual({userID: "1", username: "jest user"})
     })
 
-    test("login with bad token", async () => {
+    test("valid login with new user and new device", async () => {
         let req = {body: {
-            token: "badtoken",
-            userID: "3",
+            token: "good token",
+            userID: "new user",
             verifiedDevice: "false",
-            username: "jest user"
+            username: "n user"
         }};
-        userStore.login(req, res);
-        expect(res.stat).toEqual(500);
+        await userStore.login(req, res);
+        expect(res.stat).toEqual(200);
+        expect(res.msg).toEqual({userID: "new user", username: "n user", presentations: [], presentationTitles: []})
     })
 
-    test("verified login with returning user", async () => {
+    test("valid login with returning user and verified device", async () => {
         let req = {body: {
-            token: "estimatedDocumentCount",
+            token: "good token",
             userID: "1",
             verifiedDevice: "true",
             username: "jest user"
         }};
-        userStore.login(req, res);
+        await userStore.login(req, res)
         expect(res.stat).toEqual(200);
+        expect(res.msg).toEqual({userID: "1", username: "jest user"})
     })
 
-    test("verified login with new user", async () => {
+    test("valid login with new user and verified device", async () => {
         let req = {body: {
-            token: "estimatedDocumentCount",
-            userID: "newuser",
+            token: "good token",
+            userID: "new user 2",
             verifiedDevice: "true",
-            username: "jest user"
+            username: "n user 2"
         }};
-        userStore.login(req, res);
+        await userStore.login(req, res);
         expect(res.stat).toEqual(200);
+        expect(res.msg).toEqual({userID: "new user 2", username: "n user 2", presentations: [], presentationTitles: []})
     })
 
-    test("verified login with null userID", async () => {
+    test("invalid token on new device", async () => {
         let req = {body: {
-            token: "estimatedDocumentCount",
-            userID: null,
+            token: "bad token",
+            userID: "1",
             verifiedDevice: "false",
             username: "jest user"
         }};
-        userStore.login(req, res);
+        await userStore.login(req, res)
         expect(res.stat).toEqual(500);
+        expect(res.msg).toEqual({ error: new Error("login failed") })
     })
 
-    test("verified login with null username", async () => {
+    test("invalid userID", async () => {
         let req = {body: {
-            token: "estimatedDocumentCount",
-            userID: "1",
+            token: "good token",
+            userID: 312987.34,
+            verifiedDevice: "false",
+            username: "jest user"
+        }};
+        await userStore.login(req, res)
+        expect(res.stat).toEqual(500);
+        expect(res.msg).toEqual({ error: new Error("login failed") })
+    })
+
+    test("invalid username", async () => {
+        let req = {body: {
+            token: "good token",
+            userID: "inval username",
             verifiedDevice: "false",
             username: null
         }};
-        userStore.login(req, res);
+        await userStore.login(req, res)
         expect(res.stat).toEqual(500);
+        expect(res.msg).toEqual({ error: new Error("login failed") })
     })
 })
 
