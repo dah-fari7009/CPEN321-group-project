@@ -28,9 +28,8 @@ public class Login extends AppCompatActivity {
 
     private GoogleSignInClient mGoogleSignInClient;
     private Integer RC_SIGN_IN = 1;
-    final static String TAG = "Login";
-//    private Router router;
-    private String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private static final String TAG = "Login";
+    private final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
     private static RequestQueue requestQueue;
 
     @Override
@@ -43,12 +42,15 @@ public class Login extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Abuse the createUserAndGoToMainActivity's login http request by passing hardcoded
+                // userID and email address values of account "aswin.sai009.dummy@gmail.com" instead
+                // of retrieving those values programmatically for an arbitrary account after
+                // performing a Google sing-in on the frontend.
                 createUserAndGoToMainActivity("0", true, "104866131128716891939", "aswin.sai009.dummy@gmail.com");
             }
         });
 
         /* set up HTTP requests */
-//        router = Router.getInstance(getApplicationContext());
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         /* Google sign-in */
@@ -72,7 +74,6 @@ public class Login extends AppCompatActivity {
             });
         }
     }
-
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -104,16 +105,6 @@ public class Login extends AppCompatActivity {
             updateUI(null, false);
         }
     }
-
-
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        // Check for existing Google Sign In account, if the user is already signed in
-//        // the GoogleSignInAccount will be non-null.
-//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-//        updateUI(account, false);
-//    }
 
     private void updateUI(GoogleSignInAccount account, Boolean previouslySignedIn) {
         // Create user from account
