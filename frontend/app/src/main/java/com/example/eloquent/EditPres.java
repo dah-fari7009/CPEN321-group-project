@@ -62,9 +62,11 @@ public class EditPres extends AppCompatActivity {
         Button preparationBtn;
         Button presentingBtn;
         Button liveCollabBtn;
+        Button exportButton;
         Toolbar toolbar;
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
+        Log.d(TAG, "title of opened presentation is '" + presentation.getTitle() + "'");
 
         /* Set up toolbar */
         toolbar = findViewById(R.id.toolbar);
@@ -81,6 +83,7 @@ public class EditPres extends AppCompatActivity {
         preparationBtn = findViewById(R.id.preparationButton);
         presentingBtn = findViewById(R.id.presentingButton);
         liveCollabBtn = findViewById(R.id.liveCollabButton);
+        exportButton = findViewById(R.id.exportButton);
 
         preparationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,8 +97,7 @@ public class EditPres extends AppCompatActivity {
         presentingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkPermission();
-
+                checkPermissionAndStartPresentingActivity();
             }
         });
 
@@ -104,6 +106,13 @@ public class EditPres extends AppCompatActivity {
             public void onClick(View v) {
                 Intent shareIntent = new Intent(EditPres.this, LiveCollaboration.class);
                 startActivity(shareIntent);
+            }
+        });
+
+        exportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
@@ -212,7 +221,7 @@ public class EditPres extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void checkPermission() {
+    private void checkPermissionAndStartPresentingActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
             Intent presentingIntent = new Intent(EditPres.this, Presenting.class);
             presentingIntent.putExtra("Presentation", presentation);

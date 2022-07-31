@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -23,12 +24,12 @@ import java.util.ArrayList;
 
 public class Presenting extends AppCompatActivity implements RecognitionListener {
 
-    private boolean isOnFront = false;
+    private boolean isOnFront = true;
     private int currentCard = 0;
     Presentation pres;
 
     private Intent speechRecognizerIntent;
-    private String TAG = "Speech Recognizer";
+    private String TAG = "Presenting";
 
     public static final Integer RecordAudioRequestCode = 1;
     private SpeechRecognizer speechRecognizer;
@@ -145,16 +146,19 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
     public TextView createTextView(Presentation pres, int cardIndex, boolean isOnFront) {
         TextView textView1 = new TextView(Presenting.this);
         textView1.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        SpannableString spannable;
+        String content;
         if (isOnFront) {
-            Spannable spannable = getColoredtext(pres.cueCards.get(cardIndex).front.content.colour, pres.cueCards.get(cardIndex).front.content.message);
-            textView1.setText(spannable);
-
+            spannable = getColoredtext(pres.cueCards.get(cardIndex).front.content.colour, pres.cueCards.get(cardIndex).front.content.message);
+//            content = pres.cueCards.get(cardIndex).front.content.message;
         } else {
-            Spannable spannable = getColoredtext(pres.cueCards.get(cardIndex).back.content.colour, pres.cueCards.get(cardIndex).back.content.message);
-            textView1.setText(spannable);
+            spannable = getColoredtext(pres.cueCards.get(cardIndex).back.content.colour, pres.cueCards.get(cardIndex).back.content.message);
+//            content = pres.cueCards.get(cardIndex).back.content.message;
         }
+        textView1.setText(spannable);
         textView1.setBackgroundColor(0xffffffff); // hex color 0xAARRGGBB
         textView1.setPadding(20, 20, 20, 20);// in pixels (left, top, right, bottom)
+        Log.d(TAG, String.valueOf(textView1.getText()));
 
         return textView1;
     }
@@ -284,9 +288,12 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
         // nothing to be done here
     }
 
-    private Spannable getColoredtext(int color, String text){
-        Spannable colored_text = new SpannableString(text);
-        colored_text.setSpan(new ForegroundColorSpan(color),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    private SpannableString getColoredtext(int color, String text){
+        SpannableString colored_text = new SpannableString(text);
+
+        int[] colorPallette = {Color.BLACK, Color.WHITE, Color.RED, Color.GREEN};
+
+        colored_text.setSpan(new ForegroundColorSpan(colorPallette[color]),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return colored_text;
     }
 }

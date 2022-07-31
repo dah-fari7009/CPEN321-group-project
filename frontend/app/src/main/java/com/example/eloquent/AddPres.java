@@ -79,17 +79,6 @@ public class AddPres extends AppCompatActivity {
 
         /* Set up for sending HTTP requests */
         requestQueue = Volley.newRequestQueue(getApplicationContext());
-
-        importButton = findViewById(R.id.importButton);
-        importButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Router.getInstance(AddPres.this).importPresentation(
-                        User.getInstance().getData().getUserID(),
-                        getString(R.string.sample_import_input)
-                );
-            }
-        });
     }
 
     // this will start a import activity and is invoked by pressing the import button
@@ -104,6 +93,8 @@ public class AddPres extends AppCompatActivity {
                         Uri uri = data.getData();
                         byte[] bytes = getBytesFromUrl(getApplicationContext(), uri);
                         importText = new String((bytes));
+                        Log.d(TAG, importText);
+                        importPresentation(User.getInstance().getData().getUserID(), importText);
                     }
                 }
             }
@@ -143,7 +134,7 @@ public class AddPres extends AppCompatActivity {
         Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         data.addCategory(Intent.CATEGORY_OPENABLE);
         data.setType("*/*");
-        String[] mimeTypes = {"text/*"};
+        String[] mimeTypes = {"text/plain"};
         data.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         data = Intent.createChooser(data, "choose a file");
         sActivityResultLauncher.launch(data);
@@ -173,7 +164,6 @@ public class AddPres extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, response);
-//                presentation.setPresentationID(response);
                 Intent savingIntent = new Intent(AddPres.this, MainActivity.class);
                 startActivity(savingIntent);
             }
@@ -188,6 +178,39 @@ public class AddPres extends AppCompatActivity {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("userID", userID);
                 params.put("title", title);
+                return params;
+            }
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+    }
+
+    private void importPresentation(String userID, String presentationTextRep) {
+        String url = BACKEND_HOST_AND_PORT + "/api/import"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
+        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+                Intent savingIntent = new Intent(AddPres.this, MainActivity.class);
+                startActivity(savingIntent);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("userID", userID);
+                params.put("text", presentationTextRep);
                 return params;
             }
             @Override
