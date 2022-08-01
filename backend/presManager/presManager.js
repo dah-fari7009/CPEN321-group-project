@@ -12,7 +12,31 @@ createPres = (req, res) => {
     //@TODO check for userID
         Presentation.create({
             title: presTitle,
-            cards: [],
+            cards: [{
+                backgroundColor: 1,
+                transitionPhrase: "None",
+                endWithPause: 1,
+                front: {
+                    backgroundColor: 1,
+                    content: {
+                        font: "Times New Roman",
+                        style: "normalfont",
+			size: 12,
+                        colour: 0,
+                        message: "Front: Add your prompt here"
+		    }
+		},
+                back: {
+                    backgroundColor: 1,
+                    content: {
+                        font: "Times New Roman",
+                        style: "normalfont",
+			size: 12,
+                        colour: 0,
+                        message: "Back: Add details here"
+		    }
+		}
+	    }],
             feedback: [],
             users: [{id: req.body.userID, permission: "owner"}]
         }).then((data) => {
@@ -165,12 +189,12 @@ deletePres = (req, res) => {
 
 
 savePres = (req, res) => {
+    console.log("presManager: savePres: received request to update presentation " + req.body.presID);
     const filter = {"_id": req.body.presID};
     const update = {
         "title": req.body.title,
         "cards": req.body.cards,
         "feedback": req.body.feedback,
-        "users": req.body.users
     }
     Presentation.findOneAndUpdate(filter, update, {new: true})
         .then((pres) => {
