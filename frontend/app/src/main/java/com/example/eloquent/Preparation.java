@@ -547,6 +547,20 @@ public class Preparation extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             Log.d("TAG", "back button pressed");
+            String change = content.getText().toString();
+            Cards tmp = presentation.cueCards.get(cueCards_num);
+//                Log.w("TAG", "get success" + change);
+            Log.w("TAG", Integer.toString(2));
+            if(cardFace==0) {//front
+                tmp.front.content.setMessage(change);
+                presentation.cueCards.set(cueCards_num,tmp);
+                Log.w("TAG", "front");
+            }
+            else{//back
+                tmp.back.content.setMessage(change);
+                presentation.cueCards.set(cueCards_num,tmp);
+                Log.w("TAG", "back");
+            }
             saveTitleAndGoToMainActivity(presentation.presentationID, null);
         }
         return super.onKeyDown(keyCode, event);
