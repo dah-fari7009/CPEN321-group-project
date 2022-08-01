@@ -6,7 +6,7 @@ unParsePresentation = (req, res) => {
         presStr += indent(indents + 1) + "\\title " + pres.title + "\n";
         presStr += unParseCard(pres.cards, indents + 1);
         presStr += indent(indents) + "\\end{presentation}";
-        return res.status(200).send( presStr );
+        return res.status(200).send( { presStr } );
     } catch {
         return res.status(400).send( new Error("unParse failed") );
     }
