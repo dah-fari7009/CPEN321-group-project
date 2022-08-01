@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -23,36 +24,17 @@ import java.util.ArrayList;
 
 public class Presenting extends AppCompatActivity implements RecognitionListener {
 
-    private boolean isOnFront = false;
+    private boolean isOnFront = true;
     private int currentCard = 0;
     Presentation pres;
 
     private Intent speechRecognizerIntent;
-    private String TAG = "Speech Recognizer";
+    private String TAG = "Presenting";
 
     public static final Integer RecordAudioRequestCode = 1;
     private SpeechRecognizer speechRecognizer;
     private TextView speechText;
     private LinearLayout linearLayout;
-
-//    Content contentCard1Front1 = new Content("font", "style", 5, 1, "Speeches often start with a hook");
-//    Content contentCard1Back1 = new Content("font", "style", 5, 1, "A hook is anything that grabs the audience's attention");
-//    Content contentCard1Back2 = new Content("font", "style", 5, 1, "Examples of hooks are anecdotes, jokes, hot takes");
-//    Content contentCard1Back3 = new Content("font", "style", 5, 1, "Knowing targed audience leads to better hooks");
-//
-//    Content contentCard2Back1 = new Content("font", "style", 5, 1, "The audience needs to first know why they should pay attention to your speech");
-//    Content contentCard2Back2 = new Content("font", "style", 5, 1, "Then, deliver on your promise");
-//    Content contentCard2Front1 = new Content("font", "style", 5, 1, "Bottom line upfront");
-//
-//    Front sideFront1 = new Front(1, new Content[]{contentCard1Front1});
-//    Back sideBack1 = new Back(2, new Content[]{contentCard1Back1, contentCard1Back2, contentCard1Back3});
-//
-//    Front sideFront2 = new Front(1, new Content[]{contentCard2Front1});
-//    Back sideBack2 = new Back(2, new Content[]{contentCard2Back1, contentCard2Back2});
-//
-//    Cards card1 = new Cards(1, "Knowing targed audience leads to better hooks", 0, sideFront1, sideBack1);
-//    Cards card2 = new Cards(1, "Then, deliver on your promise", 1, sideFront2, sideBack2);
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -145,16 +127,19 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
     public TextView createTextView(Presentation pres, int cardIndex, boolean isOnFront) {
         TextView textView1 = new TextView(Presenting.this);
         textView1.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        SpannableString spannable;
+        String content;
         if (isOnFront) {
-            Spannable spannable = getColoredtext(pres.cueCards.get(cardIndex).front.content.colour, pres.cueCards.get(cardIndex).front.content.message);
-            textView1.setText(spannable);
-
+            spannable = getColoredtext(pres.cueCards.get(cardIndex).front.content.colour, pres.cueCards.get(cardIndex).front.content.message);
+//            content = pres.cueCards.get(cardIndex).front.content.message;
         } else {
-            Spannable spannable = getColoredtext(pres.cueCards.get(cardIndex).back.content.colour, pres.cueCards.get(cardIndex).back.content.message);
-            textView1.setText(spannable);
+            spannable = getColoredtext(pres.cueCards.get(cardIndex).back.content.colour, pres.cueCards.get(cardIndex).back.content.message);
+//            content = pres.cueCards.get(cardIndex).back.content.message;
         }
+        textView1.setText(spannable);
         textView1.setBackgroundColor(0xffffffff); // hex color 0xAARRGGBB
         textView1.setPadding(20, 20, 20, 20);// in pixels (left, top, right, bottom)
+        Log.d(TAG, String.valueOf(textView1.getText()));
 
         return textView1;
     }
@@ -284,9 +269,12 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
         // nothing to be done here
     }
 
-    private Spannable getColoredtext(int color, String text){
-        Spannable colored_text = new SpannableString(text);
-        colored_text.setSpan(new ForegroundColorSpan(color),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    private SpannableString getColoredtext(int color, String text){
+        SpannableString colored_text = new SpannableString(text);
+
+        int[] colorPallette = {Color.BLACK, Color.WHITE, Color.RED, Color.GREEN};
+
+        colored_text.setSpan(new ForegroundColorSpan(colorPallette[color]),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return colored_text;
     }
 }

@@ -2,15 +2,15 @@ const Presentation = require('../models/presentations');
 const userStore = require('../userStore/userStore');
 
 //@TODO should this also have a title in the request body
-createPres = (req, res) => {
+createPres = async (req, res) => {
     console.log("Create presentation request received!");
     if (!req.body.presObj) {
-    var presID;
-    var presTitle = "unnamed";
-    if (req.body.title) presTitle = req.body.title;
+        // var presID;
+        var presTitle = "unnamed";
+        if (req.body.title) presTitle = req.body.title;
         
-    //@TODO check for userID
-        Presentation.create({
+        //@TODO check for userID
+        var data = await Presentation.create({
             title: presTitle,
             cards: [{
                 backgroundColor: 1,
@@ -39,21 +39,23 @@ createPres = (req, res) => {
 	    }],
             feedback: [],
             users: [{id: req.body.userID, permission: "owner"}]
-        }).then((data) => {
-            presID = data._id;
-            return userStore.addPresToUser(req.body.userID, data._id);
-        }).then((result) => { 
-            return res.status(200).send( presID );
-        }).catch((err) => {
-            console.log(err);
+        });
+        console.log("presManager: createPres: presentation successfully created");
+        // presID = data._id;
+        try {
+            var addPresToUserResult = userStore.addPresToUser(req.body.userID, data._id);
+            console.log("presManager: createPres: presentation successfully created and added to user");
+            return res.status(200).send( data );
+        } catch (err) {
+            console.log("presManager: createPres: error when adding presentation to user: " + err);
             return res.status(500).json({ err });
-        })
+        }
     } else {
         Presentation.create(req.body.presObj).then((data) => {
-            presID = data._id;
+            //presID = data._id;
             return userStore.addPresToUser(req.body.userID, data._id);
         }).then((result) => {
-            return res.status(200).send( presID );
+            return res.status(200).send( data );
         }).catch((err) => {
             return res.status(500).json({ err });
         })

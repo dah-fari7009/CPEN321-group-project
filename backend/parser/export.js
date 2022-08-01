@@ -1,11 +1,15 @@
 unParsePresentation = (req, res) => {
-    var pres = req.body
-    var indents = 0;
-    var presStr = indent(indents) + "\\begin{presentation}\n";
-    presStr += indent(indents + 1) + "\\title " + pres.title + "\n";
-    presStr += unParseCard(pres.cards, indents + 1);
-    presStr += indent(indents) + "\\end{presentation}";
-    return res.status(200).send( presStr );
+    try {
+        var pres = req.body
+        var indents = 0;
+        var presStr = indent(indents) + "\\begin{presentation}\n";
+        presStr += indent(indents + 1) + "\\title " + pres.title + "\n";
+        presStr += unParseCard(pres.cards, indents + 1);
+        presStr += indent(indents) + "\\end{presentation}";
+        return res.status(200).send( presStr );
+    } catch {
+        return res.status(400).send( new Error("unParse failed") );
+    }
 }
 
 function unParseCard(cards, indents) {
@@ -56,7 +60,9 @@ function unParseSide(side, indents, isFront) {
 
 function unParseContent(content, indents) {
     var messageArr = content.message.split("\n> ");
-    if (messageArr[0]) messageArr[0] = messageArr[0].slice(2, messageArr[0].length) //chop off beginning bracket
+    if (messageArr[0] && messageArr[0].charAt(0) === ">") {
+        messageArr[0] = messageArr[0].slice(1, messageArr[0].length).trim(); //chop off beginning bracket
+    }
     var contentStr = "";
     for (var i = 0; i < messageArr.length; i++) {
         contentStr += indent(indents) + "\\item " + messageArr[i] + "\n"

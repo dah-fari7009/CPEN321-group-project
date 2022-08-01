@@ -28,7 +28,7 @@ public class Preparation extends AppCompatActivity {
     private TextView pageNumber;
     private EditText content;
     private TextViewUndoRedo helper;
-    private Presentation presentation = new Presentation();
+    private Presentation presentation;
     private int cueCards_num = 0;
     private int cueCards_max = 0;
     private int cardFace = 0;//0: front | 1: back
@@ -66,36 +66,23 @@ public class Preparation extends AppCompatActivity {
         ImageButton undoButton;
 
 
-        cueCards_max = 3;
+        presentation = (Presentation) getIntent().getSerializableExtra("specificArgument");
 
-        Content content1 = new Content(Color.BLUE,"");
-        Content content2 = new Content(Color.BLUE,"1Back");
-        Back back1 = new Back(Color.BLACK);
-        back1.content=content2;
-        Front front1 = new Front(Color.WHITE);
-        front1.content=content1;
-        Cards card1 = new Cards(front1,back1,Color.WHITE);
+        try{
+            cueCards_max = presentation.cueCards.size();
+        }
+        catch (Exception e){
+            Content new_content_front = new Content(Color.BLACK,"");
+            Content new_content_back = new Content(Color.BLACK,"");
+            Front new_front = new Front(Color.WHITE,new_content_front);
+            Back new_back = new Back(Color.WHITE,new_content_back);
+            Cards emptyCard = new Cards(new_front,new_back,Color.WHITE);
+            presentation = new Presentation();
+            presentation.cueCards.add(emptyCard);
+            cueCards_max = presentation.cueCards.size();
+        }
 
-        Content content3 = new Content(Color.BLUE,"2Front");
-        Content content4 = new Content(Color.BLUE,"2Back");
-        Back back2 = new Back(Color.BLACK);
-        back2.content=content4;
-        Front front2 = new Front(Color.WHITE);
-        front2.content=content3;
-        Cards card2 = new Cards(front2,back2,Color.WHITE);
-
-        Content content5 = new Content(Color.BLUE,"3Front");
-        Content content6 = new Content(Color.BLUE,"3Back");
-        Back back3 = new Back(Color.BLACK);
-        back3.content=content6;
-        Front front3 = new Front(Color.WHITE);
-        front3.content=content5;
-        Cards card3 = new Cards(front3,back3,Color.WHITE);
-
-        presentation.cueCards.add(card1);
-        presentation.cueCards.add(card2);
-        presentation.cueCards.add(card3);
-        Log.w("TAG", "set success");
+        Log.w("TAG", Integer.toString(cueCards_max));
 
         //start page
 
@@ -120,6 +107,7 @@ public class Preparation extends AppCompatActivity {
         content.setText(getColoredtext(color,text));
 //        Log.w("TAG", "text success"+"|| cue card number is " +Integer.toString(cueCards_num));
         //content.setText(presentation.getCards(cueCards_num).getFront().getContent(content_num).getMessage());
+        Log.w("TAG", "OK");
 
 
         nextButton = findViewById(R.id.nextButton);
@@ -128,7 +116,7 @@ public class Preparation extends AppCompatActivity {
             public void onClick(View v) {
 
                 //first, save the change on the edit text
-
+                Log.w("TAG", "nextButton");
                 nexthelper();
 
             }
@@ -140,7 +128,7 @@ public class Preparation extends AppCompatActivity {
             public void onClick(View v) {
 
                 //first, save the change on the edit text
-
+                Log.w("TAG", "backButton");
                 backhelper();
 
             }
@@ -152,6 +140,7 @@ public class Preparation extends AppCompatActivity {
             public void onClick(View v) {
 
                 //save the change on the edit text and flip the page
+                Log.w("TAG", "flipButton");
                 fliphelper();
 
             }
@@ -465,22 +454,25 @@ public class Preparation extends AppCompatActivity {
             helper.clearHistory();
         }
         else{
-            Toast.makeText(getApplicationContext(),"Min number, cannot go to the last page",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"Min number, cannot go to the last page",Toast.LENGTH_SHORT).show();
         }
     }
 
     private void nexthelper() {
+        Log.w("TAG", Integer.toString(1));
         String change = content.getText().toString();
         Cards tmp = presentation.cueCards.get(cueCards_num);
 //                Log.w("TAG", "get success" + change);
-
+        Log.w("TAG", Integer.toString(2));
         if(cardFace==0) {//front
             tmp.front.content.setMessage(change);
             presentation.cueCards.set(cueCards_num,tmp);
+            Log.w("TAG", "front");
         }
         else{//back
             tmp.back.content.setMessage(change);
             presentation.cueCards.set(cueCards_num,tmp);
+            Log.w("TAG", "back");
         }
 //                Log.w("TAG", "save success");
 
@@ -497,10 +489,12 @@ public class Preparation extends AppCompatActivity {
             content.setText(getColoredtext(color,text));
             pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
             helper.clearHistory();
+            Log.w("TAG", "next");
 
         }
         else{
             Toast.makeText(getApplicationContext(),"Max number, cannot go to the next page",Toast.LENGTH_SHORT).show();
+            Log.w("TAG", "error");
         }
     }
 
