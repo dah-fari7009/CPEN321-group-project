@@ -25,14 +25,14 @@ login = async (req, res) => {
 // expects userID and username
 retreiveUserInfo = async (req, res) => {
     try {
-        var data = await User.findOne({somdmos: "yiadwgywaduygwda"})//({userID: req.body.userID});
+        var data = await User.findOne({userID: req.body.userID});
         if (!data) {
-            let newPres = await User.create({
+            let newUser = await User.create({
                 userID: req.body.userID,
                 username: req.body.username,
                 presentations: []
             })
-            return res.status(200).json({ userID: newPres.userID, username: newPres.username, presentations: newPres.presentations, presentationTitles: [] });
+            return res.status(200).json({ userID: newUser.userID, username: newUser.username, presentations: newUser.presentations });
         } else {
             return res.status(200).json({userID: data.userID, username: data.username});
         }
