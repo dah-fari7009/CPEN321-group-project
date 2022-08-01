@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -130,10 +129,10 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
         SpannableString spannable;
         String content;
         if (isOnFront) {
-            spannable = getColoredtext(pres.cueCards.get(cardIndex).front.content.colour, pres.cueCards.get(cardIndex).front.content.message);
+            spannable = getColoredText(pres.cueCards.get(cardIndex).front.content.colour, pres.cueCards.get(cardIndex).front.content.message);
 //            content = pres.cueCards.get(cardIndex).front.content.message;
         } else {
-            spannable = getColoredtext(pres.cueCards.get(cardIndex).back.content.colour, pres.cueCards.get(cardIndex).back.content.message);
+            spannable = getColoredText(pres.cueCards.get(cardIndex).back.content.colour, pres.cueCards.get(cardIndex).back.content.message);
 //            content = pres.cueCards.get(cardIndex).back.content.message;
         }
         textView1.setText(spannable);
@@ -269,10 +268,10 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
         // nothing to be done here
     }
 
-    private SpannableString getColoredtext(int color, String text){
+    private SpannableString getColoredText(int color, String text){
         SpannableString colored_text = new SpannableString(text);
 
-        int[] colorPallette = {
+        int[] colorPalette = {
                 Color.BLACK,
                 Color.WHITE,
                 Color.RED,
@@ -284,7 +283,7 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
                 Color.MAGENTA
         };
 
-        colored_text.setSpan(new ForegroundColorSpan(colorPallette[color]),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        colored_text.setSpan(new ForegroundColorSpan(colorPalette[color]),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return colored_text;
     }
 }

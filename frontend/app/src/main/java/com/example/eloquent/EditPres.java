@@ -35,6 +35,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -120,7 +123,7 @@ public class EditPres extends AppCompatActivity {
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                exportPresentation();
             }
         });
 
@@ -192,7 +195,7 @@ public class EditPres extends AppCompatActivity {
                                 .build();
 
                         driverServiceHelper = new DriverServiceHelper(googleDriveService);
-
+//                        driverServiceHelper.createFile("/storage/emulated/0/Downloads/sampleInputText.txt");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -260,6 +263,8 @@ public class EditPres extends AppCompatActivity {
         }
     }
 
+
+
     private void deletePresentation(String userID, String presID) {
         String url = BACKEND_HOST_AND_PORT + "/api/presentation?userID=" + userID + "&presID=" + presID;
         StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
@@ -279,35 +284,47 @@ public class EditPres extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
-    private void exportPresentation(String userID, String presentationTextRep) {
+    private void exportPresentation() {
         String url = BACKEND_HOST_AND_PORT + "/api/export"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG,error.toString());
-            }
-        }) {
-            @Override
-            public Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("userID", userID);
-                params.put("text", presentationTextRep);
-                return params;
-            }
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/x-www-form-urlencoded");
-                return headers;
-            }
-        };
 
-        requestQueue.add(stringRequest);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String presJsonString;
+        JSONObject pres;
+
+        try {
+            presJsonString = objectMapper.writeValueAsString(presentation);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            presJsonString = null;
+            pres = null;
+            throw new NullPointerException();
+        }
+        try {
+            pres = new JSONObject(presJsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            presJsonString = null;
+            pres = null;
+            throw new NullPointerException();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, pres,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+//                        requestSignIn();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }
+        );
+
+        requestQueue.add(jsonObjectRequest);
     }
 
     private void saveTitleAndGoToMainActivity(String userID, String presID) {
