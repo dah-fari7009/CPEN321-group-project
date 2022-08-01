@@ -20,7 +20,18 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Preparation extends AppCompatActivity {
 
@@ -34,27 +45,20 @@ public class Preparation extends AppCompatActivity {
     private int cardFace = 0;//0: front | 1: back
     ObjectMapper objectMapper = new ObjectMapper();
 
+    private static final String TAG = "Preparation";
 
+    private static final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private static RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preparation);
 
-        /**
-         * get json from backend server by request
-         */
+        /* Set up for sending HTTP requests */
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-//        try {
-//            presentation = objectMapper.readValue(json, Preparation.class);
-//        }
-//        catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
-
-
-        //then change json to pres obj
-
+        /* Button variables */
         ImageButton nextButton;
         ImageButton backButton;
         ImageButton flipButton;
@@ -66,7 +70,8 @@ public class Preparation extends AppCompatActivity {
         ImageButton undoButton;
 
 
-        presentation = (Presentation) getIntent().getSerializableExtra("specificArgument");
+        /* Retrieve presentation object */
+        presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
 
         try{
             cueCards_max = presentation.cueCards.size();
@@ -84,12 +89,7 @@ public class Preparation extends AppCompatActivity {
 
         Log.w("TAG", Integer.toString(cueCards_max));
 
-        //start page
-
-
-        //!!!!!!!!!!
-
-
+        /* Set up UI elements */
         pageNumber = findViewById(R.id.pageNumber);
         pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
 
@@ -109,7 +109,7 @@ public class Preparation extends AppCompatActivity {
         //content.setText(presentation.getCards(cueCards_num).getFront().getContent(content_num).getMessage());
         Log.w("TAG", "OK");
 
-
+        /* Set up on-click handlers for buttons */
         nextButton = findViewById(R.id.nextButton);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +117,7 @@ public class Preparation extends AppCompatActivity {
 
                 //first, save the change on the edit text
                 Log.w("TAG", "nextButton");
-                nexthelper();
+                nextHelper();
 
             }
         });
@@ -129,7 +129,7 @@ public class Preparation extends AppCompatActivity {
 
                 //first, save the change on the edit text
                 Log.w("TAG", "backButton");
-                backhelper();
+                backHelper();
 
             }
         });
@@ -141,7 +141,7 @@ public class Preparation extends AppCompatActivity {
 
                 //save the change on the edit text and flip the page
                 Log.w("TAG", "flipButton");
-                fliphelper();
+                flipHelper();
 
             }
         });
@@ -152,11 +152,7 @@ public class Preparation extends AppCompatActivity {
             public void onClick(View v) {
 
                 //first, save the change on the edit text
-
-
-                addhelper();
-
-
+                addHelper();
             }
         });
 
@@ -164,11 +160,7 @@ public class Preparation extends AppCompatActivity {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                deletehelper();
-
-
+                deleteHelper();
             }
         });
 
@@ -179,10 +171,7 @@ public class Preparation extends AppCompatActivity {
 
                 //first, save the change on the edit text
 
-
-                swapnexthelper();
-
-
+                swapNextHelper();
             }
         });
 
@@ -193,10 +182,7 @@ public class Preparation extends AppCompatActivity {
 
                 //first, save the change on the edit text
 
-
-                swaplasthelper();
-
-
+                swapLastHelper();
             }
         });
 
@@ -204,9 +190,7 @@ public class Preparation extends AppCompatActivity {
         undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 helper.undo();
-
             }
         });
 
@@ -214,16 +198,14 @@ public class Preparation extends AppCompatActivity {
         redoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 helper.redo();
-
             }
         });
 
 
     }
 
-    private void swaplasthelper() {
+    private void swapLastHelper() {
         String change = content.getText().toString();
         Cards tmp = presentation.cueCards.get(cueCards_num);
 //                Log.w("TAG", "get success" + change);
@@ -265,7 +247,7 @@ public class Preparation extends AppCompatActivity {
         helper.clearHistory();
     }
 
-    private void swapnexthelper() {
+    private void swapNextHelper() {
         String change = content.getText().toString();
         Cards tmp = presentation.cueCards.get(cueCards_num);
 //                Log.w("TAG", "get success" + change);
@@ -307,7 +289,7 @@ public class Preparation extends AppCompatActivity {
         helper.clearHistory();
     }
 
-    private void deletehelper() {
+    private void deleteHelper() {
         createDialog();
         //Don't need to save because the content will be deleted
 
@@ -349,7 +331,7 @@ public class Preparation extends AppCompatActivity {
         helper.clearHistory();
     }
 
-    private void addhelper() {
+    private void addHelper() {
         String change = content.getText().toString();
         Cards tmp = presentation.cueCards.get(cueCards_num);
 //                Log.w("TAG", "get success" + change);
@@ -395,7 +377,7 @@ public class Preparation extends AppCompatActivity {
         helper.clearHistory();
     }
 
-    private void fliphelper() {
+    private void flipHelper() {
         String change = content.getText().toString();
         Cards tmp = presentation.cueCards.get(cueCards_num);
 
@@ -425,7 +407,7 @@ public class Preparation extends AppCompatActivity {
         helper.clearHistory();
     }
 
-    private void backhelper() {
+    private void backHelper() {
         String change = content.getText().toString();
         Cards tmp = presentation.cueCards.get(cueCards_num);
 
@@ -458,7 +440,7 @@ public class Preparation extends AppCompatActivity {
         }
     }
 
-    private void nexthelper() {
+    private void nextHelper() {
         Log.w("TAG", Integer.toString(1));
         String change = content.getText().toString();
         Cards tmp = presentation.cueCards.get(cueCards_num);
@@ -546,7 +528,20 @@ public class Preparation extends AppCompatActivity {
 
     private Spannable getColoredtext(int color, String text){
         Spannable colored_text = new SpannableString(text);
-        colored_text.setSpan(new ForegroundColorSpan(color),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        int[] colorPalette = {
+                Color.BLACK,
+                Color.WHITE,
+                Color.RED,
+                Color.GREEN,
+                Color.BLUE,
+                Color.GRAY,
+                Color.YELLOW,
+                Color.CYAN,
+                Color.MAGENTA
+        };
+
+        colored_text.setSpan(new ForegroundColorSpan(colorPalette[color]),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return colored_text;
     }
 
@@ -572,6 +567,49 @@ public class Preparation extends AppCompatActivity {
         bundleObj.putString("fromNewActivity", Boolean.toString(fromNewActivity));
         mainIntent.putExtras(bundleObj);
         startActivityForResult(mainIntent, 0);
+    }
+
+    private void saveTitleAndGoToMainActivity(String userID, String presID) {
+        String url = BACKEND_HOST_AND_PORT + "/api/savePresentation"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
+        ObjectMapper objectMapper = new ObjectMapper();
+        String cardsJsonString;
+        String feedbackJsonString;
+        JSONArray cards;
+        JSONArray feedback;
+        JSONObject body = new JSONObject();
+        try {
+            cardsJsonString = objectMapper.writeValueAsString(presentation.cueCards);
+            feedbackJsonString = objectMapper.writeValueAsString(presentation.feedback);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new NullPointerException();
+        }
+
+        try {
+            cards = new JSONArray(cardsJsonString);
+            feedback = new JSONArray(feedbackJsonString);
+            body.put("presID", presID);
+            body.put("title", presentation.getTitle());
+            body.put("cards", cards);
+            body.put("feedback", feedback);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new NullPointerException();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, body, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(TAG, response.toString());
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,error.toString());
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
     }
 
 }
