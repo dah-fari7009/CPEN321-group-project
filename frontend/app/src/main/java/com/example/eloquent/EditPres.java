@@ -28,8 +28,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,6 +42,11 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -128,6 +136,7 @@ public class EditPres extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(s.length() != 0) {
                     getSupportActionBar().setTitle(s);
+                    presentation.setIsTitleChanged(true);
                 }
             }
 
@@ -208,11 +217,9 @@ public class EditPres extends AppCompatActivity {
             deletePresentation(User.getInstance().getData().getUserID(), presentation.presentationID);
         }
         if(item.getItemId() == R.id.save) {
-            if(presentation.title != null) {
+            if(presentation.title != null && presentation.getIsTitleChanged() == true) {
                 presentation.title = presTitle.getText().toString();
-                Intent changingIntent = new Intent(EditPres.this, MainActivity.class);
-                changingIntent.putExtra("Presentation", presentation);
-                startActivity(changingIntent);
+                saveTitleAndGoToMainActivity(User.getInstance().getData().getUserID(), presentation.presentationID);
             }
             else {
                 Toast.makeText(getApplicationContext(),"Title cannot be null", Toast.LENGTH_SHORT).show();
@@ -301,5 +308,51 @@ public class EditPres extends AppCompatActivity {
         };
 
         requestQueue.add(stringRequest);
+    }
+
+    private void saveTitleAndGoToMainActivity(String userID, String presID) {
+        String url = BACKEND_HOST_AND_PORT + "/api/savePresentation"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
+        ObjectMapper objectMapper = new ObjectMapper();
+        String cardsJsonString;
+        String feedbackJsonString;
+        JSONArray cards;
+        JSONArray feedback;
+        JSONObject body = new JSONObject();
+        try {
+            cardsJsonString = objectMapper.writeValueAsString(presentation.cueCards);
+            feedbackJsonString = objectMapper.writeValueAsString(presentation.feedback);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new NullPointerException();
+        }
+
+        try {
+            cards = new JSONArray(cardsJsonString);
+            feedback = new JSONArray(feedbackJsonString);
+            body.put("presID", presID);
+            body.put("title", presentation.getTitle());
+            body.put("cards", cards);
+            body.put("feedback", feedback);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new NullPointerException();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, body, new Response.Listener<JSONObject>() {
+            @Override
+                public void onResponse(JSONObject response) {
+                Log.d(TAG, response.toString());
+                presentation.setIsTitleChanged(false);
+                Intent changingIntent = new Intent(EditPres.this, MainActivity.class);
+                startActivity(changingIntent);
+                }
+            }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,error.toString());
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
     }
 }
