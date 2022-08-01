@@ -114,11 +114,9 @@ public class Preparation extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 //first, save the change on the edit text
                 Log.w("TAG", "nextButton");
                 nextHelper();
-
             }
         });
 
@@ -549,11 +547,7 @@ public class Preparation extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             Log.d("TAG", "back button pressed");
-//            try {
-//                String presentationJson = objectMapper.writeValueAsString(presentation);
-//            } catch (JsonProcessingException e) {
-//                e.printStackTrace();
-//            }
+            saveTitleAndGoToMainActivity(presentation.presentationID, null);
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -569,8 +563,24 @@ public class Preparation extends AppCompatActivity {
         startActivityForResult(mainIntent, 0);
     }
 
-    private void saveTitleAndGoToMainActivity(String userID, String presID) {
+    /**
+     * @brief Updates the entire presentation object in backend.
+     * @param presID: String, presentationID field of a presentation object.
+     * @param responseListener: Response.Listener<JSONObject>, its onResponse callback is used on HTTP
+     *                        response. If null, uses a default Response.Listener\<\> whose onResponse
+     *                        callback simply logs the received HTTP response.
+     */
+    private void saveTitleAndGoToMainActivity(String presID, Response.Listener<JSONObject> responseListener) {
         String url = BACKEND_HOST_AND_PORT + "/api/savePresentation"; // BACKEND_HOST_AND_PORT doesn't end with a "/"!
+        if (responseListener == null) {
+            responseListener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.d(TAG, response.toString());
+                }
+            };
+        }
+
         ObjectMapper objectMapper = new ObjectMapper();
         String cardsJsonString;
         String feedbackJsonString;
@@ -597,12 +607,7 @@ public class Preparation extends AppCompatActivity {
             throw new NullPointerException();
         }
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, body, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.d(TAG, response.toString());
-            }
-        }, new Response.ErrorListener() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, body, responseListener, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG,error.toString());
