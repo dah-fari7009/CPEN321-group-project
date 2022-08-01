@@ -272,7 +272,17 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
     private SpannableString getColoredtext(int color, String text){
         SpannableString colored_text = new SpannableString(text);
 
-        int[] colorPallette = {Color.BLACK, Color.WHITE, Color.RED, Color.GREEN};
+        int[] colorPallette = {
+                Color.BLACK,
+                Color.WHITE,
+                Color.RED,
+                Color.GREEN,
+                Color.BLUE,
+                Color.GRAY,
+                Color.YELLOW,
+                Color.CYAN,
+                Color.MAGENTA
+        };
 
         colored_text.setSpan(new ForegroundColorSpan(colorPallette[color]),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return colored_text;
