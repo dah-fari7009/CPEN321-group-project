@@ -36,25 +36,6 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
     private TextView speechText;
     private LinearLayout linearLayout;
 
-//    Content contentCard1Front1 = new Content("font", "style", 5, 1, "Speeches often start with a hook");
-//    Content contentCard1Back1 = new Content("font", "style", 5, 1, "A hook is anything that grabs the audience's attention");
-//    Content contentCard1Back2 = new Content("font", "style", 5, 1, "Examples of hooks are anecdotes, jokes, hot takes");
-//    Content contentCard1Back3 = new Content("font", "style", 5, 1, "Knowing targed audience leads to better hooks");
-//
-//    Content contentCard2Back1 = new Content("font", "style", 5, 1, "The audience needs to first know why they should pay attention to your speech");
-//    Content contentCard2Back2 = new Content("font", "style", 5, 1, "Then, deliver on your promise");
-//    Content contentCard2Front1 = new Content("font", "style", 5, 1, "Bottom line upfront");
-//
-//    Front sideFront1 = new Front(1, new Content[]{contentCard1Front1});
-//    Back sideBack1 = new Back(2, new Content[]{contentCard1Back1, contentCard1Back2, contentCard1Back3});
-//
-//    Front sideFront2 = new Front(1, new Content[]{contentCard2Front1});
-//    Back sideBack2 = new Back(2, new Content[]{contentCard2Back1, contentCard2Back2});
-//
-//    Cards card1 = new Cards(1, "Knowing targed audience leads to better hooks", 0, sideFront1, sideBack1);
-//    Cards card2 = new Cards(1, "Then, deliver on your promise", 1, sideFront2, sideBack2);
-
-
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
