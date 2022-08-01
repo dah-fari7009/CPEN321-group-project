@@ -6,20 +6,10 @@ var colors = {
     "red":          2,    
     "green":        3,
     "blue":         4,
-    "silver":       5,
-    "gray":         6,
-    "maroon":       7,
-    "olive":        8,
-    "lime":         9,
-    "aqua":         10,
-    "teal":         11,
-    "navy":         12,
-    "fuschia":      13,
-    "purple":       14,
-    "indianred":    15,
-    "salmon":       16,
-    "darksalmon":   17,
-    "lightsalmon":  18
+    "gray":         5,
+    "yellow":       6,
+    "cyan":         7,
+    "magenta":      8
 }
 
 
