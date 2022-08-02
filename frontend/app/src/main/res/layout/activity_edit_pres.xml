@@ -63,6 +63,12 @@
             android:text="Edit" />
 
         <Button
+            android:id="@+id/shareButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share" />
+
+        <Button
             android:id="@+id/exportButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

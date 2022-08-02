@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
@@ -61,6 +62,7 @@ public class EditPres extends AppCompatActivity {
     private static final String TAG = "EditPres";
     private static final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
     private static RequestQueue requestQueue;
+    private String m_Text;
 
     Presentation presentation;
 
@@ -74,7 +76,9 @@ public class EditPres extends AppCompatActivity {
         Button presentingBtn;
         Button liveCollabBtn;
         Button exportButton;
+        Button shareButton;
         Toolbar toolbar;
+
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
         Log.d(TAG, "title of opened presentation is '" + presentation.getTitle() + "'");
@@ -95,6 +99,8 @@ public class EditPres extends AppCompatActivity {
         presentingBtn = findViewById(R.id.presentingButton);
         liveCollabBtn = findViewById(R.id.liveCollabButton);
         exportButton = findViewById(R.id.exportButton);
+        shareButton = findViewById(R.id.shareButton);
+
 
         preparationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +115,37 @@ public class EditPres extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkPermissionAndStartPresentingActivity();
+            }
+        });
+
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditPres.this);
+                builder.setTitle("Enter the email you want to share your presentation to");
+
+                // Set up the input
+                final EditText input = new EditText(EditPres.this);
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                builder.setView(input);
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        m_Text = input.getText().toString();
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
             }
         });
 
