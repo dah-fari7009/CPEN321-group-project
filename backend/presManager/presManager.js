@@ -3,7 +3,18 @@ const userStore = require('../userStore/userStore');
 
 //@TODO should this also have a title in the request body
 createPres = async (req, res) => {
-    console.log("Create presentation request received!");
+    console.log("presManager: createPres: Create presentation request received!");
+    // check for required req field, userID
+    if (!req.body.userID) {
+        return res.status(400).json({err: "presManager: createPres: no userID provided!"});
+    }
+    // check if user specified by userID exists
+    try {
+        await userStore.userExistsWithID(req.body.userID);
+        console.log("presManager: createPres: user with userID " + req.body.userID + " exists");
+    } catch (userDoesNotExist) {
+        return res.status(400).json({err: "presManager: createPres: user not found - presentation will not be created"});
+    }
     if (!req.body.presObj) {
         // var presID;
         var presTitle = "unnamed";

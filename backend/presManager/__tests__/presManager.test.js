@@ -24,35 +24,36 @@ jest.mock("../../userStore/userStore");
  * tests for createPres
  */
 describe("createPres tests", () => {
-    var res = {
-        stat: 100,
-        body: null,
-        json: function(obj){
-            this.body = obj;
-        },
-        send: function(obj) {
-            this.body = obj;
-        },
-        status: function(responseStatus) {
-            this.stat = responseStatus;
-            return this; 
-        }
+    function Response() {
+        this.stat = 100;
+        this.body = null;
+    }
+    Response.prototype.json = function(obj){
+        this.body = obj;
+    }
+    Response.prototype.send = function(obj) {
+        this.body = obj;
+    }
+    Response.prototype.status = function(responseStatus) {
+        this.stat = responseStatus;
+        return this;
     }
 
     test("Presentation name is null", async () => {
         var req = {body: {presTitle: null, userID: "104866131128716891939"}};
+        var res = new Response();
         var expectedPres = {
             title: "unnamed",
             cards: [{
                 "backgroundColor": 1,
-                "transitionPhrase": "",
-                "endWithPause": true,
+                "transitionPhrase": "-",
+                "endWithPause": 1,
                 "front": {
                     "backgroundColor": 1,
                     "content": {
-                        "font": "",
-                        "style": "",
-                        "size": "",
+                        "font": "Times New Roman",
+                        "style": "normalfont",
+                        "size": "12",
                         "colour": 0,
                         "message": "> "
                     }
@@ -60,9 +61,9 @@ describe("createPres tests", () => {
                 "back": {
                     "backgroundColor": 1,
                     "content": {
-                        "font": "",
-                        "style": "",
-                        "size": "",
+                        "font": "Times New Roman",
+                        "style": "normalfont",
+                        "size": "12",
                         "colour": 0,
                         "message": "> "
                     }
@@ -77,30 +78,56 @@ describe("createPres tests", () => {
 
         await presManager.createPres(req, res);
         
-        console.log(res);
+        console.log(res.body);
         expectedPres._id = res.body._id;
         expectedPres.__v = res.body.__v;
+        expectedPres.users[0]._id = res.body.users[0]._id;
+	expectedPres.cards[0]._id = res.body.cards[0]._id;
 
-        expect(res.body).toEqual(expectedPres);
+        expect(res.body.title).toEqual(expectedPres.title);
+        expect(res.body.cards[0].backgroundColor).toEqual(expectedPres.cards[0].backgroundColor);
+        expect(res.body.feedback).toEqual(expectedPres.feedback);
+        expect(res.body.users[0].id).toEqual(expectedPres.users[0].id);
+        expect(res.body.users[0].permission).toEqual(expectedPres.users[0].permission);
+        
+        expect(res.stat).toEqual(200);
+    });
+
+    test("userID is null", async () => {
+        var res = new Response();
+        //console.log(res);
+        var req = {body: {title: "Presentation", userID: null}};
+	await presManager.createPres(req, res);
+        expect(res.body).toEqual({err: "presManager: createPres: no userID provided!"});
+        expect(res.stat).toEqual(400);
+	//console.log(res);
+    });
+
+    test("userID is illegal - no such user exists", async () => {
+        var req = {body: {title: "Presentation", userID: "Idontexist"}};
+        var res = new Response();
+        await presManager.createPres(req, res);
+        //console.log("{ stat: " + res.stat + ", body: " + res.body + " }");
+        expect(res.body).toEqual({err: "presManager: createPres: user not found - presentation will not be created"});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("Valid userID and presentation title", async () => {
+        var req = {body: {title: "Presentation", userID: "104866131128716891939"}};
+        var res = new Response();
+        await presManager.createPres(req, res);
+	
+        expect(res.body.title).toBeDefined();
+        expect(res.body.title).toEqual(req.body.title);
+        
+        expect(res.body.cards.length).toBeDefined();
+        expect(res.body.cards.length).toEqual(1);
+        
+        expect(res.body.users[0].id).toBeDefined();
+        expect(res.body.users[0].id).toEqual(req.body.userID);
+	
         expect(res.stat).toEqual(200);
     });
 });
 
 
-/**
- * dummy HTTP response object
- */
-
-function Res() {
-    this.body = null;
-    this.stat = null;
-}
-Res.prototype.status = function (num) {
-    this.stat = num;
-}
-Res.prototype.status.prototype.json = function (obj) {
-    this.body = JSON.stringigy(obj);
-}
-Res.prototype.status.prototype.send = function (str) {
-    this.body = str;
-}

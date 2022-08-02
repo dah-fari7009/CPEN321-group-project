@@ -304,13 +304,13 @@ public class Preparation extends AppCompatActivity {
             cueCards_num = cueCards_num-1;
         }
         else if(cueCards_max == 0){//if no page left after delete, create a new empty page
-            Content new_content_front = new Content(Color.BLACK,"");
-            Content new_content_back = new Content(Color.BLACK,"");
-            Front new_front = new Front(Color.WHITE);
+            Content new_content_front = new Content(0,""); // colour==0 means black
+            Content new_content_back = new Content(0,"");
+            Front new_front = new Front(1); // backgroundColor==1 means white
             new_front.content=new_content_front;
-            Back new_back = new Back(Color.WHITE);
+            Back new_back = new Back(1);
             new_back.content=new_content_back;
-            Cards new_card = new Cards(new_front,new_back,Color.WHITE);
+            Cards new_card = new Cards(new_front,new_back,1);
             presentation.cueCards.add(new_card);
             cueCards_max=cueCards_max+1;
         }
@@ -346,13 +346,13 @@ public class Preparation extends AppCompatActivity {
 
         //second, create a new page
 
-        Content new_content_front = new Content(Color.BLACK,"");
-        Content new_content_back = new Content(Color.BLACK,"");
-        Front new_front = new Front(Color.WHITE);
+        Content new_content_front = new Content(0,""); // colour==0 means black
+        Content new_content_back = new Content(0,"");
+        Front new_front = new Front(1); // backgroundColor==1 means white
         new_front.content=new_content_front;
-        Back new_back = new Back(Color.WHITE);
+        Back new_back = new Back(1);
         new_back.content=new_content_back;
-        Cards new_card = new Cards(new_front,new_back,Color.WHITE);
+        Cards new_card = new Cards(new_front,new_back, 1);
 
         //Third, change page position
 
@@ -497,13 +497,13 @@ public class Preparation extends AppCompatActivity {
                     cueCards_num = cueCards_num-1;
                 }
                 else if(cueCards_max == 0){//if no page left after delete, create a new empty page
-                    Content new_content_front = new Content(Color.BLACK,"");
-                    Content new_content_back = new Content(Color.BLACK,"");
-                    Front new_front = new Front(Color.WHITE);
+                    Content new_content_front = new Content(0,""); // colour==0 means black
+                    Content new_content_back = new Content(0,"");
+                    Front new_front = new Front(1); // backgroundColor==1 means white
                     new_front.content=new_content_front;
-                    Back new_back = new Back(Color.WHITE);
+                    Back new_back = new Back(1);
                     new_back.content=new_content_back;
-                    Cards new_card = new Cards(new_front,new_back,Color.WHITE);
+                    Cards new_card = new Cards(new_front,new_back,1);
                     presentation.cueCards.add(new_card);
                     cueCards_max=cueCards_max+1;
                 }
@@ -547,6 +547,20 @@ public class Preparation extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             Log.d("TAG", "back button pressed");
+            String change = content.getText().toString();
+            Cards tmp = presentation.cueCards.get(cueCards_num);
+//                Log.w("TAG", "get success" + change);
+            Log.w("TAG", Integer.toString(2));
+            if(cardFace==0) {//front
+                tmp.front.content.setMessage(change);
+                presentation.cueCards.set(cueCards_num,tmp);
+                Log.w("TAG", "front");
+            }
+            else{//back
+                tmp.back.content.setMessage(change);
+                presentation.cueCards.set(cueCards_num,tmp);
+                Log.w("TAG", "back");
+            }
             saveTitleAndGoToMainActivity(presentation.presentationID, null);
         }
         return super.onKeyDown(keyCode, event);
