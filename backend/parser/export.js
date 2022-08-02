@@ -24,7 +24,7 @@ unParsePresentation = async (req, res) => {
         await axios(config)
         return res.status(200).send( { presStr } );
     } catch (e) {
-        return res.status(400).send( e.message );
+        return res.status(400).send( "unparse failed" );
     }
 }
 
