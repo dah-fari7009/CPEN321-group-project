@@ -15,6 +15,17 @@ const addPresToUser = (userID, presID) => {
     });
 }
 
+const userExistsWithID = (userID) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (userID === "Idontexist" || userID === null) {
+                reject(false);
+            } else {
+                resolve(true);
+            }
+        }, 1000);
+    });
+}
 
 // const removePresFromUser = (userID, presID) => {
 //     console.log("userStore: removePresFromUser: Deleting presentation " + presID + " from user " + userID);
@@ -33,6 +44,7 @@ const addPresToUser = (userID, presID) => {
 // }
 
 userStore.addPresToUser = addPresToUser;
+userStore.userExistsWithID = userExistsWithID;
 // userStore.removePresFromUser = removePresFromUser;
 
 module.exports = userStore;

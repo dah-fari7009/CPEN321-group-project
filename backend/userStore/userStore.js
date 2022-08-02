@@ -93,8 +93,29 @@ removePresFromUser = (userID, presID) => {
     });
 }
 
+// Internal - called from presManager.js's createPres(). Expects a userID string. Returns 
+// a promise that resolves to true if there exists a user in that user database with userID 
+// field equal to userID. Otherwise rejects with false.
+userExistsWithID = (userID) => {
+    console.log("userStore: userExistsWithID: Checking whether there exists a user with userID " + userID + " in the database");
+    return new Promise((resolve, reject) => {
+        User.find({userID}).then(
+            (data) => {
+                console.log("userStore: userExistsWithID: result of searching user database is " + data);
+                if(data.length > 0) {
+                    console.log("userStore: userExistsWithID: A user with userID " + userID + " exists");
+                    resolve(true);
+                } else {
+                    console.log("userStore: userExistsWithID: There exists no user with userID " + userID);
+                    reject(false);
+                }
+        });
+    });
+}
+
 module.exports = {
     login,
     addPresToUser,
-    removePresFromUser
+    removePresFromUser,
+    userExistsWithID
 }
