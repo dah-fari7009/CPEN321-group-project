@@ -1,4 +1,8 @@
-unParsePresentation = (req, res) => {
+const axios = require('axios');
+
+let token = 'ya29.A0AVA9y1to64XhzL-2h_Jet3z_2h0lcpwZdQeTyMI8Tnxl_dHAc2qwb7ht_i7JZMmrKVD-E348_YSV3gwCCm_zppDQaezIfxulMnVaMHIhqbnPQ8zno-k8-DYWlVfJJ-z9MdNa2_VCJeFRfNLmi9lODYNInmymYUNnWUtBVEFTQVRBU0ZRRTY1ZHI4WWZNRkpxc0VfdnlVSW15V2RPQXBYUQ0163'
+
+unParsePresentation = async (req, res) => {
     try {
         var pres = req.body
         var indents = 0;
@@ -6,9 +10,21 @@ unParsePresentation = (req, res) => {
         presStr += indent(indents + 1) + "\\title " + pres.title + "\n";
         presStr += unParseCard(pres.cards, indents + 1);
         presStr += indent(indents) + "\\end{presentation}";
+
+        var config = {
+            method: 'post',
+            url: 'https://www.googleapis.com/upload/drive/v3/files',
+            headers: { 
+              'Authorization': 'Bearer ' + token, 
+              'Content-Type': 'text/plain'
+            },
+            data : presStr
+        };
+
+        await axios(config)
         return res.status(200).send( { presStr } );
-    } catch {
-        return res.status(400).send( new Error("unParse failed") );
+    } catch (e) {
+        return res.status(400).send( "unparse failed" );
     }
 }
 
