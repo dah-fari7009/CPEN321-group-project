@@ -2,7 +2,7 @@ const presManager = require("../presManager");
 const mongoose = require("mongoose");
 const Presentation = require("../../models/presentations");
 
-beforeAll(async() => {
+beforeEach(async() => {
     try {
         await mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
         console.log("connected to DB");
@@ -13,7 +13,7 @@ beforeAll(async() => {
     }
 });
 
-afterAll(async () => {
+afterEach(async () => {
     await mongoose.connection.close();
 });
 
@@ -24,20 +24,6 @@ jest.mock("../../userStore/userStore");
  * tests for createPres
  */
 describe("createPres tests", () => {
-    function Response() {
-        this.stat = 100;
-        this.body = null;
-    }
-    Response.prototype.json = function(obj){
-        this.body = obj;
-    }
-    Response.prototype.send = function(obj) {
-        this.body = obj;
-    }
-    Response.prototype.status = function(responseStatus) {
-        this.stat = responseStatus;
-        return this;
-    }
 
     test("Presentation name is null", async () => {
         var req = {body: {presTitle: null, userID: "104866131128716891939"}};
@@ -124,10 +110,55 @@ describe("createPres tests", () => {
         expect(res.body.cards.length).toEqual(1);
         
         expect(res.body.users[0].id).toBeDefined();
+        expect(res.body.users[0].permission).toBeDefined();
         expect(res.body.users[0].id).toEqual(req.body.userID);
+        expect(res.body.users[0].permission).toEqual("owner");
 	
         expect(res.stat).toEqual(200);
     });
 });
 
+describe("deletePres tests", () => {
+    test("presentation ID is null", async () => {
+        var req = {query: {presID: null, userID: "104866131128716891939"}};
+        var res = new Response();
+        await presManager.deletePres(req, res);
+        console.log("{ res.stat: " + res.stat + ", res.body: " + res.body + " }");
+        expect(res.body).toEqual({err: "Presentation to delete is not specified."});
+        expect(res.stat).toEqual(400);
+    });
 
+    test("User ID is null", async () => {
+        // create a presentation for user "104866131128716891939"
+        var req = {body: {title: "Jest test presentation", userID: "104866131128716891939"}};
+        var res = new Response();
+        await presManager.createPres(req, res);
+	var thisPresentation = res.body._id;
+        //console.log("ID of user's presentation is " + presID);
+
+        // Try deleting presentation with ID==thisPresentation, but with null userID
+        req = {query: {presID: thisPresentation, userID: null}}
+	res = new Response();
+	await presManager.deletePres(req, res);
+	expect(res.body).toEqual({err: "User who is requesting to delete the presentation is not specified."});
+        expect(res.stat).toEqual(400);
+    });
+});
+
+/**
+ * Dummy response class
+ */
+function Response() {
+    this.stat = 100;
+    this.body = null;
+}
+Response.prototype.json = function(obj){
+    this.body = obj;
+}
+Response.prototype.send = function(obj) {
+    this.body = obj;
+}
+Response.prototype.status = function(responseStatus) {
+    this.stat = responseStatus;
+    return this;
+}
