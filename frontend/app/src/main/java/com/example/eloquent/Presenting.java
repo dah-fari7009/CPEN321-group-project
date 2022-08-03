@@ -244,12 +244,22 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
     public void onResults(Bundle results) {
         ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         speechText.setText(data.get(0));
+        String[] words = data.get(0).toLowerCase().split("\\w+");
+        int transitionPhraseWordsCount = pres.cueCards.get(currentCard).transitionPhrase.split("\\w+").length;
+        // number of words that are correctly pronounced
+        int correct = 0;
         //see if a substring in the text matches the transition phrase, ignoring case and punctuation
-        if (data.get(0).toLowerCase().contains(pres.cueCards.get(currentCard).transitionPhrase.toLowerCase().replaceAll("\\p{Punct}", ""))) {
+        for (int i = 0; i < transitionPhraseWordsCount; i++) {
+            if (pres.cueCards.get(currentCard).transitionPhrase.toLowerCase().contains(words[i])) {
+                correct ++;
+            }
+        }
+        if ((double)(correct / transitionPhraseWordsCount) > 0.5) {
             if (currentCard >= pres.cueCards.size() - 1) {
                 Toast.makeText(Presenting.this, "No more cards!", Toast.LENGTH_SHORT).show();
                 return;
             }
+
 
             linearLayout.removeAllViews();
             currentCard++;
