@@ -85,6 +85,18 @@ getPres = (req, res) => {
     })
 }
 
+// Internal - for calls from wssserver.js. Return presentation object after finding 
+// it by presentation ID
+getPresById = (presID) => {
+    return new Promise((resolve, reject) => {
+        Presentation.findById(presID).then((pres) => {
+            resolve(pres);
+        }, (err) => {
+            reject(err);
+        });
+    });
+}
+
 // Internal - for calls from login() of userStore.js, rather than
 // for responding to requests from the frontend.
 module.exports.getPresTitle = (userID) => {
