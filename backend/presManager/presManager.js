@@ -132,17 +132,14 @@ checkPermission = (userID, presID, permission) => {
         Presentation.findById(presID).then((pres) => {
             for (var i = 0; i < pres.users.length; i++) {
                 if (pres.users[i].id === userID && pres.users[i].permission === permission) {
-                    resolve(true)
-                    return
+                    resolve(pres);
                 }
             }
-            resolve(false)
-            return
+            reject("user " + userID + " does not have adequate permission to delete presentation " + presID);
         }).catch((err) => {
-            console.log(err)
+            console.log(err);
             //@TODO throw error if presentation is not found?
-            resolve(false)
-            return
+            reject("Presentation not found");
         })
     })
 }
@@ -175,29 +172,48 @@ search = (req, res) => {
 }
 
 // expects userID and presID in query
-deletePres = (req, res) => {
+deletePres = async (req, res) => {
     var deletedPres;
     console.log("presManager: deletePres: request query: ?userID=" + req.query.userID + "&presID=" + req.query.presID);
-    checkPermission(req.query.userID, req.query.presID, "owner")
-    .then((permissionToDelete) => {
-        if (permissionToDelete) {
-            return Presentation.findOneAndDelete({
+    
+    // check that req.query.presID is defined
+    if (!req.query.presID) {
+        return res.status(400).json({err: "Presentation to delete is not specified."});
+    }
+    // check that req.query.userID is defined
+    if (!req.query.userID) {
+        return res.status(400).json({err: "User who is requesting to delete the presentation is not specified."});
+    }
+    // check
+
+
+    var presToBeDeleted;
+    try { 
+        presToBeDeleted = await checkPermission(req.query.userID, req.query.presID, "owner"); 
+    } catch(err) {
+        return res.status(400).json({ err });
+    }
+    if (presToBeDeleted) {
+        console.log("presManager: deletePres: the presentation to be deleted has been retreived. It has " + presToBeDeleted.users.length + " participating users");
+        for (let i = 0; i < presToBeDeleted.users.length; i++) {
+            try {
+                console.log("presManager: deletePres: Calling userStore.removePresFromUser( " + presToBeDeleted.users[i].id  + " , " + req.query.presID + " )");
+                await userStore.removePresFromUser(presToBeDeleted.users[i].id, req.query.presID);
+	    } catch(err) {
+                res.status(400).json({ err });
+	    }
+	}
+        try {
+            await Presentation.findOneAndDelete({
                 "_id": req.query.presID,
                 "users.id": req.query.userID
             });
-        } else {
-            console.log("presManager: deletePres: User " + req.query.userID + " does not have adequate permission to delete presentation " + req.query.presID);
-            throw {err: "presManager: deletePres: User " + req.query.userID + " does not have adequate permission to delete presentation " + req.query.presID};
-        }
-    }).then((pres) => {
-        deletedPres = pres;
-        console.log("presManager: deletePres: Calling userStore.removePresFromUser( " + req.query.userID + " , " + req.query.presID + " )");
-        return userStore.removePresFromUser(req.query.userID, req.query.presID);
-    }).then((data) => {
-        return res.status(200).json({ deletedDoc: deletedPres });
-    }).catch((err) => {
-        return res.status(500).json({ err });
-    })
+
+        } catch(err) {
+            return res.status(400).json({ err });
+	}
+	return res.status(200).json({ deletedDoc: presToBeDeleted });
+    }
 }
 
 
@@ -232,28 +248,41 @@ getAllPresOfUser = (req, res) => {
     })
 }
 
-// expects the userID of the user being added, and presID
+// expects the username of the user being added, and presID
 share = (req, res) => {
-    let addedUser = {id: req.body.userID, permission: "collaborator"}
-    Presentation.findById(req.body.presID).then((pres) => {
-        if (!pres) {
-            throw "no presentation found";
-        }
-        return userStore.addPresToUser(req.body.userID, req.body.presID)
+    var userID = null;
+    userStore.getUserIdOf(req.body.username).then((thisUser) => {
+            userID = thisUser;
+        }, (err) => {
+            throw err;
     }).then(() => {
-        return Presentation.findOneAndUpdate(
-            { 
-                "_id": req.body.presID,
-                "users.id": { $ne: req.body.userID }
-            },
-            {$push: {users: addedUser}},
-            {new: true}
-        );
+            return Presentation.findById(req.body.presID);
+        }, (err) => {
+            throw err;
+    }).then((pres) => {
+            if (!pres) {
+                throw "No presentation found!";
+	    } 
+            return userStore.addPresToUser(userID, req.body.presID);
+        }, (err) => {
+            throw err;
+    }).then(() => {
+            console.log("presManager: share: adding user " + userID + " to presentation " + req.body.presID + " as collaborator");
+            let addedUser = {id: userID, permission: "collaborator"};
+            return Presentation.findOneAndUpdate(
+                {"_id": req.body.presID},
+                {$push: {users: addedUser}},
+                {new: true}
+	    );
+        }, (err) => {
+            throw err;
     }).then((updatedPres) => {
-        return res.status(200).json({data: updatedPres});
+            return res.status(200).json({data: updatedPres});
+        }, (err) => {
+            throw err;
     }).catch((err) => {
-        return res.status(500).json({err});
-    })
+            res.status(400).json({err});
+    });
 }
 
 unShare = (req, res) => {
