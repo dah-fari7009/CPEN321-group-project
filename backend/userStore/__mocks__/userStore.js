@@ -43,6 +43,16 @@ const userExistsWithID = (userID) => {
 //     });
 // }
 
+const removePresFromUser = (userID, presID) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (presID === null && userID === "104866131128716891939") {
+                reject("Unspecified presentation");
+            }
+        }, 1000);
+    });
+}
+
 userStore.addPresToUser = addPresToUser;
 userStore.userExistsWithID = userExistsWithID;
 // userStore.removePresFromUser = removePresFromUser;

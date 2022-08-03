@@ -15,7 +15,7 @@ public class Presentation implements Serializable {
     @JsonProperty("cards")
     public ArrayList<Cards> cueCards;
     public ArrayList<Feedback> feedback;
-
+    public ArrayList<PresentationMember> users;
     // Flags for edits
     private boolean isTitleChanged;
 
@@ -23,12 +23,13 @@ public class Presentation implements Serializable {
         this.title = title;
         this.presentationID = presentationID;
         this.cueCards = new ArrayList<>();
-        cueCards.add(card1);
-        cueCards.add(card2);
-        cueCards.add(card3);
+        this.cueCards.add(card1);
+        this.cueCards.add(card2);
+        this.cueCards.add(card3);
         this.feedback = new ArrayList<>();
 
-        isTitleChanged = false;
+        this.isTitleChanged = false;
+        this.users = new ArrayList<>();
     }
 
     public Presentation(String title, String presentationID, ArrayList<Cards> cueCards) {
@@ -38,6 +39,7 @@ public class Presentation implements Serializable {
         this.feedback = new ArrayList<>();
 
         this.isTitleChanged = false;
+        this.users = new ArrayList<>();
     }
 
     public Presentation(String title, String presentationID) {
@@ -47,6 +49,7 @@ public class Presentation implements Serializable {
         this.feedback = new ArrayList<>();
 
         this.isTitleChanged = false;
+        this.users = new ArrayList<>();
     }
 
     public Presentation(String title) {
@@ -55,11 +58,13 @@ public class Presentation implements Serializable {
         this.feedback = new ArrayList<>();
 
         this.isTitleChanged = false;
+        this.users = new ArrayList<>();
     }
 
     public Presentation() {
         this.cueCards = new ArrayList<>();
         this.feedback = new ArrayList<>();
+        this.users = new ArrayList<>();
 
         this.isTitleChanged = false;
     }

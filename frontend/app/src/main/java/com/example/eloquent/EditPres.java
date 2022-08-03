@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -60,6 +62,8 @@ public class EditPres extends AppCompatActivity {
 
 
     private EditText presTitle;
+    private TextView sharedWithCountDisplay;
+    private int sharedWithCount;
     private static final String TAG = "EditPres";
     private String BACKEND_HOST_AND_PORT;
     private static RequestQueue requestQueue;
@@ -78,7 +82,10 @@ public class EditPres extends AppCompatActivity {
         Button presentingBtn;
         Button liveCollabBtn;
         Button exportButton;
+        Button shareButton;
         Toolbar toolbar;
+
+
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
         authCode = getIntent().getExtras().getString("authCode");
@@ -95,12 +102,17 @@ public class EditPres extends AppCompatActivity {
         /* Set up for sending HTTP requests */
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        /* Set up presentation title box and navigation buttons */
+        /* Set up presentation title box, navigation buttons, and other dynamic UI elements */
         presTitle = findViewById(R.id.presTitle);
         preparationBtn = findViewById(R.id.preparationButton);
         presentingBtn = findViewById(R.id.presentingButton);
         liveCollabBtn = findViewById(R.id.liveCollabButton);
         exportButton = findViewById(R.id.exportButton);
+        shareButton = findViewById(R.id.shareButton);
+        sharedWithCountDisplay = findViewById(R.id.sharedWithCount);
+
+        sharedWithCount = presentation.users.size();
+        updateSharedWithCountMessage(sharedWithCount);
 
         preparationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,6 +127,38 @@ public class EditPres extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkPermissionAndStartPresentingActivity();
+            }
+        });
+
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditPres.this);
+                builder.setTitle("Enter the email you want to share your presentation to");
+
+                // Set up the input
+                final EditText input = new EditText(EditPres.this);
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                builder.setView(input);
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String m_Text = input.getText().toString();
+                        Log.d(TAG, "shareButton: onClick: sharing presentation '" + presentation.getTitle() + "' with user '" + m_Text + "'");
+                        sharePresentation(m_Text, presentation.presentationID);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
             }
         });
 
@@ -154,6 +198,17 @@ public class EditPres extends AppCompatActivity {
                 //nothing to be done here
             }
         });
+    }
+
+    private void updateSharedWithCountMessage(int count) {
+        String[] numUsersWithAccessMessageWords = String.valueOf(sharedWithCountDisplay.getText()).split(" ");
+        String numUsersWithAccessMessage = "";
+        numUsersWithAccessMessageWords[numUsersWithAccessMessageWords.length - 1] = String.valueOf(count);
+        for (int i = 0; i < numUsersWithAccessMessageWords.length; i++) {
+            numUsersWithAccessMessage += numUsersWithAccessMessageWords[i];
+            numUsersWithAccessMessage += " ";
+        }
+        sharedWithCountDisplay.setText(numUsersWithAccessMessage);
     }
 
 
@@ -385,5 +440,38 @@ public class EditPres extends AppCompatActivity {
         });
 
         requestQueue.add(jsonObjectRequest);
+    }
+
+    private void sharePresentation(String targetUser, String presentationID) {
+        //ObjectMapper objectMapper = new ObjectMapper();
+        String url = BACKEND_HOST_AND_PORT + "/api/share";
+        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+                updateSharedWithCountMessage(++sharedWithCount);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("username", targetUser);
+                params.put("presID", presentationID);
+                return params;
+            }
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
     }
 }

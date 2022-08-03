@@ -156,12 +156,6 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
                     }
                 }
 
-                // sanity check
-//                Log.d(TAG, presCollection.get(7).title);
-//                Log.d(TAG, presCollection.get(7).cueCards.get(0).front.content.message);
-//                Log.d(TAG, presCollection.get(7).feedback.toString());
-//                Log.d(TAG, String.valueOf(presCollection.get(7).presentationID));
-
                 showPresentations();
             }
         }, new Response.ErrorListener() {

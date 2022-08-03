@@ -113,9 +113,26 @@ userExistsWithID = (userID) => {
     });
 }
 
+// Internal - called from presManager.js's share(). Expects a username (google email address) string. 
+// Returns a promise that resolves to a userID string if a user exists with the given username. 
+// Otherwise, rejects with a "No user exists with username USERNAME".
+getUserIdOf = (username) => {
+    console.log("userStore: getUserIdOf: attempting to retreive userID of user with username " + username);
+    return new Promise((resolve, reject) => {
+        User.findOne({ username }).then((user) => {
+            if (user) {
+                resolve(user.userID);
+	    } else {
+                reject("No user exists with username " + username);
+	    }
+	});
+    });
+}
+
 module.exports = {
     login,
     addPresToUser,
     removePresFromUser,
-    userExistsWithID
+    userExistsWithID,
+    getUserIdOf
 }
