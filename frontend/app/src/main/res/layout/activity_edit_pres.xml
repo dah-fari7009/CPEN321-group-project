@@ -68,6 +68,12 @@
             android:layout_height="wrap_content"
             android:text="Share" />
 
+        <TextView
+            android:id="@+id/sharedWithCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Users with access: 1" />
+
         <Button
             android:id="@+id/exportButton"
             android:layout_width="wrap_content"

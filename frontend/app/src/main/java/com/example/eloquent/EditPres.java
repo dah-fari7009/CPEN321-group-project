@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -59,10 +60,10 @@ public class EditPres extends AppCompatActivity {
 
 
     private EditText presTitle;
+    private TextView sharedWithCount;
     private static final String TAG = "EditPres";
     private static final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
     private static RequestQueue requestQueue;
-    private String m_Text;
 
     Presentation presentation;
 
@@ -80,6 +81,7 @@ public class EditPres extends AppCompatActivity {
         Toolbar toolbar;
 
 
+
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
         Log.d(TAG, "title of opened presentation is '" + presentation.getTitle() + "'");
 
@@ -93,14 +95,16 @@ public class EditPres extends AppCompatActivity {
         /* Set up for sending HTTP requests */
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        /* Set up presentation title box and navigation buttons */
+        /* Set up presentation title box, navigation buttons, and other dynamic UI elements */
         presTitle = findViewById(R.id.presTitle);
         preparationBtn = findViewById(R.id.preparationButton);
         presentingBtn = findViewById(R.id.presentingButton);
         liveCollabBtn = findViewById(R.id.liveCollabButton);
         exportButton = findViewById(R.id.exportButton);
         shareButton = findViewById(R.id.shareButton);
+        sharedWithCount = findViewById(R.id.sharedWithCount);
 
+        updateSharedWithCountMessage(presentation.users.size());
 
         preparationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,8 +138,9 @@ public class EditPres extends AppCompatActivity {
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        m_Text = input.getText().toString();
-
+                        String m_Text = input.getText().toString();
+                        Log.d(TAG, "shareButton: onClick: sharing presentation '" + presentation.getTitle() + "' with user '" + m_Text + "'");
+                        sharePresentation(m_Text, presentation.presentationID);
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -185,6 +190,17 @@ public class EditPres extends AppCompatActivity {
                 //nothing to be done here
             }
         });
+    }
+
+    private void updateSharedWithCountMessage(int count) {
+        String[] numUsersWithAccessMessageWords = String.valueOf(sharedWithCount.getText()).split(" ");
+        String numUsersWithAccessMessage = "";
+        numUsersWithAccessMessageWords[numUsersWithAccessMessageWords.length - 1] = String.valueOf(count);
+        for (int i = 0; i < numUsersWithAccessMessageWords.length; i++) {
+            numUsersWithAccessMessage += numUsersWithAccessMessageWords[i];
+            numUsersWithAccessMessage += " ";
+        }
+        sharedWithCount.setText(numUsersWithAccessMessage);
     }
 
 
@@ -408,5 +424,38 @@ public class EditPres extends AppCompatActivity {
         });
 
         requestQueue.add(jsonObjectRequest);
+    }
+
+    private void sharePresentation(String targetUser, String presentationID) {
+        //ObjectMapper objectMapper = new ObjectMapper();
+        String url = BACKEND_HOST_AND_PORT + "/api/share";
+        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+                updateSharedWithCountMessage(presentation.users.size() + 1);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("username", targetUser);
+                params.put("presID", presentationID);
+                return params;
+            }
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
     }
 }
