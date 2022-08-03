@@ -1,30 +1,54 @@
+const User = require('../models/users');
 const axios = require('axios');
+var qs = require('qs');
+const { google } = require('googleapis');
+require('dotenv').config();
 
-let token = 'ya29.A0AVA9y1to64XhzL-2h_Jet3z_2h0lcpwZdQeTyMI8Tnxl_dHAc2qwb7ht_i7JZMmrKVD-E348_YSV3gwCCm_zppDQaezIfxulMnVaMHIhqbnPQ8zno-k8-DYWlVfJJ-z9MdNa2_VCJeFRfNLmi9lODYNInmymYUNnWUtBVEFTQVRBU0ZRRTY1ZHI4WWZNRkpxc0VfdnlVSW15V2RPQXBYUQ0163'
+//let refresh = "1//06oBf3IVYreBbCgYIARAAGAYSNwF-L9Ir5LT3aKOeRrACMcJljmCwGMS7fgbxHCJMBq836e5wG-X7k_26VwskeT507SRR4DjoqRw";
+const CLIENT_ID = process.env.CLIENT_ID
+const CLIENT_SECRET = process.env.CLIENT_SECRET
+
+const oauth2Client = new google.auth.OAuth2(
+    CLIENT_ID,
+    CLIENT_SECRET,
+    "https://developers.google.com/oauthplayground"
+  );
 
 unParsePresentation = async (req, res) => {
     try {
-        var pres = req.body
+        var pres = req.body.pres
         var indents = 0;
         var presStr = indent(indents) + "\\begin{presentation}\n";
         presStr += indent(indents + 1) + "\\title " + pres.title + "\n";
         presStr += unParseCard(pres.cards, indents + 1);
         presStr += indent(indents) + "\\end{presentation}";
 
-        var config = {
-            method: 'post',
-            url: 'https://www.googleapis.com/upload/drive/v3/files',
+        let user = await User.findOne({"userID": req.body.userID});
+        var data = qs.stringify({
+            'client_secret': CLIENT_SECRET,
+            'grant_type': 'refresh_token',
+            'refresh_token': user.refreshToken,
+            'client_id': CLIENT_ID 
+        });
+        var config = {method: 'post', url: 'https://oauth2.googleapis.com/token', data : data,
             headers: { 
-              'Authorization': 'Bearer ' + token, 
-              'Content-Type': 'text/plain'
-            },
-            data : presStr
+              'user-agent': 'google-oauth-playground', 
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }            
         };
+        let token = await axios(config)
 
-        await axios(config)
+        var createFile = {method: 'post', url: 'https://www.googleapis.com/upload/drive/v3/files', data : presStr,
+            headers: { 
+              'Authorization': 'Bearer ' + token.data.access_token, 
+              'Content-Type': 'text/plain'
+            }           
+        };
+        await axios(createFile);
         return res.status(200).send( { presStr } );
     } catch (e) {
-        return res.status(400).send( "unparse failed" );
+        console.log("eeeror: " + e.message)
+        return res.status(400).send( e.message );
     }
 }
 

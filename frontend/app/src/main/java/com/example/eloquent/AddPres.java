@@ -41,13 +41,14 @@ public class AddPres extends AppCompatActivity {
 
     private EditText presTitle;
     private static final String TAG = "AddPres";
-    private static final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private String BACKEND_HOST_AND_PORT;
     private static RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_pres);
+        BACKEND_HOST_AND_PORT = getString(R.string.backend_host);
 
         /* Toolbar */
         Button importButton;
