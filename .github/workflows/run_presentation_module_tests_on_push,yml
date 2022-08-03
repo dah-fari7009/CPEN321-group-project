@@ -47,5 +47,4 @@ jobs:
           npm install
           npm install --save-dev jest
           npm install jest --global
-          jest presManager.test.js
-          jest parser.test.js
+          jest presManager.test.js parser.test.js
