@@ -188,16 +188,21 @@ deletePres = async (req, res) => {
     var deletedPres;
     console.log("presManager: deletePres: request query: ?userID=" + req.query.userID + "&presID=" + req.query.presID);
     
+    var inputErr = "";
     // check that req.query.presID is defined
     if (!req.query.presID) {
-        return res.status(400).json({err: "Presentation to delete is not specified."});
+        inputErr += "Presentation to delete is not specified.";
+        inputErr += " ";
     }
     // check that req.query.userID is defined
     if (!req.query.userID) {
-        return res.status(400).json({err: "User who is requesting to delete the presentation is not specified."});
+        inputErr += "User who is requesting to delete the presentation is not specified.";
+        inputErr += " ";
     }
-    // check
-
+    // check that neither req.query.presID nor req.query.userID is null
+    if (!req.query.presID || !req.query.userID) {
+        return res.status(400).json({err: inputErr});
+    }
 
     var presToBeDeleted;
     try { 
@@ -320,6 +325,7 @@ module.exports = {
     createPres,
     storeImportedPres,
     getPres,
+    getPresById,
     //getPresTitle,
     editPres,
     search,
