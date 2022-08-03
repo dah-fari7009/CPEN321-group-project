@@ -5,6 +5,7 @@ const User = new Schema(
     {
         userID: { type: String, required: true },
         username: { type: String, required: true },
+        refreshToken: { type: String, required: true },
         presentations: [{ type: Schema.ObjectId }]
     }
 )

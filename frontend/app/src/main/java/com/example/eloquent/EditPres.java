@@ -67,7 +67,7 @@ public class EditPres extends AppCompatActivity {
     private static final String TAG = "EditPres";
     private String BACKEND_HOST_AND_PORT;
     private static RequestQueue requestQueue;
-    String authCode;
+    String userID;
 
     Presentation presentation;
 
@@ -88,7 +88,7 @@ public class EditPres extends AppCompatActivity {
 
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
-        authCode = getIntent().getExtras().getString("authCode");
+        userID = getIntent().getExtras().getString("userID");
 
         Log.d(TAG, "title of opened presentation is '" + presentation.getTitle() + "'");
 
@@ -372,7 +372,7 @@ public class EditPres extends AppCompatActivity {
         JSONObject body = new JSONObject();
         try {
             body.put("pres", pres);
-            body.put("authCode", authCode);
+            body.put("userID", userID);
         } catch (JSONException e) {
             e.printStackTrace();
         }

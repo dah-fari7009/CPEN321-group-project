@@ -129,9 +129,9 @@ public class Login extends AppCompatActivity {
         }
     }
 
-    private void openMainActivity(String authCode) {
+    private void openMainActivity(String userID) {
         Intent usingIntent = new Intent(Login.this, MainActivity.class);
-        usingIntent.putExtra("authCode", authCode);
+        usingIntent.putExtra("userID", userID);
         startActivity(usingIntent);
     }
 
@@ -146,7 +146,7 @@ public class Login extends AppCompatActivity {
                 user.setData(response);
                 Log.d(TAG, user.getData().getUserID() + " " + user.getData().getUsername());
                 // Go to main activity
-                openMainActivity(authCode);
+                openMainActivity(userID);
             }
         }, new Response.ErrorListener() {
             @Override

@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     Adapter adapter;
     private String BACKEND_HOST_AND_PORT;
     private static RequestQueue requestQueue;
-    private String authCode;
+    private String userID;
 
     private String TAG = "MainActivity";
 
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            authCode = extras.getString("authCode");
+            userID = extras.getString("userID");
         }
 
         /* Set up toolbar */
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     public void selectedPres(Presentation presentation) {
         Intent intent = new Intent(this, EditPres.class);
         intent.putExtra("Presentation", presentation);
-        intent.putExtra("authCode", authCode);
+        intent.putExtra("userID", userID);
         startActivity(intent);
     }
 

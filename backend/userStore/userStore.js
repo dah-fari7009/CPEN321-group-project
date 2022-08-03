@@ -1,14 +1,32 @@
 const User = require('../models/users');
 const presManager = require('../presManager/presManager');
 const verifier = require("./verify");
+const { google } = require('googleapis');
+require('dotenv').config();
+const CLIENT_ID = process.env.CLIENT_ID
+const CLIENT_SECRET = process.env.CLIENT_SECRET
 
+const oauth2Client = new google.auth.OAuth2(
+    CLIENT_ID,
+    CLIENT_SECRET,
+    "https://developers.google.com/oauthplayground"
+  );
 
 // expects token, userID, verifiedDevice and username
 login = async (req, res) => {
+    let refresh;
+    try {
+        let { tokens } = await oauth2Client.getToken(req.body.authCode)
+        refresh = tokens.refresh_token;
+    } catch (e) {
+        console.log("dobo: "+ e.message)
+    }
+
+
     if (req.body.verifiedDevice === "false") {
         try {
             if (await verifier.verify(req.body.token)) {
-                return retreiveUserInfo(req, res);
+                return retreiveUserInfo(req, res, refresh);
             } else {
                 return res.status(500).json({ error: new Error("login failed") });
             }
@@ -17,19 +35,20 @@ login = async (req, res) => {
             return res.status(500).json({ error: new Error("login failed") });
         }
     } else {
-        return retreiveUserInfo(req, res);
+        return retreiveUserInfo(req, res, refresh);
     }
 }
 
 // helper function - retrieve user info, called by login
 // expects userID and username
-retreiveUserInfo = async (req, res) => {
+retreiveUserInfo = async (req, res, refresh) => {
     try {
         var data = await User.findOne({userID: req.body.userID});
         if (!data) {
             let newUser = await User.create({
                 userID: req.body.userID,
                 username: req.body.username,
+                refreshToken: refresh,
                 presentations: []
             })
             return res.status(200).json({ userID: newUser.userID, username: newUser.username, presentations: newUser.presentations });
