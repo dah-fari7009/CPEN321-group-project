@@ -34,8 +34,9 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     private RecyclerView recyclerView;
     ArrayList<Presentation> presentations;
     Adapter adapter;
-    private String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private String BACKEND_HOST_AND_PORT;
     private static RequestQueue requestQueue;
+    private String authCode;
 
     private String TAG = "MainActivity";
 
@@ -43,6 +44,12 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        BACKEND_HOST_AND_PORT = getString(R.string.backend_host);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            authCode = extras.getString("authCode");
+        }
 
         /* Set up toolbar */
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -108,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
     public void selectedPres(Presentation presentation) {
         Intent intent = new Intent(this, EditPres.class);
         intent.putExtra("Presentation", presentation);
+        intent.putExtra("authCode", authCode);
         startActivity(intent);
     }
 

@@ -37,6 +37,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -59,8 +61,9 @@ public class EditPres extends AppCompatActivity {
 
     private EditText presTitle;
     private static final String TAG = "EditPres";
-    private static final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private String BACKEND_HOST_AND_PORT;
     private static RequestQueue requestQueue;
+    String authCode;
 
     Presentation presentation;
 
@@ -69,6 +72,7 @@ public class EditPres extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_pres);
+        BACKEND_HOST_AND_PORT = getString(R.string.backend_host);
 
         Button preparationBtn;
         Button presentingBtn;
@@ -77,6 +81,8 @@ public class EditPres extends AppCompatActivity {
         Toolbar toolbar;
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
+        authCode = getIntent().getExtras().getString("authCode");
+
         Log.d(TAG, "title of opened presentation is '" + presentation.getTitle() + "'");
 
         /* Set up toolbar */
@@ -308,7 +314,15 @@ public class EditPres extends AppCompatActivity {
             throw new NullPointerException();
         }
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, pres,
+        JSONObject body = new JSONObject();
+        try {
+            body.put("pres", pres);
+            body.put("authCode", authCode);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, body,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
