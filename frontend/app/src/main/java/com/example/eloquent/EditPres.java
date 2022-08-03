@@ -37,9 +37,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -60,7 +57,8 @@ public class EditPres extends AppCompatActivity {
 
 
     private EditText presTitle;
-    private TextView sharedWithCount;
+    private TextView sharedWithCountDisplay;
+    private int sharedWithCount;
     private static final String TAG = "EditPres";
     private static final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
     private static RequestQueue requestQueue;
@@ -102,9 +100,10 @@ public class EditPres extends AppCompatActivity {
         liveCollabBtn = findViewById(R.id.liveCollabButton);
         exportButton = findViewById(R.id.exportButton);
         shareButton = findViewById(R.id.shareButton);
-        sharedWithCount = findViewById(R.id.sharedWithCount);
+        sharedWithCountDisplay = findViewById(R.id.sharedWithCount);
 
-        updateSharedWithCountMessage(presentation.users.size());
+        sharedWithCount = presentation.users.size();
+        updateSharedWithCountMessage(sharedWithCount);
 
         preparationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,14 +192,14 @@ public class EditPres extends AppCompatActivity {
     }
 
     private void updateSharedWithCountMessage(int count) {
-        String[] numUsersWithAccessMessageWords = String.valueOf(sharedWithCount.getText()).split(" ");
+        String[] numUsersWithAccessMessageWords = String.valueOf(sharedWithCountDisplay.getText()).split(" ");
         String numUsersWithAccessMessage = "";
         numUsersWithAccessMessageWords[numUsersWithAccessMessageWords.length - 1] = String.valueOf(count);
         for (int i = 0; i < numUsersWithAccessMessageWords.length; i++) {
             numUsersWithAccessMessage += numUsersWithAccessMessageWords[i];
             numUsersWithAccessMessage += " ";
         }
-        sharedWithCount.setText(numUsersWithAccessMessage);
+        sharedWithCountDisplay.setText(numUsersWithAccessMessage);
     }
 
 
@@ -433,7 +432,7 @@ public class EditPres extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, response);
-                updateSharedWithCountMessage(presentation.users.size() + 1);
+                updateSharedWithCountMessage(++sharedWithCount);
             }
         }, new Response.ErrorListener() {
             @Override
