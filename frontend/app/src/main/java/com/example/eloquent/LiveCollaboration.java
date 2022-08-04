@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -20,6 +21,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
@@ -60,6 +63,7 @@ public class LiveCollaboration extends AppCompatActivity {
     ObjectMapper objectMapper = new ObjectMapper();
     private WebSocketClient webSocketClient;
     private static String TAG = "LiveCollaboration";
+    private boolean getPresentationSuccess = false;
     public int undoRedoSure = 0;//0: not sure;1: sure
 
     /**
@@ -99,11 +103,23 @@ public class LiveCollaboration extends AppCompatActivity {
             }
         });
 
-        try {
-            wait(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    content = findViewById(R.id.cueCard);
+                }
+            },3000);
+
+        while(!getPresentationSuccess){
+            //Log.w(TAG, "Wait for presentation");
         }
+
+//        try {
+//            wait(300);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
 //        try{
 //            cueCards_max = presentation.cueCards.size();
@@ -119,8 +135,8 @@ public class LiveCollaboration extends AppCompatActivity {
 //            addButtonHelper;
 //        }
 
-        
-        content = findViewById(R.id.cueCard);
+
+
 
         View back = findViewById(R.id.cueCard_background);
         back.setBackgroundColor(65280);
@@ -248,7 +264,7 @@ public class LiveCollaboration extends AppCompatActivity {
         undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+
                 undoButtonHelper();
             }
         });
@@ -263,7 +279,7 @@ public class LiveCollaboration extends AppCompatActivity {
 
 
     }
-    
+
     private void redoButtonHelper() {
         JSONObject obj =  new JSONObject();
         try{
@@ -280,7 +296,7 @@ public class LiveCollaboration extends AppCompatActivity {
     }
 
 
-    
+
     private void redoSureHelper() {
         // Window to show whether undo or not
 
@@ -290,7 +306,7 @@ public class LiveCollaboration extends AppCompatActivity {
     private void firstHistoryHelper() {
         Toast.makeText(getApplicationContext(),"First history, cannot redo",Toast.LENGTH_SHORT).show();
     }
-    
+
     private void undoButtonHelper() {
 
         JSONObject obj =  new JSONObject();
@@ -306,11 +322,11 @@ public class LiveCollaboration extends AppCompatActivity {
         }
         webSocketClient.send(obj.toString());
     }
-    
+
     private void undoSureHelper() {
         // Window to show whether undo or not
         Toast.makeText(getApplicationContext(),"undoSureHelper",Toast.LENGTH_SHORT).show();
-        
+
     }
 
     private void lastHistoryHelper() {
@@ -659,9 +675,18 @@ public class LiveCollaboration extends AppCompatActivity {
         if(tmpjson.has("title")){// this is a presentation json
 
             Log.w(TAG, "newPresentation");
-            //change json to presentation obj
-
             Presentation tmp_pres = new Presentation();
+            //change json to presentation obj
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                Log.w(TAG, "presentation object transformation success1");
+                tmp_pres = objectMapper.readValue(s, Presentation.class);
+                Log.w(TAG, "presentation object transformation success2");
+
+            } catch (JsonProcessingException e) {
+                Log.w(TAG, "presentation object transformation fail");
+                e.printStackTrace();
+            }
 
 
             //reset presentation
@@ -669,12 +694,14 @@ public class LiveCollaboration extends AppCompatActivity {
 
             presentation = tmp_pres;
 
+
             LiveCollaboration.this.runOnUiThread(new Runnable() {
                 public void run() {
                     refreshPage();
                     Log.w(TAG, "newPresentation refresh");
                 }
             });
+            getPresentationSuccess = true;
             return;
         }
 
@@ -682,7 +709,7 @@ public class LiveCollaboration extends AppCompatActivity {
          * Check presentation ID same
          */
         String change_presentationID = null;
-        
+
         if(tmpjson.has("presentationID")){
             try {
                 change_presentationID = tmpjson.getString("presentationID");
@@ -692,7 +719,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 e.printStackTrace();
                 return;
             }
-            
+
             if(!change_presentationID.equals(presentationID)){
                 return;
             }
@@ -743,30 +770,30 @@ public class LiveCollaboration extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            
-                Log.w(TAG, "!=");
-                Cards tmp = presentation.cueCards.get(change_cueCards_num);
 
-                // change variable in presentation Obj
+            Log.w(TAG, "!=");
+            Cards tmp = presentation.cueCards.get(change_cueCards_num);
 
-                if(change_cardFace==0) {//front
-                    tmp.front.content.setMessage(change_recent_text);
-                    presentation.cueCards.set(change_cueCards_num,tmp);
+            // change variable in presentation Obj
+
+            if(change_cardFace==0) {//front
+                tmp.front.content.setMessage(change_recent_text);
+                presentation.cueCards.set(change_cueCards_num,tmp);
+            }
+            else{//back
+                tmp.back.content.setMessage(change_recent_text);
+                presentation.cueCards.set(cueCards_num,tmp);
+            }
+            Log.w(TAG, "change save");
+
+            //refresh editText
+
+            LiveCollaboration.this.runOnUiThread(new Runnable() {
+                public void run() {
+                    refreshPage();
+                    Log.w(TAG, "change refresh");
                 }
-                else{//back
-                    tmp.back.content.setMessage(change_recent_text);
-                    presentation.cueCards.set(cueCards_num,tmp);
-                }
-                Log.w(TAG, "change save");
-
-                //refresh editText
-
-                LiveCollaboration.this.runOnUiThread(new Runnable() {
-                    public void run() {
-                        refreshPage();
-                        Log.w(TAG, "change refresh");
-                    }
-                });
+            });
 
 
         }
@@ -790,12 +817,13 @@ public class LiveCollaboration extends AppCompatActivity {
             Log.w(TAG, "Warning: Unexpected message received");
             refreshPresentation();
         }
-        
+
     }
-        
+
 
     private void refreshPage() {
         cueCards_max = presentation.cueCards.size();
+        Log.w(TAG, String.valueOf(cueCards_max));
         sendOrNot = false;
         if(cardFace == 0){
             content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
