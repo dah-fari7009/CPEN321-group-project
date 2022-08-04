@@ -1,8 +1,11 @@
 package com.example.eloquent;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -15,7 +18,9 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -51,7 +56,7 @@ public class LiveCollaboration extends AppCompatActivity {
     private TextView pageNumber;
     private EditText content;
     private Presentation presentation;
-    private String presentationID = "10000";
+    private String presentationID = "62eaf6f05122fb599e75a190";
     private int cueCards_num = 0;
     private int cueCards_max = 0;
     private int cardFace = 0;//0: front | 1: back
@@ -65,6 +70,8 @@ public class LiveCollaboration extends AppCompatActivity {
     private static String TAG = "LiveCollaboration";
     private boolean getPresentationSuccess = false;
     public int undoRedoSure = 0;//0: not sure;1: sure
+    private CheckBox dontShowAgain;
+    private static final String PREFS_NAME = "MyPrefsFile1";
 
     /**
      * standard empty card (used for add and delete)
@@ -326,6 +333,76 @@ public class LiveCollaboration extends AppCompatActivity {
     private void undoSureHelper() {
         // Window to show whether undo or not
         Toast.makeText(getApplicationContext(),"undoSureHelper",Toast.LENGTH_SHORT).show();
+
+
+        AlertDialog.Builder adb = new AlertDialog.Builder(LiveCollaboration.this);
+        LayoutInflater adbInflater = LayoutInflater.from(LiveCollaboration.this);
+        View eulaLayout = adbInflater.inflate(R.layout.checkbox, null);
+        dontShowAgain = (CheckBox) eulaLayout.findViewById(R.id.skip);
+        adb.setTitle("Attention");
+        adb.setMessage("Are you sure you want to redo other people's work?");
+        adb.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                String checkBoxResult = "NOT checked";
+                if (dontShowAgain.isChecked()){
+                    checkBoxResult = "checked";
+                    undoRedoSure = 1;
+                    JSONObject obj =  new JSONObject();
+                    try{
+                        obj.put("undoSure","");
+                        obj.put("userID",userID);
+                        obj.put("presentationID",presentationID);
+                        obj.put("cueCards_num",Integer.toString(cueCards_num));
+                        obj.put("cardFace",Integer.toString(cardFace));
+                        obj.put("undoRedoSure",Integer.toString(undoRedoSure));
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                    webSocketClient.send(obj.toString());
+                }
+                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString("skipMessage", checkBoxResult);
+                // Commit the edits!
+                editor.commit();
+
+                JSONObject obj =  new JSONObject();
+                try{
+                    obj.put("undoSure","");
+                    obj.put("userID",userID);
+                    obj.put("presentationID",presentationID);
+                    obj.put("cueCards_num",Integer.toString(cueCards_num));
+                    obj.put("cardFace",Integer.toString(cardFace));
+                    obj.put("undoRedoSure",Integer.toString(undoRedoSure));
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+                webSocketClient.send(obj.toString());
+
+                return;
+            }
+        });
+
+        adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                String checkBoxResult = "NOT checked";
+                if (dontShowAgain.isChecked())
+                    checkBoxResult = "checked";
+                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString("skipMessage", checkBoxResult);
+                // Commit the edits!
+                editor.commit();
+
+                return;
+            }
+        });
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        String skipMessage = settings.getString("skipMessage", "NOT checked");
+        if (!skipMessage.equals("checked")){
+            adb.show();
+        }
+
 
     }
 
