@@ -19,7 +19,7 @@ const userExistsWithID = (userID) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             if (userID === "Idontexist" || userID === null) {
-                reject(false);
+                reject("User " + userID + " does not exist");
             } else {
                 resolve(true);
             }
@@ -27,27 +27,12 @@ const userExistsWithID = (userID) => {
     });
 }
 
-// const removePresFromUser = (userID, presID) => {
-//     console.log("userStore: removePresFromUser: Deleting presentation " + presID + " from user " + userID);
-//     return new Promise((resolve, reject) => {
-//         User.updateOne(
-//             { userID },
-//             {$pull: {presentations: presID}}
-//         ).then((data) => {
-//             console.log("userStore: removePresFromUser: Deleted presentation " + presID + " from user " + userID);
-//             resolve(data);
-//         }).catch((err) => {
-//             console.log(err);
-//             reject(err);
-//         })
-//     });
-// }
 
 const removePresFromUser = (userID, presID) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            if (presID === null && userID === "104866131128716891939") {
-                reject("Unspecified presentation");
+            if (userID === "1" && presID === "900df00d900df00d900df00d") {
+                resolve();
             }
         }, 1000);
     });
@@ -55,6 +40,6 @@ const removePresFromUser = (userID, presID) => {
 
 userStore.addPresToUser = addPresToUser;
 userStore.userExistsWithID = userExistsWithID;
-// userStore.removePresFromUser = removePresFromUser;
+userStore.removePresFromUser = removePresFromUser;
 
 module.exports = userStore;

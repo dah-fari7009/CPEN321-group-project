@@ -107,7 +107,7 @@ userExistsWithID = (userID) => {
                     resolve(true);
                 } else {
                     console.log("userStore: userExistsWithID: There exists no user with userID " + userID);
-                    reject(false);
+                    reject("User " + userID + " does not exist");
                 }
         });
     });

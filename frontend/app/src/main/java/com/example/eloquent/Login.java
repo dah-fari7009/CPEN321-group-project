@@ -19,7 +19,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.Task;
+import com.google.api.services.drive.Drive;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,13 +31,14 @@ public class Login extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private Integer RC_SIGN_IN = 1;
     private static final String TAG = "Login";
-    private final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private String BACKEND_HOST_AND_PORT;
     private static RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        BACKEND_HOST_AND_PORT = getString(R.string.backend_host);
 
         /* Dev login button, to bypass google sign-in */
         Button loginButton = findViewById(R.id.LB);
@@ -47,7 +50,7 @@ public class Login extends AppCompatActivity {
                 // of retrieving those values programmatically for an arbitrary account after
                 // performing a Google sing-in on the frontend.
 
-                createUserAndGoToMainActivity("0", true, "104866131128716891939", "aswin.sai009.dummy@gmail.com");
+                createUserAndGoToMainActivity("0", true, "104866131128716891939", "aswin.sai009.dummy@gmail.com", "0");
             }
         });
 
@@ -56,7 +59,9 @@ public class Login extends AppCompatActivity {
 
         /* Google sign-in */
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(new Scope("https://www.googleapis.com/auth/drive"))
                 .requestIdToken(getString(R.string.google_oauth2_web_client_id))
+                .requestServerAuthCode(getString(R.string.google_oauth2_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -117,19 +122,21 @@ public class Login extends AppCompatActivity {
             Log.d(TAG, "Family name: " + account.getFamilyName());
             Log.d(TAG, "Given name: " + account.getGivenName());
             Log.d(TAG, "Display URL: " + account.getPhotoUrl());
+            Log.d(TAG, "auth code: " + account.getServerAuthCode());
 
             // The account.getIdToken() method will get an old (expired) Id token if there exists a
             // signed-in Google account on the device from a previous session.
-            createUserAndGoToMainActivity(account.getIdToken(), previouslySignedIn, account.getId(), account.getEmail());
+            createUserAndGoToMainActivity(account.getIdToken(), previouslySignedIn, account.getId(), account.getEmail(), account.getServerAuthCode());
         }
     }
 
-    private void openMainActivity() {
+    private void openMainActivity(String userID) {
         Intent usingIntent = new Intent(Login.this, MainActivity.class);
+        usingIntent.putExtra("userID", userID);
         startActivity(usingIntent);
     }
 
-    private void createUserAndGoToMainActivity(String IdToken, Boolean googleAccountPreviouslySignedIn, String userID, String username) {
+    private void createUserAndGoToMainActivity(String IdToken, Boolean googleAccountPreviouslySignedIn, String userID, String username, String authCode) {
         //ObjectMapper objectMapper = new ObjectMapper();
         String url = BACKEND_HOST_AND_PORT + "/api/login";
         StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
@@ -140,7 +147,7 @@ public class Login extends AppCompatActivity {
                 user.setData(response);
                 Log.d(TAG, user.getData().getUserID() + " " + user.getData().getUsername());
                 // Go to main activity
-                openMainActivity();
+                openMainActivity(userID);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -154,6 +161,7 @@ public class Login extends AppCompatActivity {
                 params.put("token", IdToken);
                 params.put("userID", userID);
                 params.put("username", username);
+                params.put("authCode", authCode != null ? authCode : "");
                 if (googleAccountPreviouslySignedIn) {
                     params.put("verifiedDevice", "true");
                 } else {

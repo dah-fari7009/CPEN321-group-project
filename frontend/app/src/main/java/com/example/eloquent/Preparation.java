@@ -47,13 +47,14 @@ public class Preparation extends AppCompatActivity {
 
     private static final String TAG = "Preparation";
 
-    private static final String BACKEND_HOST_AND_PORT = "http://20.104.77.70:8081";
+    private String BACKEND_HOST_AND_PORT;
     private static RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preparation);
+        BACKEND_HOST_AND_PORT = getString(R.string.backend_host);
 
         /* Set up for sending HTTP requests */
         requestQueue = Volley.newRequestQueue(getApplicationContext());
