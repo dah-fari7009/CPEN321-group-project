@@ -32,7 +32,7 @@ jest.mock("../../userStore/userStore");
 describe("createPres tests", () => {
 
     test("Presentation name is null", async () => {
-        var req = {body: {presTitle: null, userID: "1"}};
+        var req = {body: {title: null, userID: "1"}};
         var res = new Response();
         var expectedPres = {
             title: "unnamed",
@@ -218,6 +218,83 @@ describe("deletePres tests", () => {
         expect(res.body.deletedDoc.title).toEqual(thisPresentationContent.title);
         expect(res.body.deletedDoc.users[0].id).toEqual("1");
         expect(res.body.deletedDoc.users[0].permission).toEqual("owner");
+        expect(res.stat).toEqual(200);
+    });
+});
+
+describe("getAllPresOfUser tests", () => {
+    test("user ID is null", async () => {
+        var req = {query: {userID: null}};
+        var res = new Response();
+        await presManager.getAllPresOfUser(req, res);
+        expect(res.body).toEqual({err: "User not specified"});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("user ID specifies a non-existent user", async () => {
+        var req = {query: {userID: "Idontexist"}};
+        var res = new Response();
+        await presManager.getAllPresOfUser(req, res);
+        expect(res.body).toEqual({err: "User Idontexist does not exist"});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("User has 0 presentations", async () => {
+        var req = {query: {userID: "1"}}; //add no new presentations to user "1" before retrieving all their presentations
+        var res = new Response();
+        await presManager.getAllPresOfUser(req, res),
+        expect(res.body).toEqual([]);
+        expect(res.stat).toEqual(200);
+    });
+
+    test("User has 1 presentation", async () => {
+        // create a new presentation for user "1"
+        var thisPresentation = "900df00d900df00d900df00d"; 
+        var thisPresentationContent = {
+            _id: mongoose.Types.ObjectId(thisPresentation),
+            title: "Jest test presentation 1",
+            cards: [],
+            feedback: [],
+            users: [{id: "1", permission: "owner"}]
+        };
+        await Presentation.create(thisPresentationContent);
+
+        var req = {query: {userID: "1"}};
+        var res = new Response();
+        await presManager.getAllPresOfUser(req, res);
+        expect(res.body.length).toBeDefined();
+        expect(res.body.length).toEqual(1);
+        expect(res.body[0]._id).toEqual(thisPresentationContent._id);
+        expect(res.body[0].title).toEqual(thisPresentationContent.title);
+        expect(res.body[0].users.length).toBeDefined();
+        expect(res.body[0].users.length).toEqual(thisPresentationContent.users.length);
+        expect(res.body[0].users[0].id).toEqual(thisPresentationContent.users[0].id);
+        expect(res.body[0].users[0].permission).toEqual(thisPresentationContent.users[0].permission);
+        expect(res.stat).toEqual(200);
+    });
+
+    test("User has 2 presentations", async () => {
+        var title1 = "Jest test presentation 1";  // define presentation title variables against which to match test results later
+        var title2 = "Jest test presentation 2";
+    
+        // create a presentation for user "1"
+        var req = {body: {title: title1, userID: "1"}};
+        var res = new Response();
+        await presManager.createPres(req, res);
+
+        // create a second presentation for user "1"
+        req = {body: {title: title2, userID: "1"}};
+        res = new Response();
+        await presManager.createPres(req, res);
+
+        // retrieve all presentations of user "1"
+        req = {query: {userID: "1"}};
+        res = new Response();
+        await presManager.getAllPresOfUser(req, res);
+        expect(res.body.length).toBeDefined();
+        expect(res.body.length).toEqual(2);
+        expect(res.body[0].title).toEqual(title1);
+        expect(res.body[1].title).toEqual(title2);
         expect(res.stat).toEqual(200);
     });
 });

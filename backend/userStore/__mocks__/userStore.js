@@ -18,7 +18,7 @@ const addPresToUser = (userID, presID) => {
 const userExistsWithID = (userID) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            if (userID === "Idontexist" || userID === null) {
+            if (userID === "Idontexist") {
                 reject("User " + userID + " does not exist");
             } else {
                 resolve(true);
