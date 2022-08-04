@@ -46,6 +46,7 @@ public class Login extends AppCompatActivity {
                 // userID and email address values of account "aswin.sai009.dummy@gmail.com" instead
                 // of retrieving those values programmatically for an arbitrary account after
                 // performing a Google sing-in on the frontend.
+
                 createUserAndGoToMainActivity("0", true, "104866131128716891939", "aswin.sai009.dummy@gmail.com");
             }
         });
