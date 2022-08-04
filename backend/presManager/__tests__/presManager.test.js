@@ -1,13 +1,19 @@
 const presManager = require("../presManager");
 const mongoose = require("mongoose");
 const Presentation = require("../../models/presentations");
+const User = require("../../models/users");
 
 beforeEach(async() => {
     try {
         await mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
         console.log("connected to DB");
         await Presentation.deleteMany({});
-    } catch {
+        await User.deleteMany({});
+        await User.create([
+            {userID: "1", username: "Jest user 1", refreshToken: "11", presentations: []},
+            {userID: "2", username: "Jest user 2", refreshToken: "22", presentations: []}
+        ]);
+    } catch(e) {
         console.error('Connection error', e.message);
         return;
     }
@@ -26,7 +32,7 @@ jest.mock("../../userStore/userStore");
 describe("createPres tests", () => {
 
     test("Presentation name is null", async () => {
-        var req = {body: {presTitle: null, userID: "104866131128716891939"}};
+        var req = {body: {presTitle: null, userID: "1"}};
         var res = new Response();
         var expectedPres = {
             title: "unnamed",
@@ -57,7 +63,7 @@ describe("createPres tests", () => {
             }],
             feedback: [],
             users: [
-                {id: "104866131128716891939", permission: "owner"}
+                {id: "1", permission: "owner"}
             ]
         };
         var expectedResStat = 200;
@@ -68,7 +74,7 @@ describe("createPres tests", () => {
         expectedPres._id = res.body._id;
         expectedPres.__v = res.body.__v;
         expectedPres.users[0]._id = res.body.users[0]._id;
-	expectedPres.cards[0]._id = res.body.cards[0]._id;
+	    expectedPres.cards[0]._id = res.body.cards[0]._id;
 
         expect(res.body.title).toEqual(expectedPres.title);
         expect(res.body.cards[0].backgroundColor).toEqual(expectedPres.cards[0].backgroundColor);
@@ -83,7 +89,7 @@ describe("createPres tests", () => {
         var res = new Response();
         //console.log(res);
         var req = {body: {title: "Presentation", userID: null}};
-	await presManager.createPres(req, res);
+	    await presManager.createPres(req, res);
         expect(res.body).toEqual({err: "presManager: createPres: no userID provided!"});
         expect(res.stat).toEqual(400);
 	//console.log(res);
@@ -99,7 +105,7 @@ describe("createPres tests", () => {
     });
 
     test("Valid userID and presentation title", async () => {
-        var req = {body: {title: "Presentation", userID: "104866131128716891939"}};
+        var req = {body: {title: "Presentation", userID: "1"}};
         var res = new Response();
         await presManager.createPres(req, res);
 	
@@ -120,28 +126,99 @@ describe("createPres tests", () => {
 
 describe("deletePres tests", () => {
     test("presentation ID is null", async () => {
-        var req = {query: {presID: null, userID: "104866131128716891939"}};
+        var req = {query: {presID: null, userID: "1"}};
         var res = new Response();
         await presManager.deletePres(req, res);
         console.log("{ res.stat: " + res.stat + ", res.body: " + res.body + " }");
-        expect(res.body).toEqual({err: "Presentation to delete is not specified."});
+        expect(res.body).toEqual({err: "Presentation to delete is not specified. "});
         expect(res.stat).toEqual(400);
     });
 
     test("User ID is null", async () => {
-        // create a presentation for user "104866131128716891939"
-        var req = {body: {title: "Jest test presentation", userID: "104866131128716891939"}};
+        // create a presentation for user "1"
+        var req = {body: {title: "Jest test presentation", userID: "1"}};
         var res = new Response();
         await presManager.createPres(req, res);
-	var thisPresentation = res.body._id;
+	    var thisPresentation = res.body._id;
         //console.log("ID of user's presentation is " + presID);
 
         // Try deleting presentation with ID==thisPresentation, but with null userID
         req = {query: {presID: thisPresentation, userID: null}}
-	res = new Response();
-	await presManager.deletePres(req, res);
-	expect(res.body).toEqual({err: "User who is requesting to delete the presentation is not specified."});
+	    res = new Response();
+	    await presManager.deletePres(req, res);
+	    expect(res.body).toEqual({err: "User who is requesting to delete the presentation is not specified. "});
         expect(res.stat).toEqual(400);
+    });
+
+    test("Both presentation ID and user ID are null", async () => {
+        var req = {query: {presID: null, userID: null}};
+        var res = new Response();
+        await presManager.deletePres(req, res);
+        expect(res.body).toEqual({err: "Presentation to delete is not specified. User who is requesting to delete the presentation is not specified. "});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("Illegal presentation ID - presentation does not exist", async () => {
+        var req = {query: {presID: "deadbeefdeadbeefdeadbeef", userID: "1"}};
+        var res = new Response();
+        await presManager.deletePres(req, res);
+        expect(res.body).toEqual({err: "Presentation not found"});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("Illegal user Id - user does not exist", async () => {
+        // create a new presentation for user "1"
+        var req = {body: {title: "Jest test presentation 2", userID: "1"}};
+        var res = new Response();
+        await presManager.createPres(req, res);
+        var thisPresentation = res.body._id;
+
+        // try deleteing presentation with ID==thisPresentation, but with non-existent user "Idontexist"
+        req = {query: {presID: thisPresentation, userID: "Idontexist"}};
+        res = new Response();
+        await presManager.deletePres(req, res);
+        console.log(res);
+        expect(res.body).toEqual({err: "User Idontexist does not exist"});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("user ID specifies a user without adequate permission to delete presentation", async () => {
+        // create a new presentation for user "1"
+        var req = {body: {title: "Jest test presentation 3", userID: "1"}};
+        var res = new Response();
+        await presManager.createPres(req, res);
+        var thisPresentation = res.body._id;
+
+        // try deleteing presentation with ID==thisPresentation, but with user ID "2" 
+        // which indicates a user who does not have permission to delete the presentation
+        req = {query: {presID: thisPresentation, userID: "2"}};
+        res = new Response();
+        await presManager.deletePres(req, res);
+        expect(res.body).toEqual({err: "user 2 does not have adequate permission to delete presentation " + thisPresentation});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("Valid user ID and presentation ID, and adequate permission to delete", async () => {
+        // create a new presentation for user "1"
+        var thisPresentation = "900df00d900df00d900df00d"; // custom presentation _id for mock userStore's removePresFromUser
+        var thisPresentationContent = {
+            _id: mongoose.Types.ObjectId(thisPresentation),
+            title: "Jest test presentation 4",
+            cards: [],
+            feedback: [],
+            users: [{id: "1", permission: "owner"}]
+        };
+        await Presentation.create(thisPresentationContent);
+
+        // delete presentation with _id==thisPresentation, using userID "1"
+        req = {query: {presID: thisPresentation, userID: "1"}};
+        res = new Response();
+        await presManager.deletePres(req, res);
+        expect(res.body.deletedDoc._id).toEqual(thisPresentationContent._id);
+        expect(res.body.deletedDoc.title).toEqual(thisPresentationContent.title);
+        expect(res.body.deletedDoc.users[0].id).toEqual("1");
+        expect(res.body.deletedDoc.users[0].permission).toEqual("owner");
+        expect(res.stat).toEqual(200);
     });
 });
 

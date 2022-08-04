@@ -32,22 +32,22 @@ createPres = async (req, res) => {
                     content: {
                         font: "Times New Roman",
                         style: "normalfont",
-			size: 12,
+		            	size: 12,
                         colour: 0,
                         message: "Front: Add your prompt here"
-		    }
-		},
+		            }
+		        },
                 back: {
                     backgroundColor: 1,
                     content: {
                         font: "Times New Roman",
                         style: "normalfont",
-			size: 12,
+			            size: 12,
                         colour: 0,
                         message: "Back: Add details here"
-		    }
-		}
-	    }],
+		            }
+		        }
+	        }],
             feedback: [],
             users: [{id: req.body.userID, permission: "owner"}]
         });
@@ -204,6 +204,14 @@ deletePres = async (req, res) => {
         return res.status(400).json({err: inputErr});
     }
 
+    // check if user exists
+    try {
+        await userStore.userExistsWithID(req.query.userID);
+    } catch(err) {
+        console.log("presManager: deletePres: " + err);
+        return res.status(400).json({ err });
+    }
+
     var presToBeDeleted;
     try { 
         presToBeDeleted = await checkPermission(req.query.userID, req.query.presID, "owner"); 
@@ -216,10 +224,10 @@ deletePres = async (req, res) => {
             try {
                 console.log("presManager: deletePres: Calling userStore.removePresFromUser( " + presToBeDeleted.users[i].id  + " , " + req.query.presID + " )");
                 await userStore.removePresFromUser(presToBeDeleted.users[i].id, req.query.presID);
-	    } catch(err) {
+	        } catch(err) {
                 res.status(400).json({ err });
+	        }
 	    }
-	}
         try {
             await Presentation.findOneAndDelete({
                 "_id": req.query.presID,
@@ -228,8 +236,8 @@ deletePres = async (req, res) => {
 
         } catch(err) {
             return res.status(400).json({ err });
-	}
-	return res.status(200).json({ deletedDoc: presToBeDeleted });
+	    }
+	    return res.status(200).json({ deletedDoc: presToBeDeleted });
     }
 }
 
