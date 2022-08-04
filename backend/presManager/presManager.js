@@ -77,10 +77,14 @@ createPres = async (req, res) => {
 // Internal - for calls from wssserver.js. Return presentation object after finding 
 // it by presentation ID
 getPresById = (presID) => {
+    console.log("presManager: getPresById: Retrieving presentation " + presID);
     return new Promise((resolve, reject) => {
         Presentation.findById(presID).then((pres) => {
-            resolve(pres);
+            console.log("presManager: getPresById: Found presentation " + presID);
+	    resolve(pres);
         }, (err) => {
+            console.log("presManager: getPresById: Could not find presentation " + presID + " - err is '" + err + "'");
+            console.log("presManager: getPresById: type of input presID is " + typeof presID);
             reject(err);
         });
     });
