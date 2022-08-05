@@ -201,21 +201,43 @@ deletePres = async (req, res) => {
     }
 }
 
-
 savePres = (req, res) => {
     console.log("presManager: savePres: received request to update presentation " + req.body.presID);
     const filter = {"_id": req.body.presID};
     const update = {
         "title": req.body.title,
         "cards": req.body.cards,
-        "feedback": req.body.feedback,
+        "feedback": req.body.feedback
     }
-    Presentation.findOneAndUpdate(filter, update, {new: true})
-        .then((pres) => {
-            return res.status(200).json({data: pres});
-        }).catch((err) => {
-            return res.status(500).json({err});
-        })
+
+    // input checks
+    var inputErr = "";
+    if (!req.body.presID) {
+        inputErr += "No presentation specified.";
+        inputErr += " ";
+    }
+    if (!req.body.title) {
+        inputErr += "Title required.";
+        inputErr += " ";
+    }
+    if (!req.body.cards) {
+        inputErr += "Cue cards array required.";
+        inputErr += " ";
+    }
+    if (!req.body.feedback) {
+        inputErr += "Feedback array required";
+        inputErr += " ";
+    }
+    if (!req.body.presID || !req.body.title || !req.body.cards || !req.body.feedback) {
+        return res.status(400).json({ err: inputErr });
+    }
+
+    // save changes to presentation specified by presID
+    Presentation.findOneAndUpdate(filter, update, {new: true}).then((pres) => {
+        return res.status(200).json({data: pres});
+    }).catch((err) => {
+        return res.status(400).json({err});
+    });
 }
 
 // expects userID in query
@@ -232,7 +254,7 @@ getAllPresOfUser = async (req, res) => {
         return res.status(400).json({ err });
     }
 
-    // find all presentations of user with userI===req.query.userID
+    // find all presentations of user with userID===req.query.userID
     try {
         var presentationArray = await Presentation.find({"users.id": req.query.userID});
         return res.status(200).json( presentationArray );
