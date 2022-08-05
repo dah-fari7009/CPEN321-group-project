@@ -201,7 +201,7 @@ deletePres = async (req, res) => {
     }
 }
 
-savePres = (req, res) => {
+savePres = async (req, res) => {
     console.log("presManager: savePres: received request to update presentation " + req.body.presID);
     const filter = {"_id": req.body.presID};
     const update = {
@@ -233,11 +233,37 @@ savePres = (req, res) => {
     }
 
     // save changes to presentation specified by presID
-    Presentation.findOneAndUpdate(filter, update, {new: true}).then((pres) => {
+    try {
+        var pres = await Presentation.findOneAndUpdate(filter, update, {new: true});
+        console.log(pres);
         return res.status(200).json({data: pres});
-    }).catch((err) => {
+    } catch (err) {
+        console.log(err);
         return res.status(400).json({err});
-    });
+    }
+}
+
+// Internal - to be called from wsserver.js. Wraps around savePres, and 
+// returns the body of savePres's response.
+savePresInternal = async (presID, title, cards, feedback) => {
+    function Response() {
+        this.stat = 100;
+        this.body = null;
+    }
+    Response.prototype.json = function(obj){
+        this.body = obj;
+    }
+    Response.prototype.send = function(obj) {
+        this.body = obj;
+    }
+    Response.prototype.status = function(responseStatus) {
+        this.stat = responseStatus;
+        return this;
+    }  
+    var req = {body: {presID, title, cards, feedback}};
+    var res = new Response();
+    await savePres(req, res);
+    return res.body;
 }
 
 // expects userID in query
@@ -325,6 +351,7 @@ module.exports = {
     getPresById,
     //editPres,
     deletePres,
+    savePresInternal,
     savePres,
     getAllPresOfUser,
     share,
