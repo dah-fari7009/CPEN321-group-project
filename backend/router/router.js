@@ -8,13 +8,13 @@ const router = express.Router()
 
 //Pres manager routes
 router.put("/presentation", presentationManager.createPres);
-router.get("/presentation", presentationManager.getPres);						   								
-router.get("/search", presentationManager.search);
+//router.get("/presentation", presentationManager.getPres);						   								
+//router.get("/search", presentationManager.search);
 router.delete("/presentation", presentationManager.deletePres);
 router.get("/allPresentationsOfUser", presentationManager.getAllPresOfUser);
 router.put("/savePresentation", presentationManager.savePres);
 router.put("/share", presentationManager.share);
-router.put("/unshare", presentationManager.unShare);
+//router.put("/unshare", presentationManager.unShare);
 
 //User store routes
 router.put("/login", userStore.login);

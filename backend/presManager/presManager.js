@@ -212,14 +212,26 @@ savePres = (req, res) => {
 }
 
 // expects userID in query
-getAllPresOfUser = (req, res) => {
-    Presentation.find({
-        "users.id": req.query.userID
-    }).then((data) => {
-        return res.status(200).json(data);
-    }).catch((err) => {
-        return res.status(500).json({err});
-    })
+getAllPresOfUser = async (req, res) => {
+    // check that req.query.userID is defined
+    if (!req.query.userID) {
+       return res.status(400).json({err: "User not specified"});
+    }
+
+    // check if user with userID===req.query.userID exists
+    try {
+        await userStore.userExistsWithID(req.query.userID);
+    } catch (err) {
+        return res.status(400).json({ err });
+    }
+
+    // find all presentations of user with userI===req.query.userID
+    try {
+        var presentationArray = await Presentation.find({"users.id": req.query.userID});
+        return res.status(200).json( presentationArray );
+    } catch (err) {
+        res.status(400).json({ err });
+    }
 }
 
 // expects the username of the user being added, and presID

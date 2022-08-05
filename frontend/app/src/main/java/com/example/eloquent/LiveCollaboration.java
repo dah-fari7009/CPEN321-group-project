@@ -55,12 +55,13 @@ public class LiveCollaboration extends AppCompatActivity {
     private ImageButton undoButton;
     private TextView pageNumber;
     private EditText content;
-    private Presentation presentation;
+
+    private Presentation presentation = new Presentation();
     private String presentationID = "62eaf6f05122fb599e75a190";
     private int cueCards_num = 0;
     private int cueCards_max = 0;
     private int cardFace = 0;//0: front | 1: back
-    private String userID ;
+    private String userID = "111";
     private String title ;
     private boolean sendOrNot = false;
     private CharSequence textBeforeChange;
@@ -76,8 +77,8 @@ public class LiveCollaboration extends AppCompatActivity {
     /**
      * standard empty card (used for add and delete)
      */
-    Content new_content_front = new Content(Color.BLACK,"");
-    Content new_content_back = new Content(Color.BLACK,"");
+    Content new_content_front = new Content(0,"");
+    Content new_content_back = new Content(0,"");
     Front new_front = new Front(Color.WHITE,new_content_front);
     Back new_back = new Back(Color.WHITE,new_content_back);
     Cards emptyCard = new Cards(new_front,new_back,Color.WHITE);
@@ -110,17 +111,10 @@ public class LiveCollaboration extends AppCompatActivity {
             }
         });
 
-        Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    content = findViewById(R.id.cueCard);
-                }
-            },3000);
+        content = findViewById(R.id.cueCard);
 
-        while(!getPresentationSuccess){
-            //Log.w(TAG, "Wait for presentation");
-        }
+
+
 
 //        try {
 //            wait(300);
@@ -146,6 +140,11 @@ public class LiveCollaboration extends AppCompatActivity {
 
 
         View back = findViewById(R.id.cueCard_background);
+
+        while(!getPresentationSuccess){
+            //Log.w(TAG, "Wait for presentation");
+        }
+
         back.setBackgroundColor(65280);
 
         refreshPage();
@@ -165,10 +164,17 @@ public class LiveCollaboration extends AppCompatActivity {
                     obj.put("presentationID",presentationID);
                     obj.put("cueCards_num",Integer.toString(cueCards_num));
                     obj.put("cardFace",Integer.toString(cardFace));
-                    String recent_text = content.getText().toString();
+                    //String recent_text = content.getText().toString();
+                    String recent_text = s.toString();
                     obj.put("recent_text",recent_text);
                     textAfterChange = s.subSequence(start, start + count);
                     obj.put("before_text",textBeforeChange);
+                    //Editable text = content.getEditableText();
+                    //int end = start + count;
+                    //text.replace(start, end, textBeforeChange);
+                    //textAfterChange = text.toString();
+                    //int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
+                    //content.setText(getColoredtext(color,recent_text));
                     obj.put("after_text",textAfterChange);
                     obj.put("start",start);
                 }catch (JSONException e){
@@ -184,7 +190,7 @@ public class LiveCollaboration extends AppCompatActivity {
                     return;
                 }
 
-                textBeforeChange = s.subSequence(start, start + count);
+                textBeforeChange = s.toString();
 
             }
 
@@ -521,6 +527,9 @@ public class LiveCollaboration extends AppCompatActivity {
         }
         presentation.cueCards.remove(cueCards_max-1);
         cueCards_max=cueCards_max-1;
+        if(cueCards_num >= cueCards_max){
+            cueCards_num--;
+        }
         refreshPage();
     }
 
@@ -573,18 +582,7 @@ public class LiveCollaboration extends AppCompatActivity {
         /**
          * first, save the change on the edit text
          */
-        String change = content.getText().toString();
-        Cards tmp = presentation.cueCards.get(cueCards_num);
-//                Log.w(TAG, "get success" + change);
-
-        if(cardFace==0) {//front
-            tmp.front.content.setMessage(change);
-            presentation.cueCards.set(cueCards_num,tmp);
-        }
-        else{//back
-            tmp.back.content.setMessage(change);
-            presentation.cueCards.set(cueCards_num,tmp);
-        }
+        sendOrNot = false;
 
 
         //second, change to the next page
@@ -602,24 +600,15 @@ public class LiveCollaboration extends AppCompatActivity {
         else{
             Toast.makeText(getApplicationContext(),"Max number, cannot go to the next page",Toast.LENGTH_SHORT).show();
         }
+
+        sendOrNot = true;
     }
 
     private void backButtonHelper() {
         //first, save the change on the edit text
 
 
-        String change = content.getText().toString();
-        Cards tmp = presentation.cueCards.get(cueCards_num);
-
-        if(cardFace==0) { //front
-            tmp.front.content.setMessage(change);
-            presentation.cueCards.set(cueCards_num,tmp);
-        }
-        else{ // back
-            tmp.back.content.setMessage(change);
-            presentation.cueCards.set(cueCards_num,tmp);
-        }
-        Log.w(TAG, "save success");
+        sendOrNot = false;
 
         //second, change to the last page
 
@@ -635,16 +624,16 @@ public class LiveCollaboration extends AppCompatActivity {
         else{
             Toast.makeText(getApplicationContext(),"Min number, cannot go to the last page",Toast.LENGTH_SHORT).show();
         }
+
+        sendOrNot = false;
     }
 
     private void flipButtonHelper() {
         //save the change on the edit text and flip the page
-        String change = content.getText().toString();
-        Cards tmp = presentation.cueCards.get(cueCards_num);
 
+        sendOrNot = false;
         if(cardFace==0) { //front
-            tmp.front.content.setMessage(change);
-            presentation.cueCards.set(cueCards_num,tmp);
+
 //                    Log.w(TAG, "save success");
             cardFace = 1;
             content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
@@ -653,8 +642,7 @@ public class LiveCollaboration extends AppCompatActivity {
             content.setText(getColoredtext(color,text));
         }
         else{ // back
-            tmp.back.content.setMessage(change);
-            presentation.cueCards.set(cueCards_num,tmp);
+
 //                    Log.w(TAG, "save success");
             cardFace = 0;
             content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
@@ -662,6 +650,7 @@ public class LiveCollaboration extends AppCompatActivity {
             int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
             content.setText(getColoredtext(color,text));
         }
+        sendOrNot = true;
     }
 
 
@@ -765,6 +754,13 @@ public class LiveCollaboration extends AppCompatActivity {
                 e.printStackTrace();
             }
 
+            cueCards_max = tmp_pres.cueCards.size();
+            String _id = tmp_pres.presentationID;
+            String title = tmp_pres.title;
+            int backgroundColor = tmp_pres.cueCards.get(0).backgroundColor;
+            String message = tmp_pres.cueCards.get(0).front.content.message;
+            Log.w(TAG, String.valueOf(cueCards_max) + "   id: " + _id + "   title: " + title + "   backgroundColor: " + backgroundColor + "    message: " + message);
+
 
             //reset presentation
             Log.w(TAG, "newPresentation save");
@@ -841,12 +837,19 @@ public class LiveCollaboration extends AppCompatActivity {
             Log.w(TAG, "edit");
             int change_cardFace = 0;
             String change_recent_text = null;
+            //int change_start = 0;
             try {
                 change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
                 change_recent_text = tmpjson.getString("recent_text");
+                //change_start = Integer.valueOf(tmpjson.getString("start"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+//            int position_start = content.getSelectionStart();
+//            int position_end = content.getSelectionEnd();
+//            if(change_start>position_start){
+//                content.setSelection();
+//            }
 
             Log.w(TAG, "!=");
             Cards tmp = presentation.cueCards.get(change_cueCards_num);
@@ -884,11 +887,22 @@ public class LiveCollaboration extends AppCompatActivity {
         }
         else if(tmpjson.has("firstHistory")) {
             Log.w(TAG, "firstHistory");
-            firstHistoryHelper();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    firstHistoryHelper();
+                }
+            });
+
         }
         else if(tmpjson.has("lastHistory")) {
             Log.w(TAG, "lastHistory");
-            lastHistoryHelper();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    lastHistoryHelper();
+                }
+            });
         }
         else {
             Log.w(TAG, "Warning: Unexpected message received");
@@ -899,25 +913,37 @@ public class LiveCollaboration extends AppCompatActivity {
 
 
     private void refreshPage() {
-        cueCards_max = presentation.cueCards.size();
-        Log.w(TAG, String.valueOf(cueCards_max));
-        sendOrNot = false;
-        if(cardFace == 0){
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
-            String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
-            int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
-            content.setText(getColoredtext(color,text));
-        }
-        else{
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
-            String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
-            int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
-            content.setText(getColoredtext(color,text));
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 
-        pageNumber = findViewById(R.id.pageNumber);
-        pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
-        sendOrNot = true;
+                cueCards_max = presentation.cueCards.size();
+                String _id = presentation.presentationID;
+                String title = presentation.title;
+                int backgroundColor = presentation.cueCards.get(0).backgroundColor;
+                Log.w(TAG, String.valueOf(cueCards_max) + "   id: " + _id + "   title: " + title + "   backgroundColor: " + backgroundColor);
+                sendOrNot = false;
+                if(cardFace == 0){
+                    //content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
+                    String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
+                    Log.w(TAG, "text: " + text);
+                    int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
+                    content.setText(getColoredtext(color,text));
+                }
+                else{
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
+                    String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
+                    Log.w(TAG, "text: " + text);
+                    int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
+                    content.setText(getColoredtext(color,text));
+                }
+
+                pageNumber = findViewById(R.id.pageNumber);
+                pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
+                sendOrNot = true;
+            }
+        });
+
     }
 
     private void refreshPresentation() {
@@ -935,7 +961,20 @@ public class LiveCollaboration extends AppCompatActivity {
 
     private Spannable getColoredtext(int color, String text){
         Spannable colored_text = new SpannableString(text);
-        colored_text.setSpan(new ForegroundColorSpan(color),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        int[] colorPalette = {
+                Color.BLACK,
+                Color.WHITE,
+                Color.RED,
+                Color.GREEN,
+                Color.BLUE,
+                Color.GRAY,
+                Color.YELLOW,
+                Color.CYAN,
+                Color.MAGENTA
+        };
+
+        colored_text.setSpan(new ForegroundColorSpan(colorPalette[color]),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return colored_text;
     }
 
