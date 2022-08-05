@@ -55,7 +55,7 @@ public class LiveCollaboration extends AppCompatActivity {
     private int cueCards_num = 0;
     private int cueCards_max = 0;
     private int cardFace = 0;//0: front | 1: back
-    private String userID = "111";
+    private String userID = "123";
     private String title ;
     private boolean sendOrNot = false;
     private CharSequence textBeforeChange;
@@ -64,6 +64,7 @@ public class LiveCollaboration extends AppCompatActivity {
     private WebSocketClient webSocketClient;
     private static String TAG = "LiveCollaboration";
     private boolean getPresentationSuccess = false;
+    private boolean refreshPageComplete = false;
     public int undoRedoSure = 0;//0: not sure;1: sure
 
     /**
@@ -167,8 +168,10 @@ public class LiveCollaboration extends AppCompatActivity {
                     //textAfterChange = text.toString();
                     //int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
                     //content.setText(getColoredtext(color,recent_text));
-                    obj.put("after_text",textAfterChange);
                     obj.put("start",start);
+                    obj.put("end",start + before);
+                    obj.put("undoEnd",start+count);
+                    obj.put("diff",count-before);
                 }catch (JSONException e){
                     e.printStackTrace();
                 }
@@ -300,14 +303,6 @@ public class LiveCollaboration extends AppCompatActivity {
         webSocketClient.send(obj.toString());
     }
 
-
-
-    private void redoSureHelper() {
-        // Window to show whether undo or not
-
-        Toast.makeText(getApplicationContext(),"redoSureHelper",Toast.LENGTH_SHORT).show();
-    }
-
     private void firstHistoryHelper() {
         Toast.makeText(getApplicationContext(),"First history, cannot redo",Toast.LENGTH_SHORT).show();
     }
@@ -364,11 +359,11 @@ public class LiveCollaboration extends AppCompatActivity {
             Cards temp = presentation.getCards(cueCards_num);
             presentation.cueCards.set(cueCards_num,presentation.cueCards.get(cueCards_num-1));
             presentation.cueCards.set(cueCards_num-1,temp);
-            refreshPage();
+            refreshPageWithCursor();
         }
         else{
             refreshPresentation();
-            refreshPage();
+            refreshPageWithCursor();
         }
     }
 
@@ -396,10 +391,10 @@ public class LiveCollaboration extends AppCompatActivity {
             Cards temp = presentation.getCards(cueCards_num);
             presentation.cueCards.set(cueCards_num,presentation.cueCards.get(cueCards_num+1));
             presentation.cueCards.set(cueCards_num+1,temp);
-            refreshPage();
+            refreshPageWithCursor();
         }else{
             refreshPresentation();
-            refreshPage();
+            refreshPageWithCursor();
         }
 
     }
@@ -451,8 +446,12 @@ public class LiveCollaboration extends AppCompatActivity {
         cueCards_max=cueCards_max-1;
         if(cueCards_num >= cueCards_max){
             cueCards_num--;
+            refreshPage();
         }
-        refreshPage();
+        else{
+            refreshPageWithCursor();
+        }
+
     }
 
     private void deleteLastHelper () {
@@ -728,14 +727,7 @@ public class LiveCollaboration extends AppCompatActivity {
         }
 
 
-        if(tmpjson.has("refreshPresentation")){//
-            /**
-             * pack recent presentation obj to json and send to server
-             */
-            presentation = presentation;//
-            refreshPage();
-        }
-        else if (tmpjson.has("add")){
+        if (tmpjson.has("add")){
             addHelper(change_cueCards_num);
             Log.w(TAG, "add");
         }
@@ -759,19 +751,24 @@ public class LiveCollaboration extends AppCompatActivity {
             Log.w(TAG, "edit");
             int change_cardFace = 0;
             String change_recent_text = null;
-            //int change_start = 0;
+            int change_start = 0;
+            int change_end = 0;
+            int change_diff = 0;
+            String change_userID = null;
             try {
                 change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
                 change_recent_text = tmpjson.getString("recent_text");
-                //change_start = Integer.valueOf(tmpjson.getString("start"));
+                change_start = Integer.valueOf(tmpjson.getString("start"));
+                change_end = Integer.valueOf(tmpjson.getString("end"));
+                change_diff = Integer.valueOf(tmpjson.getString("diff"));
+                change_userID = tmpjson.getString("userID");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-//            int position_start = content.getSelectionStart();
-//            int position_end = content.getSelectionEnd();
-//            if(change_start>position_start){
-//                content.setSelection();
-//            }
+            int position_start = content.getSelectionStart();
+            int position_end = content.getSelectionEnd();
+            int diff = change_diff;
+
 
             Log.w(TAG, "!=");
             Cards tmp = presentation.cueCards.get(change_cueCards_num);
@@ -790,22 +787,24 @@ public class LiveCollaboration extends AppCompatActivity {
 
             //refresh editText
 
-            LiveCollaboration.this.runOnUiThread(new Runnable() {
-                public void run() {
-                    refreshPage();
-                    Log.w(TAG, "change refresh");
-                }
-            });
+            if(!change_userID.equals(userID)){
+                refreshEditPage(change_start ,change_end,position_start,position_end,diff);
+            }
+
+
+            Log.w(TAG, "change refresh");
+
+//            while(refreshPageComplete){
+//                Log.w(TAG, "wait for refreshPage complete");
+//            }
+
+
 
 
         }
         else if(tmpjson.has("undoSure")) {
             Log.w(TAG, "undoSure");
             undoSureHelper();
-        }
-        else if(tmpjson.has("redoSure")) {
-            Log.w(TAG, "redoSure");
-            redoSureHelper();
         }
         else if(tmpjson.has("firstHistory")) {
             Log.w(TAG, "firstHistory");
@@ -833,17 +832,14 @@ public class LiveCollaboration extends AppCompatActivity {
 
     }
 
-
-    private void refreshPage() {
+    private void refreshPageWithCursor() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                int position_start = content.getSelectionStart();
+                int position_end = content.getSelectionEnd();
 
                 cueCards_max = presentation.cueCards.size();
-                String _id = presentation.presentationID;
-                String title = presentation.title;
-                int backgroundColor = presentation.cueCards.get(0).backgroundColor;
-                Log.w(TAG, String.valueOf(cueCards_max) + "   id: " + _id + "   title: " + title + "   backgroundColor: " + backgroundColor);
                 sendOrNot = false;
                 if(cardFace == 0){
                     //content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
@@ -863,6 +859,132 @@ public class LiveCollaboration extends AppCompatActivity {
                 pageNumber = findViewById(R.id.pageNumber);
                 pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
                 sendOrNot = true;
+
+                content.setSelection(position_start,position_end);
+            }
+        });
+
+    }
+
+
+    private void refreshPage() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                refreshPageComplete = false;
+                cueCards_max = presentation.cueCards.size();
+                sendOrNot = false;
+                if(cardFace == 0){
+                    //content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
+                    String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
+                    Log.w(TAG, "text: " + text);
+                    int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
+                    content.setText(getColoredtext(color,text));
+                }
+                else{
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
+                    String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
+                    Log.w(TAG, "text: " + text);
+                    int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
+                    content.setText(getColoredtext(color,text));
+                }
+
+                pageNumber = findViewById(R.id.pageNumber);
+                pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
+                sendOrNot = true;
+                refreshPageComplete = true;
+            }
+        });
+
+    }
+
+    private void refreshEditPage(int change_start ,int change_end, int position_start, int position_end, int diff) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                refreshPageComplete = false;
+                cueCards_max = presentation.cueCards.size();
+                sendOrNot = false;
+                if(cardFace == 0){
+                    //content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
+                    String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
+                    Log.w(TAG, "text: " + text);
+                    int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
+                    content.setText(getColoredtext(color,text));
+                }
+                else{
+                    content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
+                    String text = presentation.cueCards.get(cueCards_num).back.getContent().getMessage();
+                    Log.w(TAG, "text: " + text);
+                    int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
+                    content.setText(getColoredtext(color,text));
+                }
+
+                pageNumber = findViewById(R.id.pageNumber);
+                pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
+                sendOrNot = true;
+                refreshPageComplete = true;
+
+                if(change_end<=position_start){
+                    Log.w(TAG, "state1");
+                    Log.w(TAG, "position_start+diff  " + position_start+diff + "   position_end+diff  " + position_end+diff);
+                    try{
+                        content.setSelection(position_start+diff);
+                    }
+                    catch (Exception e){
+
+                    }
+                }
+                else if(change_start<=position_start && change_end > position_start && change_end <= position_end){
+                    Log.w(TAG, "state2");
+                    try{
+                        content.setSelection(change_end+diff,position_end+diff);
+                    }catch (Exception e) {
+
+                    }
+                    Log.w(TAG, "change_end+diff  " + change_end+diff + "   position_end+diff  " + position_end+diff);
+                }
+                else if(change_start<=position_start && change_end > position_end){
+                    Log.w(TAG, "state3");
+                    try{
+                        content.setSelection(position_start);
+                    }catch (Exception e) {
+
+                    }
+                    Log.w(TAG, "change_start  " + position_start);
+                }
+                else if(change_start>position_start && change_start <= position_end && change_end > position_end){
+                    Log.w(TAG, "state4");
+                    try{
+                        content.setSelection(position_start,change_start);
+                    }catch (Exception e) {
+
+                    }
+
+                    Log.w(TAG, "position_start  " + position_start + "   change_start  " + change_start);
+                }
+                else if(change_start> position_end){
+                    Log.w(TAG, "state5");
+                    try{
+                        content.setSelection(position_start,position_end);
+                    }catch (Exception e) {
+
+                    }
+
+                    Log.w(TAG, "position_start  " + position_start + "   position_end  " + position_end);
+                }
+                else if(change_start> position_start && change_end <= position_end){
+                    Log.w(TAG, "state6");
+                    try{
+                        content.setSelection(position_start);
+                    }catch (Exception e) {
+
+                    }
+                    Log.w(TAG, "change_start  " + position_start);
+                }
+                else{
+                    Log.w(TAG, "select position problem");
+                }
             }
         });
 
