@@ -3,6 +3,41 @@ const mongoose = require("mongoose");
 const Presentation = require("../../models/presentations");
 const User = require("../../models/users");
 
+const objectIdGoodFood = "900df00d900df00d900df00d";
+const samplePresentationSavePresTests = {
+    _id: mongoose.Types.ObjectId( objectIdGoodFood ),
+    title: "Jest Test Presentation 1",                                                      
+    cards: [{                                                              
+        "backgroundColor": 1,                                              
+        "transitionPhrase": "-",                                           
+        "endWithPause": 1,                                                 
+        "front": {                                                         
+            "backgroundColor": 1,                                          
+            "content": {                                                   
+                "font": "Times New Roman",                                 
+                "style": "normalfont",                                     
+                "size": "12",                                              
+                "colour": 0,                                               
+                "message": "> "                                            
+            }                                                              
+        },                                                                 
+        "back": {                                                          
+            "backgroundColor": 1,                                          
+            "content": {                                                   
+                "font": "Times New Roman",                                 
+                "style": "normalfont",                                     
+                "size": "12", 
+                "colour": 0,                                               
+                "message": "> "                                            
+            }                                                              
+        }                                                                  
+    }],                                                                    
+    feedback: [],                                                          
+    users: [                                                               
+        {id: "1", permission: "owner"}                                     
+    ]                                                                      
+};
+
 beforeEach(async() => {
     try {
         await mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
@@ -323,7 +358,7 @@ describe("getPresById tests", () => {
     });
 
     test("presID refers to a presentation that DOES exist", async () => {
-        // create a new presentation for user "1"
+        // create a new presentation for user "1", with _id=="900df00d900df00d900df00d"
         var thisPresentation = "900df00d900df00d900df00d"; 
         var thisPresentationContent = {
             _id: mongoose.Types.ObjectId(thisPresentation),
@@ -341,18 +376,147 @@ describe("getPresById tests", () => {
         } catch (e) {
             err = e;
         }
+        
         expect(err).toBeNull();
         expect(presentation).toBeDefined();
         expect(presentation.title).toBeDefined();
         expect(presentation.users).toBeDefined();
         expect(presentation.users.length).toBeDefined();
         expect(presentation.users.length).toEqual(1);
+        
         expect(presentation.title).toEqual(thisPresentationContent.title);
         expect(presentation._id).toEqual(thisPresentationContent._id);
         expect(presentation.users[0].id).toEqual(thisPresentationContent.users[0].id);
         expect(presentation.users[0].permission).toEqual(thisPresentationContent.users[0].permission);
     });
 });
+
+describe("savePres tests", () => {
+    test("presentation ID is null", async () => {
+        var req = {body: {presID: null, title: "Jest Test Presentation 1", cards: [], feedback: []}};
+        var res = new Response();
+        await presManager.savePres(req, res);
+        expect(res.body).toEqual({err: "No presentation specified. "});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("presentation ID specifies a non-existent presentation", async () => {
+        var req = {body: {presID: "deadbeefdeadbeefdeadbeef", title: "Jest Test Presentation 1", cards: [], feedback:[]}};
+        var res = new Response();
+        await presManager.savePres(req, res);
+        expect(res.body).toEqual({err: "Presentation not found."});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("title is null", async () => {
+        await Presentation.create(samplePresentationSavePresTests);
+        var req = {body: {presID: samplePresentationSavePresTests._id, title: null, cards: [], feedback: []}};
+        var res = new Response();
+        await presManager.savePres(req, res);
+        expect(res.body).toEqual({err: "Title required. "});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("cards is null", async () => {
+        await Presentation.create(samplePresentationSavePresTests);
+        var req = {body: {presID: samplePresentationSavePresTests._id, title: "Jest Test Presentation 1, Updated", cards: null, feedback: []}};
+        var res = new Response();
+        await presManager.savePres(req, res);
+        expect(res.body).toEqual({err: "Cue cards array required. "});
+        expect(res.stat).toEqual(400);
+    });
+    
+    test("feedback is null", async () => {
+        await Presentation.create(samplePresentationSavePresTests);
+        var req = {body: {presID: samplePresentationSavePresTests._id, title: "Jest Test Presentation 1, Updated", cards: [], feedback: null}};
+        var res = new Response();
+        await presManager.savePres(req, res);
+        expect(res.body).toEqual({err: "Feedback array required. "});
+        expect(res.stat).toEqual(400);
+    });
+    
+    test("Valid presesntation ID, but multiple other inputs are null", async () => {
+        await Presentation.create(samplePresentationSavePresTests);
+        var req = {body: {presID: samplePresentationSavePresTests._id, title: null, cards: [], feedback: null}};
+        var res = new Response();
+        await presManager.savePres(req, res);
+        expect(res.body).toEqual({err: "Title required. Feedback array required. "});
+        expect(res.stat).toEqual(400);
+    });
+
+    test("Typical input - all required fields are given and valid", async () => {
+        await Presentation.create(samplePresentationSavePresTests);
+        var req = {body: {presID: samplePresentationSavePresTests._id, title: "Jest Test Presentation 1, Updated", cards: [], feedback: []}};
+        var res = new Response();
+        await presManager.savePres(req, res);
+
+        // confirm non-error response
+        expect(res.body).toBeDefined();
+        expect(res.body.data).toBeDefined(); // if this passes, it means savePresInternal didn't return an {err: ...} object
+        
+        // expect the presentation to be the same presentation...
+        expect(res.body.data._id).toEqual(samplePresentationSavePresTests._id);
+        
+        // ... but expect its contents to be the new contents we set...
+        expect(res.body.data.title).toEqual(req.body.title);
+        expect(res.body.data.cards).toEqual(req.body.cards);
+        expect(res.body.data.feedback).toEqual(req.body.feedback);
+
+        // ... and not the old contents.
+        expect(res.body.data.title).not.toEqual(samplePresentationSavePresTests.title);
+        expect(res.body.data.cards).not.toEqual(samplePresentationSavePresTests.cards);
+        expect(res.body.data.feedback).toEqual(samplePresentationSavePresTests.feedback); // didn't change the feedback field of this presentation though
+    });
+});
+
+describe("savePresInternal tests", () => {
+    test("Typical input", async () => {
+        await Presentation.create(samplePresentationSavePresTests);
+        var presID = samplePresentationSavePresTests._id; 
+        var title = "Jest Test Presentation 1, Updated";
+        var cards = [];
+        var feedback = [];
+        var updatedPres = await presManager.savePresInternal(presID, title, cards, feedback);
+
+        console.log(updatedPres);
+
+        // confirm non-error response
+        expect(updatedPres).toBeDefined();
+        expect(updatedPres.data).toBeDefined(); // if this passes, it means savePresInternal didn't return an {err: ...} object
+        expect(updatedPres.err).not.toBeDefined();
+        
+        // expect the presentation to be the same presentation...
+        expect(updatedPres.data._id).toEqual(samplePresentationSavePresTests._id);
+        
+        // ... but expect its contents to be the new contents we set...
+        expect(updatedPres.data.title).toEqual(title);
+        expect(updatedPres.data.cards).toEqual(cards);
+        expect(updatedPres.data.feedback).toEqual(feedback);
+
+        // ... and not the old contents.
+        expect(updatedPres.data.title).not.toEqual(samplePresentationSavePresTests.title);
+        expect(updatedPres.data.cards).not.toEqual(samplePresentationSavePresTests.cards);
+        expect(updatedPres.data.feedback).toEqual(samplePresentationSavePresTests.feedback); // didn't change the feedback field of this presentation though
+    });
+
+    test("Erroneous input - title and feedback are null", async () => {
+        await Presentation.create(samplePresentationSavePresTests);
+        var presID = samplePresentationSavePresTests._id; 
+        var title = null;
+        var cards = [];
+        var feedback = null;
+        var updatedPres = await presManager.savePresInternal(presID, title, cards, feedback);
+
+        // confirm error response
+        expect(updatedPres).toBeDefined();
+        expect(updatedPres.data).not.toBeDefined();
+        expect(updatedPres.err).toBeDefined();
+
+        // check error response
+        expect(updatedPres.err).toEqual("Title required. Feedback array required. ");
+    });
+});
+
 
 /**
  * Dummy response class

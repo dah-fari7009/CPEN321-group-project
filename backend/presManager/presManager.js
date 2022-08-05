@@ -225,7 +225,7 @@ savePres = async (req, res) => {
         inputErr += " ";
     }
     if (!req.body.feedback) {
-        inputErr += "Feedback array required";
+        inputErr += "Feedback array required.";
         inputErr += " ";
     }
     if (!req.body.presID || !req.body.title || !req.body.cards || !req.body.feedback) {
@@ -235,10 +235,15 @@ savePres = async (req, res) => {
     // save changes to presentation specified by presID
     try {
         var pres = await Presentation.findOneAndUpdate(filter, update, {new: true});
-        console.log(pres);
-        return res.status(200).json({data: pres});
+        if (pres === null) {
+            console.log("presManager: savePres: presentation " + req.body.presID + " was not found!");
+            return res.status(400).json({err: "Presentation not found."});
+        } else {
+            console.log("presManager: savePres: presentation " + req.body.presID + " after updates:\n" + pres);
+            return res.status(200).json({data: pres});
+        }
     } catch (err) {
-        console.log(err);
+        console.log("presManager: savePres: " + err);
         return res.status(400).json({err});
     }
 }
