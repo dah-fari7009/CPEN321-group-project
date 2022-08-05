@@ -69,8 +69,8 @@ public class LiveCollaboration extends AppCompatActivity {
     /**
      * standard empty card (used for add and delete)
      */
-    Content new_content_front = new Content(Color.BLACK,"");
-    Content new_content_back = new Content(Color.BLACK,"");
+    Content new_content_front = new Content(0,"");
+    Content new_content_back = new Content(0,"");
     Front new_front = new Front(Color.WHITE,new_content_front);
     Back new_back = new Back(Color.WHITE,new_content_back);
     Cards emptyCard = new Cards(new_front,new_back,Color.WHITE);
@@ -449,6 +449,9 @@ public class LiveCollaboration extends AppCompatActivity {
         }
         presentation.cueCards.remove(cueCards_max-1);
         cueCards_max=cueCards_max-1;
+        if(cueCards_num >= cueCards_max){
+            cueCards_num--;
+        }
         refreshPage();
     }
 
@@ -756,12 +759,19 @@ public class LiveCollaboration extends AppCompatActivity {
             Log.w(TAG, "edit");
             int change_cardFace = 0;
             String change_recent_text = null;
+            //int change_start = 0;
             try {
                 change_cardFace = Integer.valueOf(tmpjson.getString("cardFace"));
                 change_recent_text = tmpjson.getString("recent_text");
+                //change_start = Integer.valueOf(tmpjson.getString("start"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+//            int position_start = content.getSelectionStart();
+//            int position_end = content.getSelectionEnd();
+//            if(change_start>position_start){
+//                content.setSelection();
+//            }
 
             Log.w(TAG, "!=");
             Cards tmp = presentation.cueCards.get(change_cueCards_num);
@@ -828,6 +838,7 @@ public class LiveCollaboration extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
                 cueCards_max = presentation.cueCards.size();
                 String _id = presentation.presentationID;
                 String title = presentation.title;
@@ -872,7 +883,20 @@ public class LiveCollaboration extends AppCompatActivity {
 
     private Spannable getColoredtext(int color, String text){
         Spannable colored_text = new SpannableString(text);
-        colored_text.setSpan(new ForegroundColorSpan(color),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        int[] colorPalette = {
+                Color.BLACK,
+                Color.WHITE,
+                Color.RED,
+                Color.GREEN,
+                Color.BLUE,
+                Color.GRAY,
+                Color.YELLOW,
+                Color.CYAN,
+                Color.MAGENTA
+        };
+
+        colored_text.setSpan(new ForegroundColorSpan(colorPalette[color]),0,text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return colored_text;
     }
 
