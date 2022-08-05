@@ -299,6 +299,61 @@ describe("getAllPresOfUser tests", () => {
     });
 });
 
+describe("getPresById tests", () => {
+    test("presID is null", async () => {
+        var err = null;
+        try {
+            await presManager.getPresById(null);
+        } catch (e) {
+            err = e;
+        }
+        expect(err).toBeDefined();
+        expect(err).toEqual("No presentation specified");
+    });
+
+    test("presID refers to a presentation that does not exist", async () => {
+        var err = null;
+        try {
+            await presManager.getPresById("deadbeefdeadbeefdeadbeef");
+        } catch (e) {
+            err = e;
+        }
+        expect(err).toBeDefined();
+        expect(err).toEqual("Presentation not found");
+    });
+
+    test("presID refers to a presentation that DOES exist", async () => {
+        // create a new presentation for user "1"
+        var thisPresentation = "900df00d900df00d900df00d"; 
+        var thisPresentationContent = {
+            _id: mongoose.Types.ObjectId(thisPresentation),
+            title: "Jest test presentation 1",
+            cards: [],
+            feedback: [],
+            users: [{id: "1", permission: "owner"}]
+        };
+        await Presentation.create(thisPresentationContent);
+        
+        var err = null;
+        var presentation = null;
+        try {
+            presentation = await presManager.getPresById(thisPresentation);
+        } catch (e) {
+            err = e;
+        }
+        expect(err).toBeNull();
+        expect(presentation).toBeDefined();
+        expect(presentation.title).toBeDefined();
+        expect(presentation.users).toBeDefined();
+        expect(presentation.users.length).toBeDefined();
+        expect(presentation.users.length).toEqual(1);
+        expect(presentation.title).toEqual(thisPresentationContent.title);
+        expect(presentation._id).toEqual(thisPresentationContent._id);
+        expect(presentation.users[0].id).toEqual(thisPresentationContent.users[0].id);
+        expect(presentation.users[0].permission).toEqual(thisPresentationContent.users[0].permission);
+    });
+});
+
 /**
  * Dummy response class
  */

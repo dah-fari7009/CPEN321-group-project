@@ -78,8 +78,15 @@ createPres = async (req, res) => {
 // it by presentation ID
 getPresById = (presID) => {
     return new Promise((resolve, reject) => {
+        if (!presID) {
+            reject("No presentation specified");
+        }
         Presentation.findById(presID).then((pres) => {
-            resolve(pres);
+            if (pres) {
+                resolve(pres);
+            } else {
+                reject("Presentation not found");
+            }
         }, (err) => {
             reject(err);
         });
