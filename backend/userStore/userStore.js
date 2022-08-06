@@ -1,38 +1,29 @@
 const User = require('../models/users');
 const presManager = require('../presManager/presManager');
 const verifier = require("./verify");
-const { google } = require('googleapis');
-require('dotenv').config();
-const CLIENT_ID = process.env.CLIENT_ID
-const CLIENT_SECRET = process.env.CLIENT_SECRET
+const getToken = require("./token");
 
-const oauth2Client = new google.auth.OAuth2(
-    CLIENT_ID,
-    CLIENT_SECRET,
-    "https://developers.google.com/oauthplayground"
-  );
-
-// expects token, userID, verifiedDevice and username
+// expects token, userID, verifiedDevice, username and authCode
 login = async (req, res) => {
     let refresh;
     try {
-        let { tokens } = await oauth2Client.getToken(req.body.authCode)
-        refresh = tokens.refresh_token;
+        refresh = await getToken(req.body.authCode);
+        console.log(req.body.authCode)
+        console.log(refresh);
     } catch (e) {
-        console.log("dobo: "+ e.message)
+        console.log(e.message)
     }
-
 
     if (req.body.verifiedDevice === "false") {
         try {
             if (await verifier.verify(req.body.token)) {
                 return retreiveUserInfo(req, res, refresh);
             } else {
-                return res.status(500).json({ error: new Error("login failed") });
+                return res.status(400).json({ error: new Error("login failed") });
             }
         } catch (error) {
             console.log(error)
-            return res.status(500).json({ error: new Error("login failed") });
+            return res.status(400).json({ error: new Error("login failed") });
         }
     } else {
         return retreiveUserInfo(req, res, refresh);
@@ -56,8 +47,8 @@ retreiveUserInfo = async (req, res, refresh) => {
             return res.status(200).json({userID: data.userID, username: data.username});
         }
     } catch (err) {
-        console.log("dauwuihawuihdaiuhawdiuhuiadhwuhiadwiuhdawiuhdawuihdawuihdaw errir" + err);
-        return res.status(500).json({ error: err });
+        console.log("errir " + err);
+        return res.status(400).json({ error: err });
     }
 }
 
@@ -141,10 +132,10 @@ getUserIdOf = (username) => {
         User.findOne({ username }).then((user) => {
             if (user) {
                 resolve(user.userID);
-	    } else {
+	        } else {
                 reject("No user exists with username " + username);
-	    }
-	});
+	        }
+	    });
     });
 }
 
