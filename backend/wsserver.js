@@ -15,16 +15,13 @@ const server = express().listen(80);
 
 const wss = new WebSocketServer({server});
 var mongooseConnect = async function () {
-    try {
-        await mongoose.connect("mongodb://localhost:27017/CPEN321", { useNewUrlParser: true });
-        console.log("wsserver connected to db");
-    } catch (err) {
-        console.log("wsserver: " + err);
-    }
+
+    await mongoose.connect("mongodb://localhost:27017/CPEN321", { useNewUrlParser: true });
+
 }
 mongooseConnect();
 
-class history {
+class History {
     constructor(before_text, recent_text, userID, start, end, undoEnd, diff) {
         this.before_text = before_text;
         this.recent_text = recent_text;
@@ -115,7 +112,7 @@ wss.on("connection",(ws) => {
                 presentationMap.get(PID).cards[cueCards_num].front.content.message = recent_text;
                 presentationFrontHistoryPositionMap.get(PID)[cueCards_num] = presentationFrontHistoryPositionMap.get(PID)[cueCards_num]+1;
                 var position = presentationFrontHistoryPositionMap.get(PID)[cueCards_num];
-                presentationFrontHistoryMap.get(PID)[cueCards_num].splice(position,0,new history(before_text, recent_text, userID, start, end, undoEnd, diff));
+                presentationFrontHistoryMap.get(PID)[cueCards_num].splice(position,0,new History(before_text, recent_text, userID, start, end, undoEnd, diff));
                 if(!((position + 1) >= presentationFrontHistoryMap.get(PID)[cueCards_num].length)){
                     presentationFrontHistoryMap.get(PID)[cueCards_num].splice(position+1);
                 }
@@ -124,7 +121,7 @@ wss.on("connection",(ws) => {
                 presentationMap.get(PID).cards[cueCards_num].back.content.message = recent_text;
                 presentationBackHistoryPositionMap.get(PID)[cueCards_num] = presentationBackHistoryPositionMap.get(PID)[cueCards_num]+1;
                 var position = presentationBackHistoryPositionMap.get(PID)[cueCards_num];
-                presentationBackHistoryMap.get(PID)[cueCards_num].splice(position,0,new history(before_text, recent_text, userID, start, end, undoEnd, diff));
+                presentationBackHistoryMap.get(PID)[cueCards_num].splice(position,0,new History(before_text, recent_text, userID, start, end, undoEnd, diff));
                 if(!((position + 1) >= presentationBackHistoryMap.get(PID)[cueCards_num].length)){
                     presentationBackHistoryMap.get(PID)[cueCards_num].splice(position+1);
                 }
@@ -184,10 +181,10 @@ wss.on("connection",(ws) => {
                     var presentationBackHistoryPosition = [];
                     for (i = 0; i < count; i++){
                         var presentationFrontCueCardHistory = [];
-                        presentationFrontCueCardHistory.push(new history(a.cards[i].front.content.message,a.cards[i].front.content.message,"Initialize",0,0,0,0));
+                        presentationFrontCueCardHistory.push(new History(a.cards[i].front.content.message,a.cards[i].front.content.message,"Initialize",0,0,0,0));
                         presentationFrontHistory.push(presentationFrontCueCardHistory);
                         var presentationBackCueCardHistory = [];
-                        presentationBackCueCardHistory.push(new history(a.cards[i].front.content.message,a.cards[i].front.content.message,"Initialize",0,0,0,0));
+                        presentationBackCueCardHistory.push(new History(a.cards[i].front.content.message,a.cards[i].front.content.message,"Initialize",0,0,0,0));
                         presentationBackHistory.push(presentationBackCueCardHistory);
                         presentationFrontHistoryPosition.push(0);
                         presentationBackHistoryPosition.push(0);
@@ -248,10 +245,10 @@ wss.on("connection",(ws) => {
               };
             presentationMap.get(PID).cards.splice(cueCards_num,0,newCard);
             var presentationFrontCueCardHistory = [];
-            presentationFrontCueCardHistory.push(new history('','',"Initialize",0,0,0,0));
+            presentationFrontCueCardHistory.push(new History('','',"Initialize",0,0,0,0));
             presentationFrontHistoryMap.get(PID).splice(cueCards_num,0,presentationFrontCueCardHistory);
             var presentationBackCueCardHistory = [];
-            presentationBackCueCardHistory.push(new history('','',"Initialize",0,0,0,0));
+            presentationBackCueCardHistory.push(new History('','',"Initialize",0,0,0,0));
             presentationBackHistoryMap.get(PID).splice(cueCards_num,0,presentationBackCueCardHistory);
             presentationFrontHistoryPositionMap.get(PID).splice(cueCards_num,0,0);
             presentationBackHistoryPositionMap.get(PID).splice(cueCards_num,0,0);
@@ -318,7 +315,7 @@ wss.on("connection",(ws) => {
             };
             presentationMap.get(PID).cards.splice(0,1,newCard);
             var presentationCueCardHistory = [];
-            presentationCueCardHistory.push(new history('','',"Initialize",0,0,0,0));
+            presentationCueCardHistory.push(new History('','',"Initialize",0,0,0,0));
             presentationFrontHistoryMap.get(PID).splice(0,1,presentationCueCardHistory);
             presentationBackHistoryMap.get(PID).splice(0,1,presentationCueCardHistory);
             presentationFrontHistoryPositionMap.get(PID).splice(0,1,0);
