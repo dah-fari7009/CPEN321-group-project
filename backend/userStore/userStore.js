@@ -132,11 +132,7 @@ getUserIdOf = (username) => {
             if (user) {
                 resolve(user.userID);
 	        } else {
-<<<<<<< HEAD
                 reject("No user exists with username " + username);
-=======
-                    reject("No user exists with username " + username);
->>>>>>> e31017c42e3b3c9aecffd66da8d3e7cde426edd5
 	        }
 	    });
     });
