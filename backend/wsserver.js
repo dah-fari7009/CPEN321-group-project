@@ -134,7 +134,7 @@ wss.on("connection",(ws) => {
             if(cardFace === 0){//front
                 presentationMap.get(PID).cards[cueCards_num].front.content.message = recent_text;
                 presentationFrontHistoryPositionMap.get(PID)[cueCards_num] = presentationFrontHistoryPositionMap.get(PID)[cueCards_num]+1;
-                var position = presentationFrontHistoryPositionMap.get(PID)[cueCards_num];
+                position = presentationFrontHistoryPositionMap.get(PID)[cueCards_num];
                 presentationFrontHistoryMap.get(PID)[cueCards_num].splice(position,0,new History(before_text, recent_text, userID, start, end, undoEnd, diff));
                 if(!((position + 1) >= presentationFrontHistoryMap.get(PID)[cueCards_num].length)){
                     presentationFrontHistoryMap.get(PID)[cueCards_num].splice(position+1);
@@ -143,7 +143,7 @@ wss.on("connection",(ws) => {
             else if (cardFace === 1) {// back
                 presentationMap.get(PID).cards[cueCards_num].back.content.message = recent_text;
                 presentationBackHistoryPositionMap.get(PID)[cueCards_num] = presentationBackHistoryPositionMap.get(PID)[cueCards_num]+1;
-                var position = presentationBackHistoryPositionMap.get(PID)[cueCards_num];
+                position = presentationBackHistoryPositionMap.get(PID)[cueCards_num];
                 presentationBackHistoryMap.get(PID)[cueCards_num].splice(position,0,new History(before_text, recent_text, userID, start, end, undoEnd, diff));
                 if(!((position + 1) >= presentationBackHistoryMap.get(PID)[cueCards_num].length)){
                     presentationBackHistoryMap.get(PID)[cueCards_num].splice(position+1);
