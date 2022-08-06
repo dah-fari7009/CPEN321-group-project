@@ -34,7 +34,9 @@ login = async (req, res) => {
 // expects userID and username
 retreiveUserInfo = async (req, res, refresh) => {
     try {
+        console.log("uihadwihudawihuawdiuhawdihuwad" + req.body.userID)
         var data = await User.findOne({userID: req.body.userID});
+        console.log("uihadwihudawihuawdiuhawdihuwad" + data)
         if (!data) {
             let newUser = await User.create({
                 userID: req.body.userID,

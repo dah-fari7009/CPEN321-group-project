@@ -9,7 +9,7 @@ require('dotenv').config();
 jest.mock("../verify")
 jest.mock("../token")
 
-const USERID = "1";
+const USERID = "3";
 const USERNAME = "jest user";
 const REFRESHTOKEN = process.env.REFRESH;//"1//04rGvIMYruGDkCgYIARAAGAQSNwF-L9IrY8Sy5e7cQfBLVkbgQgKBZugZJtMeTfBbmGJbItIbSVQi7DveNwF7BGPVbgA5bDpIXz4";
 const PRESENTATIONS = ["62c38d740afce8d7ea604043"];
@@ -41,17 +41,17 @@ afterEach(async () => {
  */
 describe("addPresToUser tests", () => {
     test("Add a valid presentation", async () => {
-        await expect(userStore.addPresToUser("1", "62c38d740afce8d7ea604044")).resolves.not.toThrow();
+        await expect(userStore.addPresToUser(USERID, "62c38d740afce8d7ea604044")).resolves.not.toThrow();
     })
     
     test("Add a presentation a user already has", async () => {
         let presID = "62c38d740afce8d7ea604043";
-        await expect(userStore.addPresToUser("1", presID))
+        await expect(userStore.addPresToUser(USERID, presID))
         .rejects.toEqual("userStore: addPresToUser: Presentation " + presID + " already included in user.")
     })
     
     test("Add an invalid presentation ID", async () => {
-        let userID = "1";
+        let userID = USERID;
         let presID = "4";
         let errorMsg = "CastError: Cast to ObjectId failed for value \"" + presID + "\" (type string) at path \"presentations\" because of \"BSONTypeError\"";
         await expect(userStore.addPresToUser(userID, presID)).rejects.toEqual(errorMsg);
@@ -69,7 +69,7 @@ describe("addPresToUser tests", () => {
  */
 describe("removePresFromUser tests", () => {
     test("remove a presentation", async () => {
-        let documentsModified = await userStore.removePresFromUser("1", "62c38d740afce8d7ea604043");
+        let documentsModified = await userStore.removePresFromUser(USERID, "62c38d740afce8d7ea604043");
         expect(documentsModified.modifiedCount).toEqual(1);
         expect(documentsModified.matchedCount).toEqual(1);
 
@@ -82,7 +82,7 @@ describe("removePresFromUser tests", () => {
     })
 
     test("remove a presentation with invalid presID", async () => {
-        let documentsModified = await userStore.removePresFromUser("1", "62c38d740afce8d7ea60404c");
+        let documentsModified = await userStore.removePresFromUser(USERID, "62c38d740afce8d7ea60404c");
         expect(documentsModified.modifiedCount).toEqual(0);
         expect(documentsModified.matchedCount).toEqual(1);
     })
@@ -95,9 +95,9 @@ describe("login tests", () => {
     test("valid login with returning user and new device", async () => {
         let req = {
             token: "good token",
-            userID: "1",
+            userID: USERID,
             verifiedDevice: "false",
-            username: "jest user",
+            username: USERNAME,
             authCode: "good auth"
         };
         const res = await request.put('/api/login').send(req);
@@ -108,22 +108,22 @@ describe("login tests", () => {
     test("valid login with new user and new device", async () => {
         let req = {
             token: "good token",
-            userID: "new user",
+            userID: "new user 3",
             verifiedDevice: "false",
-            username: "jest user",
+            username: USERNAME,
             authCode: "good auth"
         };
         const res = await request.put('/api/login').send(req);
         expect(res.status).toEqual(200);
-        expect(res.body).toEqual({ userID: req.userID, username: req.username, presentations: [] });
+        expect(res.body).toEqual({ userID: req.userID, username: req.username, presentations: []});
     })
 
     test("valid login with returning user and verified device", async () => {
         let req = {
             token: "good token",
-            userID: "1",
+            userID: USERID,
             verifiedDevice: "true",
-            username: "jest user",
+            username: USERNAME,
             authCode: "good auth"            
         };
         const res = await request.put('/api/login').send(req);
@@ -136,7 +136,7 @@ describe("login tests", () => {
             token: "good token",
             userID: "new user 2",
             verifiedDevice: "true",
-            username: "jest user",
+            username: USERNAME,
             authCode: "good auth"  
         };
         const res = await request.put('/api/login').send(req);
@@ -147,9 +147,9 @@ describe("login tests", () => {
     test("invalid token", async () => {
         let req = {
             token: "bad token",
-            userID: "1",
+            userID: USERID,
             verifiedDevice: "false",
-            username: "jest user",
+            username: USERNAME,
             authCode: "good auth" 
         };
         const res = await request.put('/api/login').send(req);
@@ -161,7 +161,7 @@ describe("login tests", () => {
             token: "good token",
             userID: 312987.34,
             verifiedDevice: "false",
-            username: "jest user",
+            username: USERNAME,
             authCode: "good auth" 
         }};
         const res = await request.put('/api/login').send(req);
@@ -185,7 +185,7 @@ describe("login tests", () => {
             token: "good token",
             userID: "inval username",
             verifiedDevice: "false",
-            username: "jest user",
+            username: USERNAME,
             authCode: "bad auth" 
         }};
         const res = await request.put('/api/login').send(req);
@@ -203,11 +203,11 @@ describe("login tests", () => {
     })
 
     test("check for invalid user", async () => {
-        await expect(userStore.userExistsWithID("fakeuser")).rejects.toEqual(false);
+        await expect(userStore.userExistsWithID("fakeuser")).rejects.toEqual("User fakeuser does not exist");
     })
 
     test("check for null user", async () => {
-        await expect(userStore.userExistsWithID(null)).rejects.toEqual(false);
+        await expect(userStore.userExistsWithID(null)).rejects.toEqual("User " + null + " does not exist");
     })
 })
 
