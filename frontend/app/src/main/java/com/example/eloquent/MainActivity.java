@@ -67,6 +67,12 @@ public class MainActivity extends AppCompatActivity implements Adapter.OnPresLis
         getAllPresentationsOfUser(User.getInstance().getData().getUserID(), presentations);
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+    }
+
     private void showPresentations() {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setAdapter(adapter);

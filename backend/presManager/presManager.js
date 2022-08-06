@@ -78,8 +78,15 @@ createPres = async (req, res) => {
 // it by presentation ID
 getPresById = (presID) => {
     return new Promise((resolve, reject) => {
+        if (!presID) {
+            reject("No presentation specified");
+        }
         Presentation.findById(presID).then((pres) => {
-            resolve(pres);
+            if (pres) {
+                resolve(pres);
+            } else {
+                reject("Presentation not found");
+            }
         }, (err) => {
             reject(err);
         });
@@ -194,21 +201,74 @@ deletePres = async (req, res) => {
     }
 }
 
-
-savePres = (req, res) => {
+savePres = async (req, res) => {
     console.log("presManager: savePres: received request to update presentation " + req.body.presID);
     const filter = {"_id": req.body.presID};
     const update = {
         "title": req.body.title,
         "cards": req.body.cards,
-        "feedback": req.body.feedback,
+        "feedback": req.body.feedback
     }
-    Presentation.findOneAndUpdate(filter, update, {new: true})
-        .then((pres) => {
+
+    // input checks
+    var inputErr = "";
+    if (!req.body.presID) {
+        inputErr += "No presentation specified.";
+        inputErr += " ";
+    }
+    if (!req.body.title) {
+        inputErr += "Title required.";
+        inputErr += " ";
+    }
+    if (!req.body.cards) {
+        inputErr += "Cue cards array required.";
+        inputErr += " ";
+    }
+    if (!req.body.feedback) {
+        inputErr += "Feedback array required.";
+        inputErr += " ";
+    }
+    if (!req.body.presID || !req.body.title || !req.body.cards || !req.body.feedback) {
+        return res.status(400).json({ err: inputErr });
+    }
+
+    // save changes to presentation specified by presID
+    try {
+        var pres = await Presentation.findOneAndUpdate(filter, update, {new: true});
+        if (pres === null) {
+            console.log("presManager: savePres: presentation " + req.body.presID + " was not found!");
+            return res.status(400).json({err: "Presentation not found."});
+        } else {
+            console.log("presManager: savePres: presentation " + req.body.presID + " after updates:\n" + pres);
             return res.status(200).json({data: pres});
-        }).catch((err) => {
-            return res.status(500).json({err});
-        })
+        }
+    } catch (err) {
+        console.log("presManager: savePres: " + err);
+        return res.status(400).json({err});
+    }
+}
+
+// Internal - to be called from wsserver.js. Wraps around savePres, and 
+// returns the body of savePres's response.
+savePresInternal = async (presID, title, cards, feedback) => {
+    function Response() {
+        this.stat = 100;
+        this.body = null;
+    }
+    Response.prototype.json = function(obj){
+        this.body = obj;
+    }
+    Response.prototype.send = function(obj) {
+        this.body = obj;
+    }
+    Response.prototype.status = function(responseStatus) {
+        this.stat = responseStatus;
+        return this;
+    }  
+    var req = {body: {presID, title, cards, feedback}};
+    var res = new Response();
+    await savePres(req, res);
+    return res.body;
 }
 
 // expects userID in query
@@ -225,7 +285,7 @@ getAllPresOfUser = async (req, res) => {
         return res.status(400).json({ err });
     }
 
-    // find all presentations of user with userI===req.query.userID
+    // find all presentations of user with userID===req.query.userID
     try {
         var presentationArray = await Presentation.find({"users.id": req.query.userID});
         return res.status(200).json( presentationArray );
@@ -296,6 +356,7 @@ module.exports = {
     getPresById,
     //editPres,
     deletePres,
+    savePresInternal,
     savePres,
     getAllPresOfUser,
     share,
