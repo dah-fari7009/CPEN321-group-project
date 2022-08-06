@@ -66,7 +66,7 @@ Presentation.prototype.addUser = function(userID, role) {
  * throws an error.
  *
  * Number userID: 
- *      ID of user who owns the presentation to be parsed
+ *      ID of user who owns the presentation to be parsed.
  * String text: 
  *      Text representation of presentation (e.g. contents of 
  *      sampleInputText.txt).
