@@ -120,7 +120,7 @@ public class Preparation extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if (cardFace == 1) {
-                    String cardDetails[] = content.getText().toString().split(">");
+                    String cardDetails[] = content.getText().toString().split("\n");
                     presentation.cueCards.get(cueCards_num).transitionPhrase = cardDetails[cardDetails.length - 1];
                 }
             }
