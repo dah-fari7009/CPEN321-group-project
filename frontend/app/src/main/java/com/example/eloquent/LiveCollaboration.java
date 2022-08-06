@@ -426,7 +426,7 @@ public class LiveCollaboration extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(LiveCollaboration.this);
         builder.setTitle("Attention");
-        builder.setMessage("Are you sure you want to delete this page?");
+        builder.setMessage("Are you sure you want to delete this card?");
         builder.setPositiveButton("Yes",
                 new DialogInterface.OnClickListener()
                 {
