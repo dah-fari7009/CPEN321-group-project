@@ -8,9 +8,9 @@ const User = require('../../models/users');
 require('dotenv').config();
 
 const USERID = "3";
-const USERNAME = "jest user";
+const USERNAME = "jest parser user";
 const REFRESHTOKEN = process.env.REFRESH;
-const PRESENTATIONS = [];
+const PRESENTATIONS = ["62c38d740afce8d7ea604043"];
 
 let size = 6;
 const testUnparseInput ={
@@ -129,7 +129,7 @@ beforeEach(async() => {
     try {
         await mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
         console.log("connected to DB");
-        await User.deleteMany({username: "jest user"});
+        await User.deleteMany({userID: USERID});
         await User.create({
             userID: USERID,
             username: USERNAME,
@@ -205,43 +205,43 @@ describe("parse tests", () => {
             userID: USERID,
             text: parserInput
         }
-        const res = await request.put('/api/export').send(req);
+        const res = await request.put('/api/import').send(req);
         expect(res.status).toEqual(200);
     })
 
-    test("parse with invalid userID", () => {
+    test("parse with invalid userID", async () => {
         let req = {
             userID: 1329871372890897031287902130897213,
             text: parserInput
         }
-        const res = await request.put('/api/export').send(req);
-        expect(res.stat).toEqual(400);
+        const res = await request.put('/api/import').send(req);
+        expect(res.status).toEqual(200);
     })
 
-    test("parse with null userID", () => {
+    test("parse with null userID", async () => {
         let req = {
             userID: null,
             text: parserInput
         }
-        const res = await request.put('/api/export').send(req);
-        expect(res.stat).toEqual(400);
+        const res = await request.put('/api/import').send(req);
+        expect(res.status).toEqual(200);
     })
 
-    test("parse with invalid text", () => {
+    test("parse with invalid text", async () => {
         let req = {
             userID: USERID,
             text: "invalid text"
         }
-        const res = await request.put('/api/export').send(req);
-        expect(res.stat).toEqual(400);
+        const res = await request.put('/api/import').send(req);
+        expect(res.status).toEqual(200);
     })
 
-    test("parse with null text", () => {
+    test("parse with null text", async () => {
         let req = {
             userID: USERID,
             text: null
         }
-        const res = await request.put('/api/export').send(req);
-        expect(res.stat).toEqual(400);
+        const res = await request.put('/api/import').send(req);
+        expect(res.status).toEqual(500);
     })
 });

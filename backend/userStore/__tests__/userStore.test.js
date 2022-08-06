@@ -9,7 +9,7 @@ require('dotenv').config();
 jest.mock("../verify")
 jest.mock("../token")
 
-const USERID = "3";
+const USERID = "4";
 const USERNAME = "jest user";
 const REFRESHTOKEN = process.env.REFRESH;//"1//04rGvIMYruGDkCgYIARAAGAQSNwF-L9IrY8Sy5e7cQfBLVkbgQgKBZugZJtMeTfBbmGJbItIbSVQi7DveNwF7BGPVbgA5bDpIXz4";
 const PRESENTATIONS = ["62c38d740afce8d7ea604043"];
@@ -18,7 +18,9 @@ beforeEach(async() => {
     try {
         await mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
         console.log("connected to DB");
-        await User.deleteMany({username: "jest user"});
+        await User.deleteMany({userID: USERID});
+        await User.deleteMany({userID: "new user 2"});
+        await User.deleteMany({userID: "new user 3"});
         await User.create({
             userID: USERID,
             username: USERNAME,
