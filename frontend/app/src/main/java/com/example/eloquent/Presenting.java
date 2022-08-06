@@ -148,39 +148,6 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
         linearLayout.addView(createTextView(pres, cardIndex, isOnFront));
     }
 
-//    private void checkPermission() {
-//        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},RecordAudioRequestCode);
-//    }
-//    private void checkPermission() {
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        } else {
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
-//                Toast.makeText(this, "We need these location permissions to run!", Toast.LENGTH_LONG).show();
-//                new AlertDialog.Builder(this)
-//                        .setTitle("Need Recording Permissions")
-//                        .setMessage("We need your audio recording permissions to mark automatically switch cue cards")
-//                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                Toast.makeText(Presenting.this, "We need these location permissions to run!", Toast.LENGTH_LONG).show();
-//                                dialog.dismiss();
-//                            }
-//                        })
-//                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                ActivityCompat.requestPermissions(Presenting.this, new String[] {Manifest.permission.RECORD_AUDIO}, RecordAudioRequestCode);
-//                            }
-//                        })
-//                        .create()
-//                        .show();
-//            } else {
-//                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.RECORD_AUDIO}, RecordAudioRequestCode);
-//            }
-//        }
-//    }
-
     private void createRecognizerIntent() {
         speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
