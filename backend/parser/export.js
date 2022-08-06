@@ -4,7 +4,6 @@ var qs = require('qs');
 const { google } = require('googleapis');
 require('dotenv').config();
 
-//let refresh = "1//06oBf3IVYreBbCgYIARAAGAYSNwF-L9Ir5LT3aKOeRrACMcJljmCwGMS7fgbxHCJMBq836e5wG-X7k_26VwskeT507SRR4DjoqRw";
 const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 
@@ -18,7 +17,9 @@ unParsePresentation = async (req, res) => {
         presStr += unParseCard(pres.cards, indents + 1);
         presStr += indent(indents) + "\\end{presentation}";
 
+        console.log(req.body.userID)
         let user = await User.findOne({"userID": req.body.userID});
+        console.log(user);
         var data = qs.stringify({
             'client_secret': CLIENT_SECRET,
             'grant_type': 'refresh_token',
