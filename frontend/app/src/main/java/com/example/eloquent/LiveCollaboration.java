@@ -1,5 +1,6 @@
 package com.example.eloquent;
 
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -38,6 +39,7 @@ import tech.gusavila92.websocketclient.WebSocketClient;
 
 
 
+
 public class LiveCollaboration extends AppCompatActivity {
 
 
@@ -57,7 +59,6 @@ public class LiveCollaboration extends AppCompatActivity {
     private WebSocketClient webSocketClient;
     private static String TAG = "LiveCollaboration";
     private boolean getPresentationSuccess = false;
-//    private boolean refreshPageComplete = false;
 
     public int undoRedoSure = 0;//0: not sure;1: sure
 
@@ -69,9 +70,6 @@ public class LiveCollaboration extends AppCompatActivity {
     private final Front new_front = new Front(1,new_content_front);
     private final Back new_back = new Back(1,new_content_back);
     private final Cards emptyCard = new Cards(new_front,new_back,Color.WHITE);
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,18 +87,6 @@ public class LiveCollaboration extends AppCompatActivity {
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
         presentationID = presentation.presentationID;
         /**
-         * get json from backend server by request
-         */
-
-//        presentation = (Presentation) getIntent().getSerializableExtra("specificArgument");
-//
-//
-//        userID = (String) getIntent().getSerializableExtra("userID");
-
-
-
-
-        /**
          * start the websocket connection with the server
          */
         LiveCollaboration.this.runOnUiThread(new Runnable() {
@@ -112,36 +98,9 @@ public class LiveCollaboration extends AppCompatActivity {
         content = findViewById(R.id.cueCard);
         pageNumber = findViewById(R.id.pageNumber);
 
-
-
-
-//        try {
-//            wait(300);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
-//        try{
-//            cueCards_max = presentation.cueCards.size();
-//        }
-//        catch (Exception e){
-//            Content new_content_front = new Content(Color.BLACK,"");
-//            Content new_content_back = new Content(Color.BLACK,"");
-//            Front new_front = new Front(Color.WHITE,new_content_front);
-//            Back new_back = new Back(Color.WHITE,new_content_back);
-//            Cards emptyCard = new Cards(new_front,new_back,Color.WHITE);
-//            presentation = new Presentation();
-//            presentation.cueCards.add(emptyCard);
-//            addButtonHelper;
-//        }
-
-
-
-
         View back = findViewById(R.id.cueCard_background);
 
         while(!getPresentationSuccess){
-            //Log.w(TAG, "Wait for presentation");
         }
 
         back.setBackgroundColor(65280);
@@ -333,7 +292,6 @@ public class LiveCollaboration extends AppCompatActivity {
 
     private void undoSureHelper() {
         // Window to show whether undo or not
-        Toast.makeText(getApplicationContext(),"undoSureHelper",Toast.LENGTH_SHORT).show();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(LiveCollaboration.this);
         builder.setTitle("Attention");
@@ -388,6 +346,7 @@ public class LiveCollaboration extends AppCompatActivity {
                     }
                 });
         builder.create().show();
+
     }
 
     private void lastHistoryHelper() {
@@ -570,12 +529,8 @@ public class LiveCollaboration extends AppCompatActivity {
         Cards tmp_emptyCard = new Cards(tmp_new_front,tmp_new_back,1);
         presentation.cueCards.set(cueCards_num, tmp_emptyCard);
         String aa = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
-        Log.w(TAG, "addtext: " + aa);
         String bb = tmp_emptyCard.front.getContent().getMessage();
-        Log.w(TAG, "empty Card text: " + bb);
         String cc = tmp_new_front.getContent().getMessage();
-        Log.w(TAG, "empty Front text: " + cc);
-
         cardFace = 0;
 
     }
@@ -628,14 +583,10 @@ public class LiveCollaboration extends AppCompatActivity {
 
         sendOrNot = false;
         if(cardFace==0) { //front
-
-//                    Log.w(TAG, "save success");
             cardFace = 1;
             refreshPage();
         }
         else{ // back
-
-//                    Log.w(TAG, "save success");
             cardFace = 0;
             refreshPage();
         }
@@ -724,7 +675,6 @@ public class LiveCollaboration extends AppCompatActivity {
         try {
             tmpjson = new JSONObject(s);
         } catch (JSONException e) {
-            Log.w(TAG, "Not Json");
             e.printStackTrace();
         }
         if(tmpjson.has("title")){// this is a presentation json
@@ -734,9 +684,9 @@ public class LiveCollaboration extends AppCompatActivity {
             //change json to presentation obj
             ObjectMapper objectMapper = new ObjectMapper();
             try {
-                Log.w(TAG, "presentation object transformation success1");
+                //Log.w(TAG, "presentation object transformation success1");
                 tmp_pres = objectMapper.readValue(s, Presentation.class);
-                Log.w(TAG, "presentation object transformation success2");
+                //Log.w(TAG, "presentation object transformation success2");
 
             } catch (JsonProcessingException e) {
                 Log.w(TAG, "presentation object transformation fail");
@@ -750,13 +700,12 @@ public class LiveCollaboration extends AppCompatActivity {
 
             presentation = tmp_pres;
 
+            Log.w(TAG, "refreshPage willing to start");
 
-            LiveCollaboration.this.runOnUiThread(new Runnable() {
-                public void run() {
-                    refreshPage();
-                    Log.w(TAG, "newPresentation refresh");
-                }
-            });
+            Log.w(TAG, "refreshPage start in 1 second");
+            refreshPage();
+            Log.w(TAG, "newPresentation refresh");
+
             getPresentationSuccess = true;
             return;
         }
@@ -776,10 +725,11 @@ public class LiveCollaboration extends AppCompatActivity {
          * Check presentation ID same
          */
         String change_presentationID = null;
-
+        int change_cueCards_num = 0;
         if(tmpjson.has("presentationID")){
             try {
                 change_presentationID = tmpjson.getString("presentationID");
+                change_cueCards_num = Integer.valueOf(tmpjson.getString("cueCards_num"));
             }
             catch (JSONException e) {
                 Log.w(TAG, "No PID");
@@ -790,18 +740,52 @@ public class LiveCollaboration extends AppCompatActivity {
             if(!change_presentationID.equals(presentationID)){
                 return;
             }
-
-        }
-        int change_cueCards_num = 0;
-        try {
-            change_cueCards_num = Integer.valueOf(tmpjson.getString("cueCards_num"));
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
         tmpjsonHelper(tmpjson, change_cueCards_num);
 
-        if(tmpjson.has("edit")) {
+    }
+
+    private void tmpjsonHelper(JSONObject tmpjson, int change_cueCards_num) {
+        if (tmpjson.has("add")){
+
+
+            Log.w(TAG, "add");
+            jsonAddHelper(change_cueCards_num);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"A new card is added ",Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+        else if (tmpjson.has("delete")){
+
+            Log.w(TAG, "delete");
+            jsonDeleteHelper(change_cueCards_num);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"A card has been deleted.",Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+        else if (tmpjson.has("deleteLast")){
+            deleteLastHelper();
+            refreshPage();
+            Log.w(TAG, "deleteLast");
+        }
+        else if (tmpjson.has("swapLast")){
+            jsonSwapLastHelper(change_cueCards_num);
+            Log.w(TAG, "swapLast");
+        }
+        else if (tmpjson.has("swapNext")){
+            jsonSwapNextHelper(change_cueCards_num);
+            Log.w(TAG, "swapNext");
+        }
+        else if(tmpjson.has("edit")) {
             Log.w(TAG, "edit");
             int change_cardFace = 0;
             String change_recent_text = null;
@@ -852,12 +836,7 @@ public class LiveCollaboration extends AppCompatActivity {
         }
         else if(tmpjson.has("undoSure")) {
             Log.w(TAG, "undoSure");
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    undoSureHelper();
-                }
-            });
+            undoSureHelper();
         }
         else if(tmpjson.has("firstHistory")) {
             Log.w(TAG, "firstHistory");
@@ -881,48 +860,6 @@ public class LiveCollaboration extends AppCompatActivity {
         else {
             Log.w(TAG, "Warning: Unexpected message received");
             refreshPresentation();
-        }
-
-    }
-
-    private void tmpjsonHelper(JSONObject tmpjson, int change_cueCards_num) {
-        if (tmpjson.has("add")){
-
-
-            Log.w(TAG, "add");
-            jsonAddHelper(change_cueCards_num);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(),"A new card is added ",Toast.LENGTH_SHORT).show();
-                }
-            });
-
-        }
-        else if (tmpjson.has("delete")){
-
-            Log.w(TAG, "delete");
-            jsonDeleteHelper(change_cueCards_num);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(),"A card has been deleted.",Toast.LENGTH_SHORT).show();
-                }
-            });
-
-        }
-        else if (tmpjson.has("deleteLast")){
-            deleteLastHelper();
-            refreshPage();
-            Log.w(TAG, "deleteLast");
-        }
-        else if (tmpjson.has("swapLast")){
-            jsonSwapLastHelper(change_cueCards_num);
-            Log.w(TAG, "swapLast");
-        }
-        else if (tmpjson.has("swapNext")){
-            jsonSwapNextHelper(change_cueCards_num);
-            Log.w(TAG, "swapNext");
         }
     }
 
@@ -1071,6 +1008,7 @@ public class LiveCollaboration extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.w(TAG, "refreshPage start");
 
                 cueCards_max = presentation.cueCards.size();
                 sendOrNot = false;
@@ -1225,24 +1163,8 @@ public class LiveCollaboration extends AppCompatActivity {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             Log.d(TAG, "back button pressed");
             webSocketClient.close();
-//            try {
-//                String presentationJson = objectMapper.writeValueAsString(presentation);
-//            } catch (JsonProcessingException e) {
-//                e.printStackTrace();
-//            }
         }
         return super.onKeyDown(keyCode, event);
     }
-
-    @Override
-    public void onBackPressed() {
-        boolean fromNewActivity=true;
-
-        Intent mainIntent = new Intent(this, MainActivity.class);
-        Bundle bundleObj = new Bundle();
-        bundleObj.putString("fromNewActivity", Boolean.toString(fromNewActivity));
-        mainIntent.putExtras(bundleObj);
-        startActivityForResult(mainIntent, 0);
-    }
-
+    
 }
