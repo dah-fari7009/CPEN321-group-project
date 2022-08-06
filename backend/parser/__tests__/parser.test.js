@@ -8,9 +8,9 @@ const User = require('../../models/users');
 require('dotenv').config();
 
 const USERID = "3";
-const USERNAME = "jest user";
+const USERNAME = "jest parser user";
 const REFRESHTOKEN = process.env.REFRESH;
-const PRESENTATIONS = [];
+const PRESENTATIONS = ["62c38d740afce8d7ea604043"];
 
 let size = 6;
 const testUnparseInput ={
@@ -129,7 +129,7 @@ beforeEach(async() => {
     try {
         await mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
         console.log("connected to DB");
-        await User.deleteMany({username: "jest user"});
+        await User.deleteMany({userID: USERID});
         await User.create({
             userID: USERID,
             username: USERNAME,
@@ -215,7 +215,7 @@ describe("parse tests", () => {
             text: parserInput
         }
         const res = await request.put('/api/import').send(req);
-        expect(res.stat).toEqual(500);
+        expect(res.status).toEqual(200);
     })
 
     test("parse with null userID", async () => {
@@ -224,7 +224,7 @@ describe("parse tests", () => {
             text: parserInput
         }
         const res = await request.put('/api/import').send(req);
-        expect(res.stat).toEqual(500);
+        expect(res.status).toEqual(200);
     })
 
     test("parse with invalid text", async () => {
@@ -233,7 +233,7 @@ describe("parse tests", () => {
             text: "invalid text"
         }
         const res = await request.put('/api/import').send(req);
-        expect(res.stat).toEqual(500);
+        expect(res.status).toEqual(200);
     })
 
     test("parse with null text", async () => {
@@ -242,6 +242,6 @@ describe("parse tests", () => {
             text: null
         }
         const res = await request.put('/api/import').send(req);
-        expect(res.stat).toEqual(500);
+        expect(res.status).toEqual(500);
     })
 });
