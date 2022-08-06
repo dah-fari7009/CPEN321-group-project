@@ -17,7 +17,7 @@ login = async (req, res) => {
     if (req.body.verifiedDevice === "false") {
         try {
             if (await verifier.verify(req.body.token)) {
-                return retreiveUserInfo(req, res);
+                return retreiveUserInfo(req, res, refresh);
             } else {
                 return res.status(400).json({ error: new Error("login failed") });
             }
@@ -26,20 +26,21 @@ login = async (req, res) => {
             return res.status(400).json({ error: new Error("login failed") });
         }
     } else {
-        return retreiveUserInfo(req, res);
+        return retreiveUserInfo(req, res, refresh);
     }
 }
 
 // helper function - retrieve user info, called by login
 // expects userID and username
-retreiveUserInfo = async (req, res) => {
+retreiveUserInfo = async (req, res, refresh) => {
     try {
         var data = await User.findOne({userID: req.body.userID});
         if (!data) {
             let newUser = await User.create({
                 userID: req.body.userID,
                 username: req.body.username,
-                presentations: []
+                presentations: [],
+                refreshToken: refresh
             })
             return res.status(200).json({ userID: newUser.userID, username: newUser.username, presentations: newUser.presentations });
         } else {
