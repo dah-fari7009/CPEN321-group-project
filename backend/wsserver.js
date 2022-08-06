@@ -20,6 +20,28 @@ var mongooseConnect = async function () {
 
 }
 mongooseConnect();
+var position;
+var PID;
+var userID;
+var a;
+var cueCards_num;
+var newCard;
+var tmpcueCard;
+var tmpFrontHistory;
+var tmpBackHistory;
+var tmpFrontPosition;
+var tmpBackPosition;
+var cardFace;
+var userID;
+var before_text;
+var start;
+var end;
+var diff;
+var undoEnd;
+var undoHistory;
+var length;
+var redoHistory;
+
 
 class History {
     constructor(before_text, recent_text, userID, start, end, undoEnd, diff) {
@@ -168,7 +190,6 @@ wss.on("connection",(ws) => {
 
 
                 var a;
-                var error;
                 presManager.getPresById(PID).then((pres) => {
                     a = pres;
                     console.log(a);
