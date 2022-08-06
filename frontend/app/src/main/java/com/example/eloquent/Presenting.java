@@ -148,39 +148,6 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
         linearLayout.addView(createTextView(pres, cardIndex, isOnFront));
     }
 
-//    private void checkPermission() {
-//        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},RecordAudioRequestCode);
-//    }
-//    private void checkPermission() {
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        } else {
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
-//                Toast.makeText(this, "We need these location permissions to run!", Toast.LENGTH_LONG).show();
-//                new AlertDialog.Builder(this)
-//                        .setTitle("Need Recording Permissions")
-//                        .setMessage("We need your audio recording permissions to mark automatically switch cue cards")
-//                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                Toast.makeText(Presenting.this, "We need these location permissions to run!", Toast.LENGTH_LONG).show();
-//                                dialog.dismiss();
-//                            }
-//                        })
-//                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                ActivityCompat.requestPermissions(Presenting.this, new String[] {Manifest.permission.RECORD_AUDIO}, RecordAudioRequestCode);
-//                            }
-//                        })
-//                        .create()
-//                        .show();
-//            } else {
-//                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.RECORD_AUDIO}, RecordAudioRequestCode);
-//            }
-//        }
-//    }
-
     private void createRecognizerIntent() {
         speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -243,14 +210,14 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
     @Override
     public void onResults(Bundle results) {
         ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        speechText.setText(data.get(0));
         if (!data.get(0).equals(null)) {
-            speechText.setText(data.get(0));
             String[] words = data.get(0).toLowerCase().split("\\w+");
             int transitionPhraseWordsCount = pres.cueCards.get(currentCard).transitionPhrase.split("\\w+").length;
             // number of words that are correctly pronounced
             int correct = 0;
             //see if a substring in the text matches the transition phrase, ignoring case and punctuation
-            for (int i = 0; i < transitionPhraseWordsCount; i++) {
+            for (int i = 0; i < words.length; i++) {
                 if (pres.cueCards.get(currentCard).transitionPhrase.toLowerCase().contains(words[i])) {
                     correct ++;
                 }

@@ -17,7 +17,7 @@ login = async (req, res) => {
     if (req.body.verifiedDevice === "false") {
         try {
             if (await verifier.verify(req.body.token)) {
-                return retreiveUserInfo(req, res, refresh);
+                return retreiveUserInfo(req, res);
             } else {
                 return res.status(400).json({ error: new Error("login failed") });
             }
@@ -26,20 +26,19 @@ login = async (req, res) => {
             return res.status(400).json({ error: new Error("login failed") });
         }
     } else {
-        return retreiveUserInfo(req, res, refresh);
+        return retreiveUserInfo(req, res);
     }
 }
 
 // helper function - retrieve user info, called by login
 // expects userID and username
-retreiveUserInfo = async (req, res, refresh) => {
+retreiveUserInfo = async (req, res) => {
     try {
         var data = await User.findOne({userID: req.body.userID});
         if (!data) {
             let newUser = await User.create({
                 userID: req.body.userID,
                 username: req.body.username,
-                refreshToken: refresh,
                 presentations: []
             })
             return res.status(200).json({ userID: newUser.userID, username: newUser.username, presentations: newUser.presentations });
@@ -117,7 +116,7 @@ userExistsWithID = (userID) => {
                     resolve(true);
                 } else {
                     console.log("userStore: userExistsWithID: There exists no user with userID " + userID);
-                    reject(false);
+                    reject("User " + userID + " does not exist");
                 }
         });
     });
@@ -133,7 +132,11 @@ getUserIdOf = (username) => {
             if (user) {
                 resolve(user.userID);
 	        } else {
+<<<<<<< HEAD
                 reject("No user exists with username " + username);
+=======
+                    reject("No user exists with username " + username);
+>>>>>>> e31017c42e3b3c9aecffd66da8d3e7cde426edd5
 	        }
 	    });
     });

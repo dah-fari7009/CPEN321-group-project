@@ -68,8 +68,8 @@ public class EditPres extends AppCompatActivity {
     private String BACKEND_HOST_AND_PORT;
     private static RequestQueue requestQueue;
     String userID;
-
     Presentation presentation;
+    int PERMISSION_ALL = 1;
 
 
     @Override
@@ -84,7 +84,6 @@ public class EditPres extends AppCompatActivity {
         Button exportButton;
         Button shareButton;
         Toolbar toolbar;
-
 
 
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
@@ -165,8 +164,11 @@ public class EditPres extends AppCompatActivity {
         liveCollabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent shareIntent = new Intent(EditPres.this, LiveCollaboration.class);
-                startActivity(shareIntent);
+
+                Intent LiveCollaborationIntent = new Intent(EditPres.this, LiveCollaboration.class);
+                LiveCollaborationIntent.putExtra("Presentation", presentation);
+                startActivity(LiveCollaborationIntent);
+
             }
         });
 
@@ -322,6 +324,27 @@ public class EditPres extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.RECORD_AUDIO}, 1);
             }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == PERMISSION_ALL) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(EditPres.this, Presenting.class);
+                        intent.putExtra("Presentation", presentation);
+                        startActivity(intent);
+                    }
+                }).start();
+            } else {
+                Toast.makeText(EditPres.this, "Access Denied ! Cannot proceed further ", Toast.LENGTH_SHORT).show();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
 
