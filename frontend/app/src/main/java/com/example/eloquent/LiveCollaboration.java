@@ -71,7 +71,6 @@ public class LiveCollaboration extends AppCompatActivity {
     private static String TAG = "LiveCollaboration";
     private boolean getPresentationSuccess = false;
     public int undoRedoSure = 0;//0: not sure;1: sure
-    private CheckBox dontShowAgain;
     private static final String PREFS_NAME = "MyPrefsFile1";
 
     /**
@@ -105,13 +104,14 @@ public class LiveCollaboration extends AppCompatActivity {
         /**
          * start the websocket connection with the server
          */
-        LiveCollaboration.this.runOnUiThread(new Runnable() {
-            public void run() {
+//        LiveCollaboration.this.runOnUiThread(new Runnable() {
+//            public void run() {
                 createWebSocketClient();
-            }
-        });
+//            }
+//        });
 
         content = findViewById(R.id.cueCard);
+        undoRedoSure = 0;
 
 
 
@@ -338,76 +338,61 @@ public class LiveCollaboration extends AppCompatActivity {
 
     private void undoSureHelper() {
         // Window to show whether undo or not
-        Toast.makeText(getApplicationContext(),"undoSureHelper",Toast.LENGTH_SHORT).show();
 
 
-        AlertDialog.Builder adb = new AlertDialog.Builder(LiveCollaboration.this);
-        LayoutInflater adbInflater = LayoutInflater.from(LiveCollaboration.this);
-        View eulaLayout = adbInflater.inflate(R.layout.checkbox, null);
-        dontShowAgain = (CheckBox) eulaLayout.findViewById(R.id.skip);
-        adb.setTitle("Attention");
-        adb.setMessage("Are you sure you want to redo other people's work?");
-        adb.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                String checkBoxResult = "NOT checked";
-                if (dontShowAgain.isChecked()){
-                    checkBoxResult = "checked";
-                    undoRedoSure = 1;
-                    JSONObject obj =  new JSONObject();
-                    try{
-                        obj.put("undoSure","");
-                        obj.put("userID",userID);
-                        obj.put("presentationID",presentationID);
-                        obj.put("cueCards_num",Integer.toString(cueCards_num));
-                        obj.put("cardFace",Integer.toString(cardFace));
-                        obj.put("undoRedoSure",Integer.toString(undoRedoSure));
-                    }catch (JSONException e){
-                        e.printStackTrace();
+        AlertDialog.Builder builder = new AlertDialog.Builder(LiveCollaboration.this);
+        builder.setTitle("Attention");
+        builder.setMessage("Are you sure you want to undo other people's work?");
+        builder.setPositiveButton("Yes but only once",
+                new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        JSONObject obj =  new JSONObject();
+                        try{
+                            obj.put("undoSure","");
+                            obj.put("userID",userID);
+                            obj.put("presentationID",presentationID);
+                            obj.put("cueCards_num",Integer.toString(cueCards_num));
+                            obj.put("cardFace",Integer.toString(cardFace));
+                            obj.put("undoRedoSure",Integer.toString(undoRedoSure));
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                        webSocketClient.send(obj.toString());
                     }
-                    webSocketClient.send(obj.toString());
-                }
-                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString("skipMessage", checkBoxResult);
-                // Commit the edits!
-                editor.commit();
+                });
 
-                JSONObject obj =  new JSONObject();
-                try{
-                    obj.put("undoSure","");
-                    obj.put("userID",userID);
-                    obj.put("presentationID",presentationID);
-                    obj.put("cueCards_num",Integer.toString(cueCards_num));
-                    obj.put("cardFace",Integer.toString(cardFace));
-                    obj.put("undoRedoSure",Integer.toString(undoRedoSure));
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }
-                webSocketClient.send(obj.toString());
+        builder.setNeutralButton("Yes",
+                new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        undoRedoSure = 1;
+                        JSONObject obj =  new JSONObject();
+                        try{
+                            obj.put("undoSure","");
+                            obj.put("userID",userID);
+                            obj.put("presentationID",presentationID);
+                            obj.put("cueCards_num",Integer.toString(cueCards_num));
+                            obj.put("cardFace",Integer.toString(cardFace));
+                            obj.put("undoRedoSure",Integer.toString(undoRedoSure));
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                        webSocketClient.send(obj.toString());
+                    }
+                });
 
-                return;
-            }
-        });
+        builder.setNegativeButton("No",
+                new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
 
-        adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                String checkBoxResult = "NOT checked";
-                if (dontShowAgain.isChecked())
-                    checkBoxResult = "checked";
-                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString("skipMessage", checkBoxResult);
-                // Commit the edits!
-                editor.commit();
-
-                return;
-            }
-        });
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        String skipMessage = settings.getString("skipMessage", "NOT checked");
-        if (!skipMessage.equals("checked")){
-            adb.show();
-        }
+                    }
+                });
+        builder.create().show();
 
 
     }
@@ -879,7 +864,13 @@ public class LiveCollaboration extends AppCompatActivity {
         }
         else if(tmpjson.has("undoSure")) {
             Log.w(TAG, "undoSure");
-            undoSureHelper();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    undoSureHelper();
+                }
+            });
+
         }
         else if(tmpjson.has("redoSure")) {
             Log.w(TAG, "redoSure");
