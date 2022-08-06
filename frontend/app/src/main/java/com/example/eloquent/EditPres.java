@@ -164,9 +164,11 @@ public class EditPres extends AppCompatActivity {
         liveCollabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent liveCollabIntent = new Intent(EditPres.this, LiveCollaboration.class);
-                liveCollabIntent.putExtra("Presentation", presentation);
-                startActivity(liveCollabIntent);
+
+                Intent LiveCollaborationIntent = new Intent(EditPres.this, LiveCollaboration.class);
+                LiveCollaborationIntent.putExtra("Presentation", presentation);
+                startActivity(LiveCollaborationIntent);
+
             }
         });
 
