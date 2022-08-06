@@ -55,7 +55,7 @@ public class LiveCollaboration extends AppCompatActivity {
     private int cueCards_num = 0;
     private int cueCards_max = 0;
     private int cardFace = 0;//0: front | 1: back
-    private String userID = "123";
+    private String wsserverID = null;
     private String title ;
     private boolean sendOrNot = false;
     private CharSequence textBeforeChange;
@@ -65,16 +65,17 @@ public class LiveCollaboration extends AppCompatActivity {
     private static String TAG = "LiveCollaboration";
     private boolean getPresentationSuccess = false;
     private boolean refreshPageComplete = false;
+
     public int undoRedoSure = 0;//0: not sure;1: sure
 
     /**
      * standard empty card (used for add and delete)
      */
-    Content new_content_front = new Content(0,"");
-    Content new_content_back = new Content(0,"");
-    Front new_front = new Front(Color.WHITE,new_content_front);
-    Back new_back = new Back(Color.WHITE,new_content_back);
-    Cards emptyCard = new Cards(new_front,new_back,Color.WHITE);
+    private final Content new_content_front = new Content(0,"");
+    private final Content new_content_back = new Content(0,"");
+    private final Front new_front = new Front(1,new_content_front);
+    private final Back new_back = new Back(1,new_content_back);
+    private final Cards emptyCard = new Cards(new_front,new_back,Color.WHITE);
 
 
 
@@ -83,6 +84,8 @@ public class LiveCollaboration extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_collaboration);
+        presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
+        presentationID = presentation.presentationID;
         /**
          * get json from backend server by request
          */
@@ -105,6 +108,7 @@ public class LiveCollaboration extends AppCompatActivity {
         });
 
         content = findViewById(R.id.cueCard);
+        pageNumber = findViewById(R.id.pageNumber);
 
 
 
@@ -153,7 +157,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 JSONObject obj =  new JSONObject();
                 try{
                     obj.put("edit","");
-                    obj.put("userID",userID);
+                    obj.put("userID",wsserverID);
                     obj.put("presentationID",presentationID);
                     obj.put("cueCards_num",Integer.toString(cueCards_num));
                     obj.put("cardFace",Integer.toString(cardFace));
@@ -292,7 +296,7 @@ public class LiveCollaboration extends AppCompatActivity {
         JSONObject obj =  new JSONObject();
         try{
             obj.put("redo","");
-            obj.put("userID",userID);
+            obj.put("userID",wsserverID);
             obj.put("presentationID",presentationID);
             obj.put("cueCards_num",Integer.toString(cueCards_num));
             obj.put("cardFace",Integer.toString(cardFace));
@@ -312,7 +316,7 @@ public class LiveCollaboration extends AppCompatActivity {
         JSONObject obj =  new JSONObject();
         try{
             obj.put("undo","");
-            obj.put("userID",userID);
+            obj.put("userID",wsserverID);
             obj.put("presentationID",presentationID);
             obj.put("cueCards_num",Integer.toString(cueCards_num));
             obj.put("cardFace",Integer.toString(cardFace));
@@ -338,7 +342,7 @@ public class LiveCollaboration extends AppCompatActivity {
             JSONObject obj =  new JSONObject();
             try{
                 obj.put("swapLast","");
-                obj.put("userID",userID);
+                obj.put("userID",wsserverID);
                 obj.put("presentationID",presentationID);
                 obj.put("cueCards_num",Integer.toString(cueCards_num));
                 obj.put("cardFace",Integer.toString(cardFace));
@@ -372,7 +376,7 @@ public class LiveCollaboration extends AppCompatActivity {
             JSONObject obj =  new JSONObject();
             try{
                 obj.put("swapNext","");
-                obj.put("userID",userID);
+                obj.put("userID",wsserverID);
                 obj.put("presentationID",presentationID);
                 obj.put("cueCards_num",Integer.toString(cueCards_num));
             }catch (JSONException e){
@@ -406,22 +410,18 @@ public class LiveCollaboration extends AppCompatActivity {
         JSONObject obj =  new JSONObject();
         try{
             obj.put("delete","");
-            obj.put("userID",userID);
+            obj.put("userID",wsserverID);
             obj.put("presentationID",presentationID);
             obj.put("cueCards_num",Integer.toString(cueCards_num));
         }catch (JSONException e){
             e.printStackTrace();
         }
 
-        if(cueCards_num>=cueCards_max-1 && cueCards_max!=1){//if this is the last page, go back to previous page
-            webSocketClient.send(obj.toString());
-            cueCards_num = cueCards_num-1;
-        }
-        else if(cueCards_max == 1){//if no page left after delete, create a new empty page
+        if(cueCards_max == 1){//if no page left after delete, create a new empty page
             JSONObject objLast =  new JSONObject();
             try{
                 objLast.put("deleteLast","");
-                objLast.put("userID",userID);
+                objLast.put("userID",wsserverID);
                 objLast.put("presentationID",presentationID);
                 objLast.put("cueCards_num",Integer.toString(cueCards_num));
             }catch (JSONException e){
@@ -438,18 +438,14 @@ public class LiveCollaboration extends AppCompatActivity {
 
     }
 
-    private void deleteHelper(int cueCards_num) {
-        for(int i=cueCards_num; i<cueCards_max-1; i=i+1) {
+    private void deleteHelper(int change_cueCards_num) {
+        for(int i=change_cueCards_num; i<cueCards_max-1; i=i+1) {
             presentation.cueCards.set(i, presentation.cueCards.get(i + 1));
         }
         presentation.cueCards.remove(cueCards_max-1);
         cueCards_max=cueCards_max-1;
-        if(cueCards_num >= cueCards_max){
+        if(cueCards_num == change_cueCards_num && cueCards_num >= cueCards_max){
             cueCards_num--;
-            refreshPage();
-        }
-        else{
-            refreshPageWithCursor();
         }
 
     }
@@ -457,7 +453,6 @@ public class LiveCollaboration extends AppCompatActivity {
     private void deleteLastHelper () {
         presentation.cueCards.remove(0);
         presentation.cueCards.add(emptyCard);
-        refreshPage();
     }
 
     private void addButtonHelper() {
@@ -468,14 +463,13 @@ public class LiveCollaboration extends AppCompatActivity {
         JSONObject obj =  new JSONObject();
         try{
             obj.put("add","");
-            obj.put("userID",userID);
+            obj.put("userID",wsserverID);
             obj.put("presentationID",presentationID);
             obj.put("cueCards_num",Integer.toString(cueCards_num));
         }catch (JSONException e){
             e.printStackTrace();
         }
         webSocketClient.send(obj.toString());
-        cardFace = 0;
     }
 
     private void addHelper(int cueCards_num) {
@@ -489,12 +483,20 @@ public class LiveCollaboration extends AppCompatActivity {
         for(int i=cueCards_max-1; i>cueCards_num; i=i-1) {
             presentation.cueCards.set(i, presentation.cueCards.get(i - 1));
         }
-        presentation.cueCards.set(cueCards_num, emptyCard);
+        Content tmp_new_content_front = new Content(0,"");
+        Content tmp_new_content_back = new Content(0,"");
+        Front tmp_new_front = new Front(1,tmp_new_content_front);
+        Back tmp_new_back = new Back(1,tmp_new_content_back);
+        Cards tmp_emptyCard = new Cards(tmp_new_front,tmp_new_back,1);
+        presentation.cueCards.set(cueCards_num, tmp_emptyCard);
+        String aa = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
+        Log.w(TAG, "addtext: " + aa);
+        String bb = tmp_emptyCard.front.getContent().getMessage();
+        Log.w(TAG, "empty Card text: " + bb);
+        String cc = tmp_new_front.getContent().getMessage();
+        Log.w(TAG, "empty Front text: " + cc);
 
-        /**
-         * Last, refresh page
-         */
-        refreshPage();
+        cardFace = 0;
 
     }
 
@@ -511,11 +513,7 @@ public class LiveCollaboration extends AppCompatActivity {
         if(cueCards_num<cueCards_max-1){
             cueCards_num = cueCards_num+1;
             cardFace=0;
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
-            String text = presentation.getCards(cueCards_num).getFront().getContent().getMessage();
-            int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
-            content.setText(getColoredtext(color,text));
-            pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
+            refreshPage();;
 
         }
         else{
@@ -536,17 +534,13 @@ public class LiveCollaboration extends AppCompatActivity {
         if(cueCards_num>0){
             cueCards_num = cueCards_num-1;
             cardFace=0;
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
-            String text = presentation.getCards(cueCards_num).getFront().getContent().getMessage();
-            int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
-            content.setText(getColoredtext(color,text));
-            pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
+            refreshPage();
         }
         else{
             Toast.makeText(getApplicationContext(),"Min number, cannot go to the last page",Toast.LENGTH_SHORT).show();
         }
 
-        sendOrNot = false;
+        sendOrNot = true;
     }
 
     private void flipButtonHelper() {
@@ -557,19 +551,13 @@ public class LiveCollaboration extends AppCompatActivity {
 
 //                    Log.w(TAG, "save success");
             cardFace = 1;
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getBack().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
-            String text = presentation.getCards(cueCards_num).getBack().getContent().getMessage();
-            int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
-            content.setText(getColoredtext(color,text));
+            refreshPage();
         }
         else{ // back
 
 //                    Log.w(TAG, "save success");
             cardFace = 0;
-            content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
-            String text = presentation.getCards(cueCards_num).getFront().getContent().getMessage();
-            int color = presentation.getCards(cueCards_num).getFront().getContent().getColor();
-            content.setText(getColoredtext(color,text));
+            refreshPage();
         }
         sendOrNot = true;
     }
@@ -595,7 +583,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 try{
                     obj.put("StartLiveCollaboration",0);
                     obj.put("presentationID",presentationID);
-                    obj.put("userID",userID);
+                    obj.put("userID",wsserverID);
 //                    obj.put("cardFace",Integer.toString(cardFace));
 //                    String recent_text = content.getText().toString();
 //                    obj.put("recent_text",recent_text);
@@ -676,12 +664,6 @@ public class LiveCollaboration extends AppCompatActivity {
             }
 
             cueCards_max = tmp_pres.cueCards.size();
-            String _id = tmp_pres.presentationID;
-            String title = tmp_pres.title;
-            int backgroundColor = tmp_pres.cueCards.get(0).backgroundColor;
-            String message = tmp_pres.cueCards.get(0).front.content.message;
-            Log.w(TAG, String.valueOf(cueCards_max) + "   id: " + _id + "   title: " + title + "   backgroundColor: " + backgroundColor + "    message: " + message);
-
 
             //reset presentation
             Log.w(TAG, "newPresentation save");
@@ -696,6 +678,17 @@ public class LiveCollaboration extends AppCompatActivity {
                 }
             });
             getPresentationSuccess = true;
+            return;
+        }
+
+
+        if(tmpjson.has("wsserverID")){
+            try {
+                wsserverID = tmpjson.getString("wsID");
+            }
+            catch (JSONException e) {
+                e.printStackTrace();
+            }
             return;
         }
 
@@ -728,23 +721,120 @@ public class LiveCollaboration extends AppCompatActivity {
 
 
         if (tmpjson.has("add")){
-            addHelper(change_cueCards_num);
+            if(cueCards_num>change_cueCards_num){
+                addHelper(change_cueCards_num);
+                cueCards_num = cueCards_num+1;
+                refreshPageWithCursor();
+                Log.w(TAG, "add state 1");
+            }
+            else if (cueCards_num == change_cueCards_num) {
+                addHelper(change_cueCards_num);
+                refreshPage();
+                Log.w(TAG, "add state 2");
+            }
+            else {
+                addHelper(change_cueCards_num);
+                refreshCardNum();
+                Log.w(TAG, "add state 3");
+            }
+
             Log.w(TAG, "add");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"A new card is added ",Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
         else if (tmpjson.has("delete")){
-            deleteHelper(change_cueCards_num);
+            Log.w(TAG, "cueCards_num " + cueCards_num);
+            Log.w(TAG, "change_cueCards_num " + change_cueCards_num);
+            if(cueCards_num>change_cueCards_num){
+                deleteHelper(change_cueCards_num);
+                cueCards_num = cueCards_num-1;
+                refreshPageWithCursor();
+                Log.w(TAG, "delete state 1");
+            }
+            else if(cueCards_num==change_cueCards_num){
+                deleteHelper(change_cueCards_num);
+                refreshPage();
+                Log.w(TAG, "delete state 2");
+            }
+            else {
+                deleteHelper(change_cueCards_num);
+                refreshCardNum();
+                Log.w(TAG, "delete state 3");
+            }
             Log.w(TAG, "delete");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"A card has been deleted.",Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
         else if (tmpjson.has("deleteLast")){
             deleteLastHelper();
+            refreshPage();
             Log.w(TAG, "deleteLast");
         }
         else if (tmpjson.has("swapLast")){
-            swapLastHelper(change_cueCards_num);
+            if(cueCards_num == change_cueCards_num){
+                swapLastHelper(change_cueCards_num);
+                cueCards_num--;
+                refreshPageWithCursor();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+            else if (cueCards_num == change_cueCards_num-1){
+                swapLastHelper(change_cueCards_num);
+                cueCards_num++;
+                refreshPageWithCursor();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            else{
+                swapLastHelper(change_cueCards_num);
+            }
             Log.w(TAG, "swapLast");
         }
         else if (tmpjson.has("swapNext")){
-            swapNextHelper(change_cueCards_num);
+            if(cueCards_num == change_cueCards_num) {
+                swapNextHelper(change_cueCards_num);
+                cueCards_num++;
+                refreshPageWithCursor();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            else if(cueCards_num == change_cueCards_num+1) {
+                swapNextHelper(change_cueCards_num);
+                cueCards_num--;
+                refreshPageWithCursor();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            else{
+                swapNextHelper(change_cueCards_num);
+            }
             Log.w(TAG, "swapNext");
         }
         else if(tmpjson.has("edit")) {
@@ -787,7 +877,7 @@ public class LiveCollaboration extends AppCompatActivity {
 
             //refresh editText
 
-            if(!change_userID.equals(userID)){
+            if((!change_userID.equals(wsserverID))&&cueCards_num == change_cueCards_num && cardFace == change_cardFace){
                 refreshEditPage(change_start ,change_end,position_start,position_end,diff);
             }
 
@@ -830,6 +920,15 @@ public class LiveCollaboration extends AppCompatActivity {
             refreshPresentation();
         }
 
+    }
+
+    private void refreshCardNum() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
+            }
+        });
     }
 
     private void refreshPageWithCursor() {
@@ -889,7 +988,6 @@ public class LiveCollaboration extends AppCompatActivity {
                     content.setText(getColoredtext(color,text));
                 }
 
-                pageNumber = findViewById(R.id.pageNumber);
                 pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
                 sendOrNot = true;
                 refreshPageComplete = true;
@@ -903,8 +1001,9 @@ public class LiveCollaboration extends AppCompatActivity {
             @Override
             public void run() {
                 refreshPageComplete = false;
-                cueCards_max = presentation.cueCards.size();
                 sendOrNot = false;
+                cueCards_max = presentation.cueCards.size();
+
                 if(cardFace == 0){
                     //content.getBackground().setColorFilter(presentation.getCards(cueCards_num).getFront().getBackgroundColor(), PorterDuff.Mode.SRC_ATOP);
                     String text = presentation.cueCards.get(cueCards_num).front.getContent().getMessage();
@@ -919,8 +1018,6 @@ public class LiveCollaboration extends AppCompatActivity {
                     int color = presentation.getCards(cueCards_num).getBack().getContent().getColor();
                     content.setText(getColoredtext(color,text));
                 }
-
-                pageNumber = findViewById(R.id.pageNumber);
                 pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
                 sendOrNot = true;
                 refreshPageComplete = true;
@@ -994,7 +1091,7 @@ public class LiveCollaboration extends AppCompatActivity {
         JSONObject obj =  new JSONObject();
         try{
             obj.put("refreshPresentation","");
-            obj.put("userID",userID);
+            obj.put("userID",wsserverID);
             obj.put("presentationID",presentationID);
         }catch (JSONException e){
             e.printStackTrace();
