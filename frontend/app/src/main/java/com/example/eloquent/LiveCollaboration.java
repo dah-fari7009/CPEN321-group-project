@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.Handler;
+
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
@@ -30,7 +30,7 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+
 
 import tech.gusavila92.websocketclient.WebSocketClient;
 
@@ -39,15 +39,7 @@ import tech.gusavila92.websocketclient.WebSocketClient;
 public class LiveCollaboration extends AppCompatActivity {
 
 
-    private ImageButton nextButton;
-    private ImageButton backButton;
-    private ImageButton flipButton;
-    private ImageButton addButton;
-    private ImageButton deleteButton;
-    private ImageButton swapnextButton;
-    private ImageButton swaplastButton;
-    private ImageButton redoButton;
-    private ImageButton undoButton;
+
     private TextView pageNumber;
     private EditText content;
     private Presentation presentation = new Presentation();
@@ -56,15 +48,14 @@ public class LiveCollaboration extends AppCompatActivity {
     private int cueCards_max = 0;
     private int cardFace = 0;//0: front | 1: back
     private String wsserverID = null;
-    private String title ;
     private boolean sendOrNot = false;
     private CharSequence textBeforeChange;
-    private CharSequence textAfterChange;
+
     ObjectMapper objectMapper = new ObjectMapper();
     private WebSocketClient webSocketClient;
     private static String TAG = "LiveCollaboration";
     private boolean getPresentationSuccess = false;
-    private boolean refreshPageComplete = false;
+//    private boolean refreshPageComplete = false;
 
     public int undoRedoSure = 0;//0: not sure;1: sure
 
@@ -84,6 +75,15 @@ public class LiveCollaboration extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_collaboration);
+        ImageButton nextButton;
+        ImageButton backButton;
+        ImageButton flipButton;
+        ImageButton addButton;
+        ImageButton deleteButton;
+        ImageButton swapnextButton;
+        ImageButton swaplastButton;
+        ImageButton redoButton;
+        ImageButton undoButton;
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
         presentationID = presentation.presentationID;
         /**
@@ -164,7 +164,7 @@ public class LiveCollaboration extends AppCompatActivity {
                     //String recent_text = content.getText().toString();
                     String recent_text = s.toString();
                     obj.put("recent_text",recent_text);
-                    textAfterChange = s.subSequence(start, start + count);
+                    CharSequence textAfterChange = s.subSequence(start, start + count);
                     obj.put("before_text",textBeforeChange);
                     //Editable text = content.getEditableText();
                     //int end = start + count;
@@ -195,8 +195,7 @@ public class LiveCollaboration extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
-
+                return;
             }
         });
 
@@ -513,7 +512,7 @@ public class LiveCollaboration extends AppCompatActivity {
         if(cueCards_num<cueCards_max-1){
             cueCards_num = cueCards_num+1;
             cardFace=0;
-            refreshPage();;
+            refreshPage();
 
         }
         else{
@@ -721,24 +720,10 @@ public class LiveCollaboration extends AppCompatActivity {
 
 
         if (tmpjson.has("add")){
-            if(cueCards_num>change_cueCards_num){
-                addHelper(change_cueCards_num);
-                cueCards_num = cueCards_num+1;
-                refreshPageWithCursor();
-                Log.w(TAG, "add state 1");
-            }
-            else if (cueCards_num == change_cueCards_num) {
-                addHelper(change_cueCards_num);
-                refreshPage();
-                Log.w(TAG, "add state 2");
-            }
-            else {
-                addHelper(change_cueCards_num);
-                refreshCardNum();
-                Log.w(TAG, "add state 3");
-            }
+
 
             Log.w(TAG, "add");
+            jsonAddHelper(change_cueCards_num);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -748,25 +733,9 @@ public class LiveCollaboration extends AppCompatActivity {
 
         }
         else if (tmpjson.has("delete")){
-            Log.w(TAG, "cueCards_num " + cueCards_num);
-            Log.w(TAG, "change_cueCards_num " + change_cueCards_num);
-            if(cueCards_num>change_cueCards_num){
-                deleteHelper(change_cueCards_num);
-                cueCards_num = cueCards_num-1;
-                refreshPageWithCursor();
-                Log.w(TAG, "delete state 1");
-            }
-            else if(cueCards_num==change_cueCards_num){
-                deleteHelper(change_cueCards_num);
-                refreshPage();
-                Log.w(TAG, "delete state 2");
-            }
-            else {
-                deleteHelper(change_cueCards_num);
-                refreshCardNum();
-                Log.w(TAG, "delete state 3");
-            }
+
             Log.w(TAG, "delete");
+            jsonDeleteHelper(change_cueCards_num);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -781,60 +750,11 @@ public class LiveCollaboration extends AppCompatActivity {
             Log.w(TAG, "deleteLast");
         }
         else if (tmpjson.has("swapLast")){
-            if(cueCards_num == change_cueCards_num){
-                swapLastHelper(change_cueCards_num);
-                cueCards_num--;
-                refreshPageWithCursor();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-            }
-            else if (cueCards_num == change_cueCards_num-1){
-                swapLastHelper(change_cueCards_num);
-                cueCards_num++;
-                refreshPageWithCursor();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-            else{
-                swapLastHelper(change_cueCards_num);
-            }
+            jsonSwapLastHelper(change_cueCards_num);
             Log.w(TAG, "swapLast");
         }
         else if (tmpjson.has("swapNext")){
-            if(cueCards_num == change_cueCards_num) {
-                swapNextHelper(change_cueCards_num);
-                cueCards_num++;
-                refreshPageWithCursor();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-            else if(cueCards_num == change_cueCards_num+1) {
-                swapNextHelper(change_cueCards_num);
-                cueCards_num--;
-                refreshPageWithCursor();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-            else{
-                swapNextHelper(change_cueCards_num);
-            }
+            jsonSwapNextHelper(change_cueCards_num);
             Log.w(TAG, "swapNext");
         }
         else if(tmpjson.has("edit")) {
@@ -922,6 +842,103 @@ public class LiveCollaboration extends AppCompatActivity {
 
     }
 
+    private void jsonSwapNextHelper(int change_cueCards_num) {
+        if(cueCards_num == change_cueCards_num) {
+            swapNextHelper(change_cueCards_num);
+            cueCards_num++;
+            refreshPageWithCursor();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else if(cueCards_num == change_cueCards_num+1) {
+            swapNextHelper(change_cueCards_num);
+            cueCards_num--;
+            refreshPageWithCursor();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else{
+            swapNextHelper(change_cueCards_num);
+        }
+    }
+
+    private void jsonSwapLastHelper(int change_cueCards_num) {
+        if(cueCards_num == change_cueCards_num){
+            swapLastHelper(change_cueCards_num);
+            cueCards_num--;
+            refreshPageWithCursor();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+        else if (cueCards_num == change_cueCards_num-1){
+            swapLastHelper(change_cueCards_num);
+            cueCards_num++;
+            refreshPageWithCursor();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"Card that you are working on is swaped",Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else{
+            swapLastHelper(change_cueCards_num);
+        }
+    }
+
+    private void jsonDeleteHelper( int change_cueCards_num) {
+        Log.w(TAG, "cueCards_num " + cueCards_num);
+        Log.w(TAG, "change_cueCards_num " + change_cueCards_num);
+        if(cueCards_num>change_cueCards_num){
+            deleteHelper(change_cueCards_num);
+            cueCards_num = cueCards_num-1;
+            refreshPageWithCursor();
+            Log.w(TAG, "delete state 1");
+        }
+        else if(cueCards_num==change_cueCards_num){
+            deleteHelper(change_cueCards_num);
+            refreshPage();
+            Log.w(TAG, "delete state 2");
+        }
+        else {
+            deleteHelper(change_cueCards_num);
+            refreshCardNum();
+            Log.w(TAG, "delete state 3");
+        }
+    }
+
+    private void jsonAddHelper(int change_cueCards_num) {
+        if(cueCards_num>change_cueCards_num){
+            addHelper(change_cueCards_num);
+            cueCards_num = cueCards_num+1;
+            refreshPageWithCursor();
+            Log.w(TAG, "add state 1");
+        }
+        else if (cueCards_num == change_cueCards_num) {
+            addHelper(change_cueCards_num);
+            refreshPage();
+            Log.w(TAG, "add state 2");
+        }
+        else {
+            addHelper(change_cueCards_num);
+            refreshCardNum();
+            Log.w(TAG, "add state 3");
+        }
+    }
+
     private void refreshCardNum() {
         runOnUiThread(new Runnable() {
             @Override
@@ -970,7 +987,7 @@ public class LiveCollaboration extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                refreshPageComplete = false;
+
                 cueCards_max = presentation.cueCards.size();
                 sendOrNot = false;
                 if(cardFace == 0){
@@ -990,7 +1007,7 @@ public class LiveCollaboration extends AppCompatActivity {
 
                 pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
                 sendOrNot = true;
-                refreshPageComplete = true;
+
             }
         });
 
@@ -1000,7 +1017,7 @@ public class LiveCollaboration extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                refreshPageComplete = false;
+
                 sendOrNot = false;
                 cueCards_max = presentation.cueCards.size();
 
@@ -1020,7 +1037,7 @@ public class LiveCollaboration extends AppCompatActivity {
                 }
                 pageNumber.setText(Integer.toString(cueCards_num+1)+"/"+Integer.toString(cueCards_max));
                 sendOrNot = true;
-                refreshPageComplete = true;
+
 
                 if(change_end<=position_start){
                     Log.w(TAG, "state1");
