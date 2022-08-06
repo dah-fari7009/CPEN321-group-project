@@ -39,7 +39,7 @@ public class Preparation extends AppCompatActivity {
     private TextView pageNumber;
     private EditText content;
     private TextViewUndoRedo helper;
-    private Presentation presentation;
+    private Presentation presentation = new Presentation();
     private int cueCards_num = 0;
     private int cueCards_max = 0;
     private int cardFace = 0;//0: front | 1: back
@@ -78,14 +78,14 @@ public class Preparation extends AppCompatActivity {
             cueCards_max = presentation.cueCards.size();
         }
         catch (Exception e){
-            Content new_content_front = new Content(Color.BLACK,"");
-            Content new_content_back = new Content(Color.BLACK,"");
-            Front new_front = new Front(Color.WHITE,new_content_front);
-            Back new_back = new Back(Color.WHITE,new_content_back);
-            Cards emptyCard = new Cards(new_front,new_back,Color.WHITE);
-            presentation = new Presentation();
-            presentation.cueCards.add(emptyCard);
-            cueCards_max = presentation.cueCards.size();
+//            Content new_content_front = new Content(0,"");
+//            Content new_content_back = new Content(0,"");
+//            Front new_front = new Front(1,new_content_front);
+//            Back new_back = new Back(1,new_content_back);
+//            Cards emptyCard = new Cards(new_front,new_back,1);
+//            presentation = new Presentation();
+//            presentation.cueCards.add(emptyCard);
+//            cueCards_max = presentation.cueCards.size();
         }
 
         Log.w("TAG", Integer.toString(cueCards_max));

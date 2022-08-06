@@ -1,7 +1,11 @@
 package com.example.eloquent;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NavUtils;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +21,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -86,11 +91,17 @@ public class LiveCollaboration extends AppCompatActivity {
         ImageButton swaplastButton;
         ImageButton redoButton;
         ImageButton undoButton;
+        Toolbar toolbar;
+
+
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
         presentationID = presentation.presentationID;
+
+
         /**
          * get json from backend server by request
          */
+
 
 //        presentation = (Presentation) getIntent().getSerializableExtra("specificArgument");
 //
@@ -204,6 +215,9 @@ public class LiveCollaboration extends AppCompatActivity {
             }
         });
 
+        toolbar = findViewById(R.id.toolbar3);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         nextButton = findViewById(R.id.nextButton);
@@ -1244,5 +1258,7 @@ public class LiveCollaboration extends AppCompatActivity {
         mainIntent.putExtras(bundleObj);
         startActivityForResult(mainIntent, 0);
     }
+
+
 
 }
