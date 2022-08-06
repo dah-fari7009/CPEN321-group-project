@@ -42,8 +42,10 @@ beforeEach(async() => {
     try {
         await mongoose.connect('mongodb://localhost:27017/CPEN321', { useNewUrlParser: true })
         console.log("connected to DB");
-        await Presentation.deleteMany({});
-        await User.deleteMany({});
+        
+        await Presentation.deleteMany({"users.id": "1"});
+        await Presentation.deleteMany({"users.id": "22"});
+
         await User.create([
             {userID: "1", username: "Jest user 1", refreshToken: "11", presentations: []},
             {userID: "2", username: "Jest user 2", refreshToken: "22", presentations: []}
@@ -55,6 +57,9 @@ beforeEach(async() => {
 });
 
 afterEach(async () => {
+    await User.deleteOne({userID: "1"});
+    await User.deleteOne({userID: "2"});
+
     await mongoose.connection.close();
 });
 
@@ -104,6 +109,8 @@ describe("createPres tests", () => {
         var expectedResStat = 200;
 
         await presManager.createPres(req, res);
+        // delete created presentation
+        // await Presentation.deleteOne({_id: res.body._id});
         
         console.log(res.body);
         expectedPres._id = res.body._id;
@@ -127,7 +134,7 @@ describe("createPres tests", () => {
 	    await presManager.createPres(req, res);
         expect(res.body).toEqual({err: "presManager: createPres: no userID provided!"});
         expect(res.stat).toEqual(400);
-	//console.log(res);
+	    //console.log(res);
     });
 
     test("userID is illegal - no such user exists", async () => {
@@ -142,8 +149,11 @@ describe("createPres tests", () => {
     test("Valid userID and presentation title", async () => {
         var req = {body: {title: "Presentation", userID: "1"}};
         var res = new Response();
+
         await presManager.createPres(req, res);
-	
+        // delete created presentation
+        // await Presentation.deleteOne({_id: res.body._id});
+
         expect(res.body.title).toBeDefined();
         expect(res.body.title).toEqual(req.body.title);
         
@@ -156,6 +166,7 @@ describe("createPres tests", () => {
         expect(res.body.users[0].permission).toEqual("owner");
 	
         expect(res.stat).toEqual(200);
+
     });
 });
 
@@ -306,6 +317,9 @@ describe("getAllPresOfUser tests", () => {
         expect(res.body[0].users[0].id).toEqual(thisPresentationContent.users[0].id);
         expect(res.body[0].users[0].permission).toEqual(thisPresentationContent.users[0].permission);
         expect(res.stat).toEqual(200);
+
+        // delete created presentation
+
     });
 
     test("User has 2 presentations", async () => {
