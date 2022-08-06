@@ -122,10 +122,10 @@ getUserIdOf = (username) => {
         User.findOne({ username }).then((user) => {
             if (user) {
                 resolve(user.userID);
-	    } else {
-                reject("No user exists with username " + username);
-	    }
-	});
+	        } else {
+                    reject("No user exists with username " + username);
+	        }
+	    });
     });
 }
 

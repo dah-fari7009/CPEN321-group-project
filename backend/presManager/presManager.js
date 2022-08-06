@@ -95,22 +95,61 @@ getPresById = (presID) => {
 
 // Internal - for calls from parse() of parser.js, rather than 
 // for responding to requests form the frontend.
-storeImportedPres = (presObj, userID) => {
+storeImportedPres = async (presObj, userID) => {
     /* Expects a presentation object, and a string (e.g. "104866131128716891939") */
     console.log("presManager: storeImportedPresentation: Storing imported presentation for user " + userID);
-    console.log(presObj);
-    console.log(presObj.cards[0]);
-    var presID;
-    return new Promise ((resolve, reject) => {
-        Presentation.create(presObj).then((data) => {
-            presID = data._id;
-            return userStore.addPresToUser(userID, data._id);
-        }).then((result) => {
-            resolve( presID );
-        }).catch((err) => {
-            reject( err );
-        })
-    });
+   
+    // input error checks
+    var inputErr = "";
+    if (!userID) {
+        inputErr += "User not specified. Cannot add presentation to user.";
+        inputErr += " ";
+    }
+    if (!presObj) {
+        inputErr += "No presentation given for storage.";
+        inputErr += " ";
+    }
+    if (!userID || !presObj) {
+        inputErr += "No presentation stored."
+        return inputErr;
+    }
+
+    // check if userID refers to a user who exists
+    try {
+        await userStore.userExistsWithID(userID);
+    } catch (err) {
+        return err + ". Cannot add presentation to user. Presentation not stored.";    
+    }
+
+    // check if userID refers to someone who could have imported presObj
+    var isPresObjImportedByUser = false;
+    for (var i = 0; i < presObj.users.length; i++) {
+        if (presObj.users[i].id === userID) {
+            isPresObjImportedByUser = true;
+        }
+    }
+    if (isPresObjImportedByUser === false) {
+        return "User " + userID + " did not import this presentation. Presentation not stored.";
+    }
+    
+    try {
+        var data = await Presentation.create(presObj);
+        await userStore.addPresToUser(userID, data._id);
+        return data._id;
+    } catch (err) {
+        return err;
+    }
+    // var presID;
+    // return new Promise ((resolve, reject) => {
+    //     Presentation.create(presObj).then((data) => {
+    //         presID = data._id;
+    //         return userStore.addPresToUser(userID, data._id);
+    //     }).then((result) => {
+    //         resolve( presID );
+    //     }).catch((err) => {
+    //         reject( err );
+    //     })
+    // });
 }
 
 checkPermission = (userID, presID, permission) => {
