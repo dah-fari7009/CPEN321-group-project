@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Eloquent</string>
-    <string name="google_oauth2_web_client_id">9332959347-o8lhle1t6p7oanp5rq08vosu7vct3as3.apps.googleusercontent.com</string>
+    <string name="google_oauth2_web_client_id">939424960970-edvrfu1le3rf7st313j7dck4s3kttvf3.apps.googleusercontent.comm</string>
     <string name="backend_host">http://20.104.77.70:8081</string>
     <string name="sample_import_input">\\begin{presentation}
     \\title Sample Presentation: Speeches
