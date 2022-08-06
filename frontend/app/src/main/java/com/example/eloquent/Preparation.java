@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -70,7 +72,6 @@ public class Preparation extends AppCompatActivity {
         ImageButton redoButton;
         ImageButton undoButton;
 
-
         /* Retrieve presentation object */
         presentation = (Presentation) getIntent().getSerializableExtra("Presentation");
 
@@ -109,6 +110,26 @@ public class Preparation extends AppCompatActivity {
 //        Log.w("TAG", "text success"+"|| cue card number is " +Integer.toString(cueCards_num));
         //content.setText(presentation.getCards(cueCards_num).getFront().getContent(content_num).getMessage());
         Log.w("TAG", "OK");
+
+        content.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Nothing to be done
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (cardFace == 1) {
+                    String cardDetails[] = content.getText().toString().split(">");
+                    presentation.cueCards.get(cueCards_num).transitionPhrase = cardDetails[cardDetails.length - 1];
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Nothing to be done
+            }
+        });
 
         /* Set up on-click handlers for buttons */
         nextButton = findViewById(R.id.nextButton);
