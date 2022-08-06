@@ -8,12 +8,7 @@ require('dotenv').config();
 const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 
-const oauth2Client = new google.auth.OAuth2(
-    CLIENT_ID,
-    CLIENT_SECRET,
-    "https://developers.google.com/oauthplayground"
-  );
-
+//expects pres and userID
 unParsePresentation = async (req, res) => {
     try {
         var pres = req.body.pres
@@ -47,7 +42,7 @@ unParsePresentation = async (req, res) => {
         await axios(createFile);
         return res.status(200).send( { presStr } );
     } catch (e) {
-        console.log("eeeror: " + e.message)
+        console.log("error: " + e.message)
         return res.status(400).send( e.message );
     }
 }

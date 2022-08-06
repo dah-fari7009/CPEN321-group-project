@@ -3,7 +3,7 @@ const userStore = jest.createMockFromModule('../userStore');
 const addPresToUser = (userID, presID) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            console.log("mock userStore: addPresToUser: userID = " + userID + ", presID = " + presID);
+            //console.log("mock userStore: addPresToUser: userID = " + userID + ", presID = " + presID);
             if (userID === null) {
                 reject("Unspecified user");
             } else if (userID === "Idontexist") {
@@ -11,7 +11,7 @@ const addPresToUser = (userID, presID) => {
             } else {
                 resolve("Presentation added to user!");
             }
-        }, 1000);
+        }, 100);
     });
 }
 
@@ -23,7 +23,7 @@ const userExistsWithID = (userID) => {
             } else {
                 resolve(true);
             }
-        }, 1000);
+        }, 100);
     });
 }
 
@@ -34,7 +34,7 @@ const removePresFromUser = (userID, presID) => {
             if (userID === "1" && presID === "900df00d900df00d900df00d") {
                 resolve();
             }
-        }, 1000);
+        }, 100);
     });
 }
 

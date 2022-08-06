@@ -1,44 +1,54 @@
 const User = require('../models/users');
 const presManager = require('../presManager/presManager');
 const verifier = require("./verify");
+const getToken = require("./token");
 
-
-// expects token, userID, verifiedDevice and username
+// expects token, userID, verifiedDevice, username and authCode
 login = async (req, res) => {
+    let refresh;
+    try {
+        refresh = await getToken(req.body.authCode);
+        console.log(req.body.authCode)
+        console.log(refresh);
+    } catch (e) {
+        console.log(e.message)
+    }
+
     if (req.body.verifiedDevice === "false") {
         try {
             if (await verifier.verify(req.body.token)) {
-                return retreiveUserInfo(req, res);
+                return retreiveUserInfo(req, res, refresh);
             } else {
-                return res.status(500).json({ error: new Error("login failed") });
+                return res.status(400).json({ error: new Error("login failed") });
             }
         } catch (error) {
             console.log(error)
-            return res.status(500).json({ error: new Error("login failed") });
+            return res.status(400).json({ error: new Error("login failed") });
         }
     } else {
-        return retreiveUserInfo(req, res);
+        return retreiveUserInfo(req, res, refresh);
     }
 }
 
 // helper function - retrieve user info, called by login
 // expects userID and username
-retreiveUserInfo = async (req, res) => {
+retreiveUserInfo = async (req, res, refresh) => {
     try {
         var data = await User.findOne({userID: req.body.userID});
         if (!data) {
             let newUser = await User.create({
                 userID: req.body.userID,
                 username: req.body.username,
-                presentations: []
+                presentations: [],
+                refreshToken: refresh
             })
             return res.status(200).json({ userID: newUser.userID, username: newUser.username, presentations: newUser.presentations });
         } else {
             return res.status(200).json({userID: data.userID, username: data.username});
         }
     } catch (err) {
-        console.log("dauwuihawuihdaiuhawdiuhuiadhwuhiadwiuhdawiuhdawuihdawuihdaw errir" + err);
-        return res.status(500).json({ error: err });
+        console.log("errir " + err);
+        return res.status(400).json({ error: err });
     }
 }
 
@@ -122,10 +132,10 @@ getUserIdOf = (username) => {
         User.findOne({ username }).then((user) => {
             if (user) {
                 resolve(user.userID);
-	    } else {
+	        } else {
                 reject("No user exists with username " + username);
-	    }
-	});
+	        }
+	    });
     });
 }
 

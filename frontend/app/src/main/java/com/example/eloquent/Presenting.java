@@ -210,14 +210,14 @@ public class Presenting extends AppCompatActivity implements RecognitionListener
     @Override
     public void onResults(Bundle results) {
         ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        speechText.setText(data.get(0));
         if (!data.get(0).equals(null)) {
-            speechText.setText(data.get(0));
             String[] words = data.get(0).toLowerCase().split("\\w+");
             int transitionPhraseWordsCount = pres.cueCards.get(currentCard).transitionPhrase.split("\\w+").length;
             // number of words that are correctly pronounced
             int correct = 0;
             //see if a substring in the text matches the transition phrase, ignoring case and punctuation
-            for (int i = 0; i < transitionPhraseWordsCount; i++) {
+            for (int i = 0; i < words.length; i++) {
                 if (pres.cueCards.get(currentCard).transitionPhrase.toLowerCase().contains(words[i])) {
                     correct ++;
                 }

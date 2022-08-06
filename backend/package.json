@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --silent=true",
     "start": "node server.js"
   },
   "author": "",
@@ -18,7 +18,8 @@
     "mongoose": "^6.4.2"
   },
   "devDependencies": {
-    "jest": "^28.1.3"
+    "jest": "^28.1.3",
+    "supertest": "^6.2.4"
   },
   "jest": {
     "collectCoverage": true,

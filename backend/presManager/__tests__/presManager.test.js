@@ -4,7 +4,7 @@ const Presentation = require("../../models/presentations");
 const User = require("../../models/users");
 
 const objectIdGoodFood = "900df00d900df00d900df00d";
-const samplePresentationSavePresTests = {
+const samplePresentation = {
     _id: mongoose.Types.ObjectId( objectIdGoodFood ),
     title: "Jest Test Presentation 1",                                                      
     cards: [{                                                              
@@ -409,8 +409,8 @@ describe("savePres tests", () => {
     });
 
     test("title is null", async () => {
-        await Presentation.create(samplePresentationSavePresTests);
-        var req = {body: {presID: samplePresentationSavePresTests._id, title: null, cards: [], feedback: []}};
+        await Presentation.create(samplePresentation);
+        var req = {body: {presID: samplePresentation._id, title: null, cards: [], feedback: []}};
         var res = new Response();
         await presManager.savePres(req, res);
         expect(res.body).toEqual({err: "Title required. "});
@@ -418,8 +418,8 @@ describe("savePres tests", () => {
     });
 
     test("cards is null", async () => {
-        await Presentation.create(samplePresentationSavePresTests);
-        var req = {body: {presID: samplePresentationSavePresTests._id, title: "Jest Test Presentation 1, Updated", cards: null, feedback: []}};
+        await Presentation.create(samplePresentation);
+        var req = {body: {presID: samplePresentation._id, title: "Jest Test Presentation 1, Updated", cards: null, feedback: []}};
         var res = new Response();
         await presManager.savePres(req, res);
         expect(res.body).toEqual({err: "Cue cards array required. "});
@@ -427,8 +427,8 @@ describe("savePres tests", () => {
     });
     
     test("feedback is null", async () => {
-        await Presentation.create(samplePresentationSavePresTests);
-        var req = {body: {presID: samplePresentationSavePresTests._id, title: "Jest Test Presentation 1, Updated", cards: [], feedback: null}};
+        await Presentation.create(samplePresentation);
+        var req = {body: {presID: samplePresentation._id, title: "Jest Test Presentation 1, Updated", cards: [], feedback: null}};
         var res = new Response();
         await presManager.savePres(req, res);
         expect(res.body).toEqual({err: "Feedback array required. "});
@@ -436,8 +436,8 @@ describe("savePres tests", () => {
     });
     
     test("Valid presesntation ID, but multiple other inputs are null", async () => {
-        await Presentation.create(samplePresentationSavePresTests);
-        var req = {body: {presID: samplePresentationSavePresTests._id, title: null, cards: [], feedback: null}};
+        await Presentation.create(samplePresentation);
+        var req = {body: {presID: samplePresentation._id, title: null, cards: [], feedback: null}};
         var res = new Response();
         await presManager.savePres(req, res);
         expect(res.body).toEqual({err: "Title required. Feedback array required. "});
@@ -445,8 +445,8 @@ describe("savePres tests", () => {
     });
 
     test("Typical input - all required fields are given and valid", async () => {
-        await Presentation.create(samplePresentationSavePresTests);
-        var req = {body: {presID: samplePresentationSavePresTests._id, title: "Jest Test Presentation 1, Updated", cards: [], feedback: []}};
+        await Presentation.create(samplePresentation);
+        var req = {body: {presID: samplePresentation._id, title: "Jest Test Presentation 1, Updated", cards: [], feedback: []}};
         var res = new Response();
         await presManager.savePres(req, res);
 
@@ -455,7 +455,7 @@ describe("savePres tests", () => {
         expect(res.body.data).toBeDefined(); // if this passes, it means savePresInternal didn't return an {err: ...} object
         
         // expect the presentation to be the same presentation...
-        expect(res.body.data._id).toEqual(samplePresentationSavePresTests._id);
+        expect(res.body.data._id).toEqual(samplePresentation._id);
         
         // ... but expect its contents to be the new contents we set...
         expect(res.body.data.title).toEqual(req.body.title);
@@ -463,16 +463,16 @@ describe("savePres tests", () => {
         expect(res.body.data.feedback).toEqual(req.body.feedback);
 
         // ... and not the old contents.
-        expect(res.body.data.title).not.toEqual(samplePresentationSavePresTests.title);
-        expect(res.body.data.cards).not.toEqual(samplePresentationSavePresTests.cards);
-        expect(res.body.data.feedback).toEqual(samplePresentationSavePresTests.feedback); // didn't change the feedback field of this presentation though
+        expect(res.body.data.title).not.toEqual(samplePresentation.title);
+        expect(res.body.data.cards).not.toEqual(samplePresentation.cards);
+        expect(res.body.data.feedback).toEqual(samplePresentation.feedback); // didn't change the feedback field of this presentation though
     });
 });
 
 describe("savePresInternal tests", () => {
     test("Typical input", async () => {
-        await Presentation.create(samplePresentationSavePresTests);
-        var presID = samplePresentationSavePresTests._id; 
+        await Presentation.create(samplePresentation);
+        var presID = samplePresentation._id; 
         var title = "Jest Test Presentation 1, Updated";
         var cards = [];
         var feedback = [];
@@ -486,7 +486,7 @@ describe("savePresInternal tests", () => {
         expect(updatedPres.err).not.toBeDefined();
         
         // expect the presentation to be the same presentation...
-        expect(updatedPres.data._id).toEqual(samplePresentationSavePresTests._id);
+        expect(updatedPres.data._id).toEqual(samplePresentation._id);
         
         // ... but expect its contents to be the new contents we set...
         expect(updatedPres.data.title).toEqual(title);
@@ -494,14 +494,14 @@ describe("savePresInternal tests", () => {
         expect(updatedPres.data.feedback).toEqual(feedback);
 
         // ... and not the old contents.
-        expect(updatedPres.data.title).not.toEqual(samplePresentationSavePresTests.title);
-        expect(updatedPres.data.cards).not.toEqual(samplePresentationSavePresTests.cards);
-        expect(updatedPres.data.feedback).toEqual(samplePresentationSavePresTests.feedback); // didn't change the feedback field of this presentation though
+        expect(updatedPres.data.title).not.toEqual(samplePresentation.title);
+        expect(updatedPres.data.cards).not.toEqual(samplePresentation.cards);
+        expect(updatedPres.data.feedback).toEqual(samplePresentation.feedback); // didn't change the feedback field of this presentation though
     });
 
     test("Erroneous input - title and feedback are null", async () => {
-        await Presentation.create(samplePresentationSavePresTests);
-        var presID = samplePresentationSavePresTests._id; 
+        await Presentation.create(samplePresentation);
+        var presID = samplePresentation._id; 
         var title = null;
         var cards = [];
         var feedback = null;
@@ -517,6 +517,37 @@ describe("savePresInternal tests", () => {
     });
 });
 
+describe("storeImportedPres tests", () => {
+    test("userID is null", async () => {
+        var err = await presManager.storeImportedPres(samplePresentation, null);
+        expect(err).toEqual("User not specified. Cannot add presentation to user. No presentation stored.");
+        expect(err).not.toEqual(samplePresentation._id);
+    });
+
+    test("presObj is null", async () => {
+        var err = await presManager.storeImportedPres(null, "1");
+        expect(err).toEqual("No presentation given for storage. No presentation stored.");
+        expect(err).not.toEqual(samplePresentation._id);
+    });
+
+    test("userID refers to a non-existent user", async () => {
+        var err = await presManager.storeImportedPres(samplePresentation, "Idontexist");
+        expect(err).toEqual("User Idontexist does not exist. Cannot add presentation to user. Presentation not stored.");
+        expect(err).not.toEqual(samplePresentation._id);
+    });
+
+    test("userID does not match the 'id' field of any of the elements of the presObj.users array", async () => {
+        var err = await presManager.storeImportedPres(samplePresentation, "2");
+        expect(err).toEqual("User 2 did not import this presentation. Presentation not stored.")
+        expect(err).not.toEqual(samplePresentation._id);
+    });
+
+    test("userID is of a user who exists and is included in the presObj.users array", async () => {
+        var presID = await presManager.storeImportedPres(samplePresentation, "1");
+        expect(presID).toEqual(samplePresentation._id);
+        await expect(Presentation.findOne({_id: samplePresentation._id})).resolves.toBeDefined();
+    });
+});
 
 /**
  * Dummy response class

@@ -81,12 +81,12 @@ wss.on("connection",(ws) => {
 
     ws.on("close",() => {
         console.log("server:1 client disconnect");
-        var PID = usermap.get(ws.id);
+        PID = usermap.get(ws.id);
         console.log("PID" +PID);
         var presentationID = usermap.get(ws.id).toString();
         console.log("presentationID" +presentationID);
         var num = presentationUserMap.get(PID);
-        var a = presentationMap.get(PID);
+        a = presentationMap.get(PID);
         if(num<2){
             presManager.savePresInternal(PID, a.title, a.cards, a.feedback).then((updatedPresentation) => {
                 // things to be done after saving the presentation
@@ -121,11 +121,11 @@ wss.on("connection",(ws) => {
 
         if(Object.prototype.hasOwnProperty.call(obj, "edit") && Object.prototype.hasOwnProperty.call(obj, "before_text")){
             console.log("Edit!");
-            var PID = obj['presentationID'];
-            var cueCards_num = Number(obj['cueCards_num']);
-            var cardFace = Number(obj['cardFace']);
-            var recent_text = obj['recent_text'];
-            var userID = obj['userID'];
+            PID = obj['presentationID'];
+            cueCards_num = Number(obj['cueCards_num']);
+            cardFace = Number(obj['cardFace']);
+            recent_text = obj['recent_text'];
+            userID = obj['userID'];
             var before_text = obj['before_text'];
             var start = Number(obj['start']);
             var end = Number(obj['end']);
