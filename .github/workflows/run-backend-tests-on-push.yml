@@ -46,5 +46,18 @@ jobs:
           cd ./backend
           npm install
           npm install --save-dev jest
-          npm test presManager userStore
+          npm test presManager
+      - name: Run test for userStore
+        run: |
+          cd ./backend
+          npm install
+          npm install --save-dev jest
+          npm test userStore
           npm test parser
+          
+      - name: Run test for parser
+        run: |
+          cd ./backend
+          npm install
+          npm install --save-dev jest
+          npm test parser 
