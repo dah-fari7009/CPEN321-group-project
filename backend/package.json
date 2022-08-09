@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest --silent=true",
+    "test": "jest --silent=true --coverage",
     "start": "node server.js"
   },
   "author": "",
