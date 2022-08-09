@@ -23,6 +23,11 @@
   },
   "jest": {
     "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/coverage/**"
+    ],
     "coverageReporters": [
       "json",
       "html"
